@@ -1,310 +1,342 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../core/core.dart';
+import '../features/home/presentation/pages/home_page.dart';
+import '../features/bangun_ruang/presentation/pages/bangun_ruang_page.dart';
+import '../features/bangun_datar/presentation/pages/bangun_datar_page.dart';
+import '../features/ar/presentation/pages/ar_page.dart';
+import '../features/kuis/presentation/pages/kuis_page.dart';
 
-// ─── Feature Imports ──────────────────────────────────────────────────────────
-// Nanti import halaman dari masing-masing feature setelah dibuat
-// import '../features/home/presentation/pages/home_page.dart';
-// import '../features/bangun_ruang/presentation/pages/bangun_ruang_page.dart';
-// import '../features/bangun_datar/presentation/pages/bangun_datar_page.dart';
-// import '../features/ar/presentation/pages/ar_page.dart';
-// import '../features/kuis/presentation/pages/kuis_page.dart';
+// ─── Placeholder pages untuk shell bottom nav ─────────────────────────────────
 
-// ─── Placeholder Pages (hapus setelah fitur dibuat) ───────────────────────────
-class _PlaceholderPage extends StatelessWidget {
-  const _PlaceholderPage({required this.title, required this.color});
-  final String title;
-  final Color color;
-
+class _PetunjukPage extends StatelessWidget {
+  const _PetunjukPage();
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(title: const Text('Petunjuk')),
+        body: Center(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            const Icon(Icons.menu_book_rounded,
+                size: 64, color: AppColors.secondary),
+            const SizedBox(height: 16),
+            Text('Petunjuk Penggunaan', style: AppTypography.titleMedium),
+            const SizedBox(height: 8),
+            Text('Segera hadir!', style: AppTypography.bodyMedium),
+          ]),
+        ),
+      );
+}
+
+class _ProfilPage extends StatelessWidget {
+  const _ProfilPage();
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(title: const Text('Profil')),
+        body: Center(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Container(
               width: 80,
               height: 80,
-              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-              child: const Icon(Icons.construction_rounded,
-                  color: Colors.white, size: 40),
+              decoration: const BoxDecoration(
+                gradient: AppColors.primaryGradient,
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.person_rounded,
+                  size: 44, color: Colors.white),
             ),
             const SizedBox(height: 16),
-            Text(title, style: AppTypography.headlineSmall),
+            Text('Profil Pengguna', style: AppTypography.titleMedium),
             const SizedBox(height: 8),
-            Text(
-              'Halaman sedang dikembangkan',
-              style: AppTypography.bodyMedium,
-            ),
-          ],
+            Text('Segera hadir!', style: AppTypography.bodyMedium),
+          ]),
         ),
-      ),
-    );
-  }
+      );
 }
 
-/// Konfigurasi navigasi GoRouter untuk Ruang-Geo
+class _PencapaianPage extends StatelessWidget {
+  const _PencapaianPage();
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(title: const Text('Pencapaian')),
+        body: Center(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            const Icon(Icons.emoji_events_rounded,
+                size: 64, color: AppColors.warning),
+            const SizedBox(height: 16),
+            Text('Pencapaian Kamu', style: AppTypography.titleMedium),
+            const SizedBox(height: 8),
+            Text('Kumpulkan badge dengan belajar!',
+                style: AppTypography.bodyMedium),
+          ]),
+        ),
+      );
+}
+
+class _PengaturanPage extends StatelessWidget {
+  const _PengaturanPage();
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: AppBar(title: const Text('Pengaturan')),
+        body: Center(
+          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+            const Icon(Icons.settings_rounded,
+                size: 64, color: AppColors.textHint),
+            const SizedBox(height: 16),
+            Text('Pengaturan', style: AppTypography.titleMedium),
+            const SizedBox(height: 8),
+            Text('Segera hadir!', style: AppTypography.bodyMedium),
+          ]),
+        ),
+      );
+}
+
+// ─── GoRouter Configuration ───────────────────────────────────────────────────
+
+/// Konfigurasi navigasi utama Ruang-Geo
 ///
-/// Menggunakan shell route untuk bottom navigation bar yang persisten.
 /// Struktur:
-/// - / → Splash
-/// - /onboarding → Onboarding
-/// - Shell (bottom nav):
-///   - /home → Home
-///   - /bangun-ruang → Bangun Ruang List
-///   - /bangun-datar → Bangun Datar List
-///   - /ar → AR Home
-///   - /kuis → Kuis Menu
-/// - /bangun-ruang/:id → Detail Bangun Ruang
-/// - /bangun-datar/:id → Detail Bangun Datar
-/// - /ar/:shapeId → AR View
-/// - /kuis/:kategori → Kuis Bermain
-/// - /kuis/:kategori/hasil → Hasil Kuis
+/// - / → Splash (redirect ke /home)
+/// - Shell (bottom nav: Home | Petunjuk | Profil | Pencapaian | Pengaturan):
+///   - /home
+///   - /petunjuk
+///   - /profil
+///   - /pencapaian
+///   - /pengaturan
+/// - Detail pages (di luar shell, full-screen):
+///   - /bangun-ruang
+///   - /bangun-ruang/:id
+///   - /bangun-datar
+///   - /bangun-datar/:id
+///   - /ar
+///   - /ar/:shapeId
+///   - /kuis
+///   - /kuis/:kategori
+///   - /kuis/:kategori/hasil
 final GoRouter appRouter = GoRouter(
-  initialLocation: AppConstants.routeSplash,
-  debugLogDiagnostics: true,
+  initialLocation: AppConstants.routeHome,
+  debugLogDiagnostics: false,
   routes: [
-    // ─── Splash ─────────────────────────────────────────────────────────────
+    // ─── Splash redirect ────────────────────────────────────────────────────
     GoRoute(
       path: AppConstants.routeSplash,
-      name: 'splash',
-      builder: (context, state) => const _PlaceholderPage(
-        title: 'Splash Screen',
-        color: AppColors.primary,
-      ),
+      redirect: (_, __) => AppConstants.routeHome,
     ),
 
-    // ─── Onboarding ─────────────────────────────────────────────────────────
-    GoRoute(
-      path: AppConstants.routeOnboarding,
-      name: 'onboarding',
-      pageBuilder: (context, state) => CustomTransitionPage(
-        key: state.pageKey,
-        child: const _PlaceholderPage(
-          title: 'Onboarding',
-          color: AppColors.secondary,
-        ),
-        transitionsBuilder: (context, animation, secondaryAnimation, child) {
-          return FadeTransition(opacity: animation, child: child);
-        },
-      ),
-    ),
-
-    // ─── Shell Route (Bottom Navigation) ────────────────────────────────────
+    // ─── Shell Route: Bottom Navigation ─────────────────────────────────────
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
-        return _MainShell(navigationShell: navigationShell);
+        return _AppShell(navigationShell: navigationShell);
       },
       branches: [
-        // Branch 0: Home
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: AppConstants.routeHome,
-              name: 'home',
-              builder: (context, state) => const _PlaceholderPage(
-                title: 'Home',
-                color: AppColors.primary,
-              ),
-            ),
-          ],
-        ),
+        // 0: Home
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: AppConstants.routeHome,
+            name: 'home',
+            builder: (context, state) => const HomePage(),
+          ),
+        ]),
 
-        // Branch 1: Bangun Ruang
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/bangun-ruang',
-              name: 'bangun-ruang',
-              builder: (context, state) => const _PlaceholderPage(
-                title: 'Bangun Ruang',
-                color: AppColors.primary,
-              ),
-            ),
-          ],
-        ),
+        // 1: Petunjuk
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/petunjuk',
+            name: 'petunjuk',
+            builder: (context, state) => const _PetunjukPage(),
+          ),
+        ]),
 
-        // Branch 2: Bangun Datar
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: '/bangun-datar',
-              name: 'bangun-datar',
-              builder: (context, state) => const _PlaceholderPage(
-                title: 'Bangun Datar',
-                color: AppColors.success,
-              ),
-            ),
-          ],
-        ),
+        // 2: Profil
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/profil',
+            name: 'profil',
+            builder: (context, state) => const _ProfilPage(),
+          ),
+        ]),
 
-        // Branch 3: AR
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: AppConstants.routeAR,
-              name: 'ar',
-              builder: (context, state) => const _PlaceholderPage(
-                title: 'Augmented Reality',
-                color: AppColors.accent,
-              ),
-            ),
-          ],
-        ),
+        // 3: Pencapaian
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/pencapaian',
+            name: 'pencapaian',
+            builder: (context, state) => const _PencapaianPage(),
+          ),
+        ]),
 
-        // Branch 4: Kuis
-        StatefulShellBranch(
-          routes: [
-            GoRoute(
-              path: AppConstants.routeKuis,
-              name: 'kuis',
-              builder: (context, state) => const _PlaceholderPage(
-                title: 'Kuis',
-                color: AppColors.warning,
-              ),
-            ),
-          ],
-        ),
+        // 4: Pengaturan
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: AppConstants.routeSettings,
+            name: 'pengaturan',
+            builder: (context, state) => const _PengaturanPage(),
+          ),
+        ]),
       ],
     ),
 
-    // ─── Detail Pages (di luar shell) ───────────────────────────────────────
+    // ─── Feature Pages (Full-screen, di luar shell) ──────────────────────────
     GoRoute(
-      path: AppConstants.routeBangunRuangDetail,
-      name: 'bangun-ruang-detail',
-      pageBuilder: (context, state) {
-        final id = state.pathParameters['id']!;
-        return CustomTransitionPage(
-          key: state.pageKey,
-          child: _PlaceholderPage(
-            title: 'Detail Bangun Ruang: $id',
-            color: AppColors.primary,
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(1.0, 0.0),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeInOut,
-              )),
-              child: child,
-            );
-          },
-        );
-      },
-    ),
-
-    GoRoute(
-      path: AppConstants.routeBangunDatarDetail,
-      name: 'bangun-datar-detail',
-      pageBuilder: (context, state) {
-        final id = state.pathParameters['id']!;
-        return CustomTransitionPage(
-          key: state.pageKey,
-          child: _PlaceholderPage(
-            title: 'Detail Bangun Datar: $id',
-            color: AppColors.success,
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(1.0, 0.0),
-                end: Offset.zero,
-              ).animate(CurvedAnimation(
-                parent: animation,
-                curve: Curves.easeInOut,
-              )),
-              child: child,
-            );
-          },
-        );
-      },
-    ),
-
-    GoRoute(
-      path: AppConstants.routeARView,
-      name: 'ar-view',
-      pageBuilder: (context, state) {
-        final shapeId = state.pathParameters['shapeId']!;
-        return CustomTransitionPage(
-          key: state.pageKey,
-          child: _PlaceholderPage(
-            title: 'AR View: $shapeId',
-            color: AppColors.accent,
-          ),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(opacity: animation, child: child);
-          },
-        );
-      },
-    ),
-
-    GoRoute(
-      path: AppConstants.routeKuisPlay,
-      name: 'kuis-play',
-      builder: (context, state) {
-        final kategori = state.pathParameters['kategori']!;
-        return _PlaceholderPage(
-          title: 'Kuis: $kategori',
-          color: AppColors.warning,
-        );
-      },
+      path: '/bangun-ruang',
+      name: 'bangun-ruang',
+      pageBuilder: (context, state) => _slidePageBuilder(
+        state,
+        const BangunRuangPage(),
+      ),
       routes: [
         GoRoute(
-          path: 'hasil',
-          name: 'kuis-hasil',
-          builder: (context, state) => const _PlaceholderPage(
-            title: 'Hasil Kuis',
-            color: AppColors.success,
+          path: ':id',
+          name: 'bangun-ruang-detail',
+          pageBuilder: (context, state) => _slidePageBuilder(
+            state,
+            BangunRuangDetailPage(
+                bangunId: state.pathParameters['id']!),
           ),
         ),
       ],
     ),
 
-    // ─── Settings ────────────────────────────────────────────────────────────
     GoRoute(
-      path: AppConstants.routeSettings,
-      name: 'settings',
-      builder: (context, state) => const _PlaceholderPage(
-        title: 'Pengaturan',
-        color: AppColors.secondary,
+      path: '/bangun-datar',
+      name: 'bangun-datar',
+      pageBuilder: (context, state) => _slidePageBuilder(
+        state,
+        const BangunDatarPage(),
       ),
+      routes: [
+        GoRoute(
+          path: ':id',
+          name: 'bangun-datar-detail',
+          pageBuilder: (context, state) => _slidePageBuilder(
+            state,
+            BangunDatarDetailPage(
+                bangunId: state.pathParameters['id']!),
+          ),
+        ),
+      ],
+    ),
+
+    GoRoute(
+      path: AppConstants.routeAR,
+      name: 'ar',
+      pageBuilder: (context, state) => _fadePageBuilder(
+        state,
+        const ArPage(),
+      ),
+      routes: [
+        GoRoute(
+          path: ':shapeId',
+          name: 'ar-view',
+          pageBuilder: (context, state) => _fadePageBuilder(
+            state,
+            ArViewPage(shapeId: state.pathParameters['shapeId']!),
+          ),
+        ),
+      ],
+    ),
+
+    GoRoute(
+      path: AppConstants.routeKuis,
+      name: 'kuis',
+      pageBuilder: (context, state) => _slidePageBuilder(
+        state,
+        const KuisPage(),
+      ),
+      routes: [
+        GoRoute(
+          path: ':kategori',
+          name: 'kuis-play',
+          builder: (context, state) =>
+              KuisPlayPage(kategori: state.pathParameters['kategori']!),
+          routes: [
+            GoRoute(
+              path: 'hasil',
+              name: 'kuis-hasil',
+              builder: (context, state) =>
+                  KuisHasilPage(kategori: state.pathParameters['kategori']!),
+            ),
+          ],
+        ),
+      ],
     ),
   ],
 
-  // ─── Error Handler ─────────────────────────────────────────────────────────
+  // ─── Error page ─────────────────────────────────────────────────────────────
   errorBuilder: (context, state) => Scaffold(
     backgroundColor: AppColors.background,
     body: Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          const Icon(Icons.map_outlined, color: AppColors.error, size: 64),
-          const SizedBox(height: 16),
-          Text('Halaman tidak ditemukan', style: AppTypography.headlineSmall),
-          const SizedBox(height: 8),
-          Text(
-            state.error?.message ?? 'Route tidak valid',
-            style: AppTypography.bodyMedium,
-          ),
-          const SizedBox(height: 24),
-          TextButton(
-            onPressed: () => context.go(AppConstants.routeHome),
-            child: const Text('Kembali ke Home'),
-          ),
-        ],
+      child: Padding(
+        padding: const EdgeInsets.all(32),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.map_outlined, color: AppColors.error, size: 64),
+            const SizedBox(height: 16),
+            Text('Halaman tidak ditemukan',
+                style: AppTypography.headlineSmall,
+                textAlign: TextAlign.center),
+            const SizedBox(height: 8),
+            Text(
+              state.error?.message ?? 'Route tidak valid',
+              style: AppTypography.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton.icon(
+              onPressed: () => context.go(AppConstants.routeHome),
+              icon: const Icon(Icons.home_rounded),
+              label: const Text('Kembali ke Home'),
+            ),
+          ],
+        ),
       ),
     ),
   ),
 );
 
-/// Shell widget dengan bottom navigation bar
-class _MainShell extends StatelessWidget {
-  const _MainShell({required this.navigationShell});
+// ─── Page transition helpers ──────────────────────────────────────────────────
+
+CustomTransitionPage<void> _slidePageBuilder(
+    GoRouterState state, Widget child) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(1.0, 0.0),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(
+          parent: animation,
+          curve: Curves.easeInOut,
+        )),
+        child: child,
+      );
+    },
+    transitionDuration: const Duration(milliseconds: 280),
+  );
+}
+
+CustomTransitionPage<void> _fadePageBuilder(
+    GoRouterState state, Widget child) {
+  return CustomTransitionPage<void>(
+    key: state.pageKey,
+    child: child,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      return FadeTransition(opacity: animation, child: child);
+    },
+    transitionDuration: const Duration(milliseconds: 250),
+  );
+}
+
+// ─── App Shell (Bottom Navigation) ───────────────────────────────────────────
+
+class _AppShell extends StatelessWidget {
+  const _AppShell({required this.navigationShell});
 
   final StatefulNavigationShell navigationShell;
 
@@ -312,42 +344,153 @@ class _MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: navigationShell,
-      bottomNavigationBar: NavigationBar(
-        selectedIndex: navigationShell.currentIndex,
-        onDestinationSelected: (index) {
-          navigationShell.goBranch(
-            index,
-            // Kembali ke initial route saat tab yang aktif di-tap lagi
-            initialLocation: index == navigationShell.currentIndex,
-          );
-        },
-        destinations: const [
-          NavigationDestination(
-            icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home_rounded),
-            label: 'Home',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.view_in_ar_outlined),
-            selectedIcon: Icon(Icons.view_in_ar_rounded),
-            label: 'Bangun Ruang',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.crop_square_outlined),
-            selectedIcon: Icon(Icons.crop_square_rounded),
-            label: 'Bangun Datar',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.camera_outlined),
-            selectedIcon: Icon(Icons.camera_rounded),
-            label: 'AR',
-          ),
-          NavigationDestination(
-            icon: Icon(Icons.quiz_outlined),
-            selectedIcon: Icon(Icons.quiz_rounded),
-            label: 'Kuis',
+      bottomNavigationBar: _BottomNav(
+        currentIndex: navigationShell.currentIndex,
+        onTap: (index) => navigationShell.goBranch(
+          index,
+          initialLocation: index == navigationShell.currentIndex,
+        ),
+      ),
+    );
+  }
+}
+
+/// Bottom navigation bar dengan style custom
+class _BottomNav extends StatelessWidget {
+  const _BottomNav({
+    required this.currentIndex,
+    required this.onTap,
+  });
+
+  final int currentIndex;
+  final ValueChanged<int> onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withAlpha(20),
+            blurRadius: 20,
+            offset: const Offset(0, -4),
           ),
         ],
+      ),
+      child: SafeArea(
+        top: false,
+        child: SizedBox(
+          height: 68,
+          child: Row(
+            children: [
+              _NavItem(
+                icon: Icons.home_outlined,
+                activeIcon: Icons.home_rounded,
+                label: 'Beranda',
+                isActive: currentIndex == 0,
+                onTap: () => onTap(0),
+                activeColor: AppColors.primary,
+              ),
+              _NavItem(
+                icon: Icons.menu_book_outlined,
+                activeIcon: Icons.menu_book_rounded,
+                label: 'Petunjuk',
+                isActive: currentIndex == 1,
+                onTap: () => onTap(1),
+                activeColor: AppColors.secondary,
+              ),
+              _NavItem(
+                icon: Icons.person_outline_rounded,
+                activeIcon: Icons.person_rounded,
+                label: 'Profil',
+                isActive: currentIndex == 2,
+                onTap: () => onTap(2),
+                activeColor: AppColors.success,
+              ),
+              _NavItem(
+                icon: Icons.emoji_events_outlined,
+                activeIcon: Icons.emoji_events_rounded,
+                label: 'Pencapaian',
+                isActive: currentIndex == 3,
+                onTap: () => onTap(3),
+                activeColor: AppColors.warning,
+              ),
+              _NavItem(
+                icon: Icons.settings_outlined,
+                activeIcon: Icons.settings_rounded,
+                label: 'Pengaturan',
+                isActive: currentIndex == 4,
+                onTap: () => onTap(4),
+                activeColor: AppColors.accent,
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+    required this.activeColor,
+  });
+
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+  final bool isActive;
+  final VoidCallback onTap;
+  final Color activeColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: EdgeInsets.symmetric(
+                  horizontal: isActive ? 16 : 0,
+                  vertical: 4,
+                ),
+                decoration: BoxDecoration(
+                  color: isActive ? activeColor.withAlpha(25) : Colors.transparent,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Icon(
+                  isActive ? activeIcon : icon,
+                  color: isActive ? activeColor : AppColors.textHint,
+                  size: 22,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                label,
+                style: AppTypography.labelSmall.copyWith(
+                  color: isActive ? activeColor : AppColors.textHint,
+                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
+                  fontSize: 10,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

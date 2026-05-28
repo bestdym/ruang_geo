@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/core.dart';
+import 'package:ruang_geo/core/core.dart';
 
 /// Halaman daftar Bangun Datar
 class BangunDatarPage extends StatelessWidget {

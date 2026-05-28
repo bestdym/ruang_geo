@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../core/core.dart';
+import 'package:ruang_geo/core/core.dart';
 
 /// Halaman menu kuis - pilih kategori
 class KuisPage extends StatelessWidget {
