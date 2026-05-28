@@ -269,6 +269,7 @@ final GoRouter appRouter = GoRouter(
                   poin: extra['poin'] as int? ?? 0,
                 );
               },
+            ),
           ],
         ),
       ],

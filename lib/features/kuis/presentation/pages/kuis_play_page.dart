@@ -230,18 +230,18 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: AppColors.info.withAlpha(20),
+                          color: AppColors.secondary.withAlpha(20),
                           borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.info.withAlpha(50)),
+                          border: Border.all(color: AppColors.secondary.withAlpha(50)),
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.lightbulb_outline_rounded, color: AppColors.info, size: 20),
+                            const Icon(Icons.lightbulb_outline_rounded, color: AppColors.secondary, size: 20),
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
                                 'Hint: ${soal.rumusHint}',
-                                style: AppTypography.bodySmall.copyWith(color: AppColors.info),
+                                style: AppTypography.bodySmall.copyWith(color: AppColors.secondary),
                               ),
                             ),
                           ],
@@ -335,14 +335,14 @@ class _JawabanCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Color getBorderColor() {
-      if (!isRevealed) return isSelected ? AppColors.info : AppColors.outlineVariant;
+      if (!isRevealed) return isSelected ? AppColors.secondary : AppColors.outlineVariant;
       if (isCorrect) return AppColors.success;
       if (isSelected && !isCorrect) return AppColors.error;
       return AppColors.outlineVariant;
     }
 
     Color getBgColor() {
-      if (!isRevealed) return isSelected ? AppColors.info.withAlpha(20) : AppColors.surface;
+      if (!isRevealed) return isSelected ? AppColors.secondary.withAlpha(20) : AppColors.surface;
       if (isCorrect) return AppColors.success.withAlpha(20);
       if (isSelected && !isCorrect) return AppColors.error.withAlpha(20);
       return AppColors.surface;
@@ -378,7 +378,7 @@ class _JawabanCard extends StatelessWidget {
               decoration: BoxDecoration(
                 color: isRevealed && isCorrect
                     ? AppColors.success
-                    : (isSelected && !isRevealed ? AppColors.info : AppColors.surfaceVariant),
+                    : (isSelected && !isRevealed ? AppColors.secondary : AppColors.surfaceVariant),
                 shape: BoxShape.circle,
               ),
               child: Center(
