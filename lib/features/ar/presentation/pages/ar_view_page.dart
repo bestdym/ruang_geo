@@ -263,7 +263,7 @@ class _ArViewPageState extends State<ArViewPage> {
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           _buildControlButton(
-                            icon: Icons.360_rounded,
+                            icon: Icons.screen_rotation_rounded,
                             isActive: _isRotating,
                             onTap: () {
                               setState(() => _isRotating = !_isRotating);

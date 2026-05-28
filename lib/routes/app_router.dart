@@ -9,7 +9,8 @@ import '../features/bangun_datar/presentation/pages/bangun_datar_detail_page.dar
 import '../features/ar/presentation/pages/ar_page.dart';
 import '../features/ar/presentation/pages/ar_view_page.dart';
 import '../features/kuis/presentation/pages/kuis_page.dart';
-
+import '../features/kuis/presentation/pages/kuis_play_page.dart';
+import '../features/kuis/presentation/pages/kuis_hasil_page.dart';
 // ─── Placeholder pages untuk shell bottom nav ─────────────────────────────────
 
 class _PetunjukPage extends StatelessWidget {
@@ -259,9 +260,15 @@ final GoRouter appRouter = GoRouter(
             GoRoute(
               path: 'hasil',
               name: 'kuis-hasil',
-              builder: (context, state) =>
-                  KuisHasilPage(kategori: state.pathParameters['kategori']!),
-            ),
+              builder: (context, state) {
+                final extra = state.extra as Map<String, dynamic>? ?? {};
+                return KuisHasilPage(
+                  kategori: state.pathParameters['kategori']!,
+                  score: extra['score'] as int? ?? 0,
+                  total: extra['total'] as int? ?? 0,
+                  poin: extra['poin'] as int? ?? 0,
+                );
+              },
           ],
         ),
       ],
