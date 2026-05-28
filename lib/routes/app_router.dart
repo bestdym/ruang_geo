@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../core/core.dart';
 import '../features/home/presentation/pages/home_page.dart';
 import '../features/bangun_ruang/presentation/pages/bangun_ruang_page.dart';
+import '../features/bangun_ruang/presentation/pages/bangun_ruang_detail_page.dart';
 import '../features/bangun_datar/presentation/pages/bangun_datar_page.dart';
 import '../features/ar/presentation/pages/ar_page.dart';
 import '../features/kuis/presentation/pages/kuis_page.dart';

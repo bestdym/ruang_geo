@@ -241,43 +241,4 @@ class _BangunCard extends StatelessWidget {
   }
 }
 
-/// Halaman Detail Bangun Ruang (Placeholder)
-class BangunRuangDetailPage extends StatelessWidget {
-  const BangunRuangDetailPage({
-    super.key,
-    required this.bangunId,
-  });
 
-  final String bangunId;
-
-  @override
-  Widget build(BuildContext context) {
-    // Cari data bangun berdasarkan ID
-    final bangun = DummyData.bangunRuangList.firstWhere(
-      (b) => b.id == bangunId,
-      orElse: () => DummyData.bangunRuangList.first,
-    );
-
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(bangun.nama),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Detail Bangun Ruang', style: AppTypography.headlineMedium),
-            const SizedBox(height: 16),
-            Text('ID: $bangunId', style: AppTypography.titleMedium),
-            Text('Nama: ${bangun.nama}', style: AppTypography.titleMedium),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => context.pop(),
-              child: const Text('Kembali'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
