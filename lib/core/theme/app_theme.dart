@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 import 'app_typography.dart';
 
 /// ThemeData lengkap untuk aplikasi Ruang-Geo
 ///
 /// Mendukung light mode dan dark mode dengan konsisten.
-/// Menggunakan Material 3 Design System.
+/// Menggunakan Material 3 Design System + Google Fonts Poppins.
 abstract class AppTheme {
   // ─── Light Theme ─────────────────────────────────────────────────────────────
   static ThemeData get lightTheme {
@@ -41,33 +42,32 @@ abstract class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.background,
-      fontFamily: AppTypography.fontFamily,
-      textTheme: AppTypography.textTheme,
+      // Gunakan google_fonts sebagai textTheme agar konsisten di seluruh app
+      textTheme: GoogleFonts.poppinsTextTheme(AppTypography.textTheme),
 
-      // ─── AppBar ────────────────────────────────────────────────────────────
-      appBarTheme: const AppBarTheme(
+      // ─── AppBar ──────────────────────────────────────────────────────────────
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.surface,
         foregroundColor: AppColors.textPrimary,
         elevation: 0,
         centerTitle: true,
         scrolledUnderElevation: 1,
-        shadowColor: Color(0x1A6C63FF),
-        systemOverlayStyle: SystemUiOverlayStyle(
+        shadowColor: const Color(0x1A6C63FF),
+        systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.dark,
           statusBarBrightness: Brightness.light,
         ),
-        titleTextStyle: TextStyle(
-          fontFamily: AppTypography.fontFamily,
+        titleTextStyle: GoogleFonts.poppins(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.textPrimary,
           letterSpacing: 0,
         ),
-        iconTheme: IconThemeData(color: AppColors.textPrimary, size: 24),
+        iconTheme: const IconThemeData(color: AppColors.textPrimary, size: 24),
       ),
 
-      // ─── Bottom Navigation ──────────────────────────────────────────────────
+      // ─── Bottom Navigation ────────────────────────────────────────────────────
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.surface,
         indicatorColor: AppColors.primaryContainer,
@@ -88,10 +88,10 @@ abstract class AppTheme {
         }),
         height: 70,
         elevation: 4,
-        shadowColor: Color(0x1A6C63FF),
+        shadowColor: const Color(0x1A6C63FF),
       ),
 
-      // ─── Card ──────────────────────────────────────────────────────────────
+      // ─── Card ────────────────────────────────────────────────────────────────
       cardTheme: CardThemeData(
         color: AppColors.surface,
         elevation: 0,
@@ -100,10 +100,10 @@ abstract class AppTheme {
           side: const BorderSide(color: AppColors.outlineVariant, width: 1),
         ),
         clipBehavior: Clip.antiAliasWithSaveLayer,
-        margin: const EdgeInsets.all(0),
+        margin: EdgeInsets.zero,
       ),
 
-      // ─── Elevated Button ───────────────────────────────────────────────────
+      // ─── Elevated Button ──────────────────────────────────────────────────────
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primary,
@@ -117,11 +117,11 @@ abstract class AppTheme {
             color: AppColors.textOnPrimary,
             fontSize: 15,
           ),
-          shadowColor: Color(0x526C63FF),
+          shadowColor: const Color(0x526C63FF),
         ),
       ),
 
-      // ─── Outlined Button ───────────────────────────────────────────────────
+      // ─── Outlined Button ──────────────────────────────────────────────────────
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -137,7 +137,7 @@ abstract class AppTheme {
         ),
       ),
 
-      // ─── Text Button ───────────────────────────────────────────────────────
+      // ─── Text Button ──────────────────────────────────────────────────────────
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: AppColors.primary,
@@ -152,7 +152,7 @@ abstract class AppTheme {
         ),
       ),
 
-      // ─── Floating Action Button ────────────────────────────────────────────
+      // ─── FAB ─────────────────────────────────────────────────────────────────
       floatingActionButtonTheme: const FloatingActionButtonThemeData(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.textOnPrimary,
@@ -160,14 +160,11 @@ abstract class AppTheme {
         shape: CircleBorder(),
       ),
 
-      // ─── Input Decoration ──────────────────────────────────────────────────
+      // ─── Input Decoration ─────────────────────────────────────────────────────
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: AppColors.surfaceVariant,
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 18,
-          vertical: 14,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
           borderSide: BorderSide.none,
@@ -185,12 +182,10 @@ abstract class AppTheme {
           borderSide: const BorderSide(color: AppColors.error),
         ),
         hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textHint),
-        labelStyle: AppTypography.bodyMedium.copyWith(
-          color: AppColors.textSecondary,
-        ),
+        labelStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
       ),
 
-      // ─── Chip ──────────────────────────────────────────────────────────────
+      // ─── Chip ─────────────────────────────────────────────────────────────────
       chipTheme: ChipThemeData(
         backgroundColor: AppColors.surfaceVariant,
         selectedColor: AppColors.primaryContainer,
@@ -202,7 +197,7 @@ abstract class AppTheme {
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       ),
 
-      // ─── Snackbar ──────────────────────────────────────────────────────────
+      // ─── Snackbar ─────────────────────────────────────────────────────────────
       snackBarTheme: SnackBarThemeData(
         backgroundColor: AppColors.textPrimary,
         contentTextStyle: AppTypography.bodyMedium.copyWith(
@@ -213,7 +208,7 @@ abstract class AppTheme {
         behavior: SnackBarBehavior.floating,
       ),
 
-      // ─── Dialog ────────────────────────────────────────────────────────────
+      // ─── Dialog ───────────────────────────────────────────────────────────────
       dialogTheme: DialogThemeData(
         backgroundColor: AppColors.surface,
         elevation: 8,
@@ -222,7 +217,7 @@ abstract class AppTheme {
         contentTextStyle: AppTypography.bodyMedium,
       ),
 
-      // ─── Bottom Sheet ──────────────────────────────────────────────────────
+      // ─── Bottom Sheet ─────────────────────────────────────────────────────────
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: AppColors.surface,
         modalBackgroundColor: AppColors.surface,
@@ -234,45 +229,43 @@ abstract class AppTheme {
         dragHandleSize: Size(40, 4),
       ),
 
-      // ─── Divider ───────────────────────────────────────────────────────────
+      // ─── Divider ──────────────────────────────────────────────────────────────
       dividerTheme: const DividerThemeData(
         color: AppColors.outlineVariant,
         thickness: 1,
         space: 1,
       ),
 
-      // ─── Progress Indicator ────────────────────────────────────────────────
+      // ─── Progress Indicator ───────────────────────────────────────────────────
       progressIndicatorTheme: const ProgressIndicatorThemeData(
         color: AppColors.primary,
         linearTrackColor: AppColors.primaryContainer,
         circularTrackColor: AppColors.primaryContainer,
       ),
 
-      // ─── Tab Bar ───────────────────────────────────────────────────────────
-      tabBarTheme: const TabBarThemeData(
+      // ─── Tab Bar ──────────────────────────────────────────────────────────────
+      tabBarTheme: TabBarThemeData(
         labelColor: AppColors.primary,
         unselectedLabelColor: AppColors.textHint,
         indicatorColor: AppColors.primary,
-        labelStyle: TextStyle(
-          fontFamily: AppTypography.fontFamily,
+        labelStyle: GoogleFonts.poppins(
           fontSize: 14,
           fontWeight: FontWeight.w600,
         ),
-        unselectedLabelStyle: TextStyle(
-          fontFamily: AppTypography.fontFamily,
+        unselectedLabelStyle: GoogleFonts.poppins(
           fontSize: 14,
           fontWeight: FontWeight.w400,
         ),
         dividerColor: Colors.transparent,
       ),
 
-      // ─── Icon Theme ────────────────────────────────────────────────────────
+      // ─── Icon Theme ───────────────────────────────────────────────────────────
       iconTheme: const IconThemeData(
         color: AppColors.textSecondary,
         size: 24,
       ),
 
-      // ─── List Tile ─────────────────────────────────────────────────────────
+      // ─── List Tile ────────────────────────────────────────────────────────────
       listTileTheme: ListTileThemeData(
         tileColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -282,7 +275,7 @@ abstract class AppTheme {
         iconColor: AppColors.primary,
       ),
 
-      // ─── Switch ────────────────────────────────────────────────────────────
+      // ─── Switch ───────────────────────────────────────────────────────────────
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
@@ -333,29 +326,27 @@ abstract class AppTheme {
       useMaterial3: true,
       colorScheme: colorScheme,
       scaffoldBackgroundColor: AppColors.darkBackground,
-      fontFamily: AppTypography.fontFamily,
-      textTheme: AppTypography.textTheme.apply(
+      textTheme: GoogleFonts.poppinsTextTheme(AppTypography.textTheme).apply(
         bodyColor: AppColors.darkTextSecondary,
         displayColor: AppColors.darkTextPrimary,
       ),
 
-      appBarTheme: const AppBarTheme(
+      appBarTheme: AppBarTheme(
         backgroundColor: AppColors.darkSurface,
         foregroundColor: AppColors.darkTextPrimary,
         elevation: 0,
         centerTitle: true,
-        systemOverlayStyle: SystemUiOverlayStyle(
+        systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.light,
           statusBarBrightness: Brightness.dark,
         ),
-        titleTextStyle: TextStyle(
-          fontFamily: AppTypography.fontFamily,
+        titleTextStyle: GoogleFonts.poppins(
           fontSize: 18,
           fontWeight: FontWeight.w700,
           color: AppColors.darkTextPrimary,
         ),
-        iconTheme: IconThemeData(color: AppColors.darkTextPrimary, size: 24),
+        iconTheme: const IconThemeData(color: AppColors.darkTextPrimary, size: 24),
       ),
 
       cardTheme: CardThemeData(
@@ -366,7 +357,7 @@ abstract class AppTheme {
           side: const BorderSide(color: Color(0xFF2A2750), width: 1),
         ),
         clipBehavior: Clip.antiAliasWithSaveLayer,
-        margin: const EdgeInsets.all(0),
+        margin: EdgeInsets.zero,
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
@@ -404,9 +395,7 @@ abstract class AppTheme {
           borderRadius: BorderRadius.circular(14),
           borderSide: const BorderSide(color: AppColors.primaryLight, width: 2),
         ),
-        hintStyle: AppTypography.bodyMedium.copyWith(
-          color: AppColors.darkOutline,
-        ),
+        hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.darkOutline),
       ),
 
       dividerTheme: const DividerThemeData(

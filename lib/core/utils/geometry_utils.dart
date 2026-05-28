@@ -8,7 +8,7 @@ abstract class GeometryUtils {
   static double volumeKubus(double sisi) => math.pow(sisi, 3).toDouble();
 
   /// Luas Permukaan Kubus: L = 6s²
-  static double luasKubus(double sisi) => 6 * math.pow(sisi, 2);
+  static double luasKubus(double sisi) => 6 * math.pow(sisi, 2).toDouble();
 
   /// Volume Balok: V = p × l × t
   static double volumeBalok(double p, double l, double t) => p * l * t;
@@ -38,13 +38,15 @@ abstract class GeometryUtils {
   }
 
   /// Volume Bola: V = ⁴⁄₃πr³
-  static double volumeBola(double r) => (4 / 3) * math.pi * math.pow(r, 3);
+  static double volumeBola(double r) =>
+      (4 / 3) * math.pi * math.pow(r, 3).toDouble();
 
   /// Luas Permukaan Bola: L = 4πr²
   static double luasBola(double r) => 4 * math.pi * r * r;
 
   /// Volume Prisma Segitiga: V = ½ × a × t_alas × tinggi_prisma
-  static double volumePrismaSegitiga(double alas, double tinggiAlas, double tinggiPrisma) =>
+  static double volumePrismaSegitiga(
+          double alas, double tinggiAlas, double tinggiPrisma) =>
       0.5 * alas * tinggiAlas * tinggiPrisma;
 
   /// Volume Limas Segiempat: V = ⅓ × p × l × t
@@ -66,7 +68,8 @@ abstract class GeometryUtils {
   static double kelilingPersegiPanjang(double p, double l) => 2 * (p + l);
 
   /// Luas Segitiga: A = ½ × a × t
-  static double luasSegitiga(double alas, double tinggi) => 0.5 * alas * tinggi;
+  static double luasSegitiga(double alas, double tinggi) =>
+      0.5 * alas * tinggi;
 
   /// Keliling Segitiga: K = a + b + c
   static double kelilingSegitiga(double a, double b, double c) => a + b + c;

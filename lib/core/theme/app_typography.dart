@@ -1,210 +1,190 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'app_colors.dart';
 
 /// Sistem tipografi aplikasi Ruang-Geo
 ///
-/// Menggunakan font Poppins dengan hierarki yang jelas:
-/// - Display: Untuk judul besar / hero section
-/// - Headline: Untuk judul halaman & section
-/// - Title: Untuk card titles & sub-sections
-/// - Body: Untuk konten teks utama
-/// - Label: Untuk tombol, badge, caption
+/// Menggunakan font Poppins via google_fonts package.
+/// Tidak perlu file .ttf lokal — didownload otomatis saat debug,
+/// dan di-bundle saat release via google_fonts.
 abstract class AppTypography {
   static const String fontFamily = 'Poppins';
 
+  // ─── Helper: base TextStyle dengan Poppins ────────────────────────────────
+  static TextStyle _poppins({
+    required double fontSize,
+    required FontWeight fontWeight,
+    double letterSpacing = 0,
+    double height = 1.4,
+    Color color = AppColors.textPrimary,
+    FontStyle fontStyle = FontStyle.normal,
+  }) {
+    return GoogleFonts.poppins(
+      fontSize: fontSize,
+      fontWeight: fontWeight,
+      letterSpacing: letterSpacing,
+      height: height,
+      color: color,
+      fontStyle: fontStyle,
+    );
+  }
+
   // ─── Display ─────────────────────────────────────────────────────────────────
-  static const TextStyle displayLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 57,
-    fontWeight: FontWeight.w800,
-    letterSpacing: -0.25,
-    height: 1.12,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get displayLarge => _poppins(
+        fontSize: 57,
+        fontWeight: FontWeight.w800,
+        letterSpacing: -0.25,
+        height: 1.12,
+      );
 
-  static const TextStyle displayMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 45,
-    fontWeight: FontWeight.w700,
-    letterSpacing: 0,
-    height: 1.16,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get displayMedium => _poppins(
+        fontSize: 45,
+        fontWeight: FontWeight.w700,
+        height: 1.16,
+      );
 
-  static const TextStyle displaySmall = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 36,
-    fontWeight: FontWeight.w700,
-    letterSpacing: 0,
-    height: 1.22,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get displaySmall => _poppins(
+        fontSize: 36,
+        fontWeight: FontWeight.w700,
+        height: 1.22,
+      );
 
   // ─── Headline ────────────────────────────────────────────────────────────────
-  static const TextStyle headlineLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 32,
-    fontWeight: FontWeight.w700,
-    letterSpacing: 0,
-    height: 1.25,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get headlineLarge => _poppins(
+        fontSize: 32,
+        fontWeight: FontWeight.w700,
+        height: 1.25,
+      );
 
-  static const TextStyle headlineMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 28,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 0,
-    height: 1.29,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get headlineMedium => _poppins(
+        fontSize: 28,
+        fontWeight: FontWeight.w600,
+        height: 1.29,
+      );
 
-  static const TextStyle headlineSmall = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 24,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 0,
-    height: 1.33,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get headlineSmall => _poppins(
+        fontSize: 24,
+        fontWeight: FontWeight.w600,
+        height: 1.33,
+      );
 
   // ─── Title ───────────────────────────────────────────────────────────────────
-  static const TextStyle titleLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 22,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 0,
-    height: 1.27,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get titleLarge => _poppins(
+        fontSize: 22,
+        fontWeight: FontWeight.w600,
+        height: 1.27,
+      );
 
-  static const TextStyle titleMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 16,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 0.15,
-    height: 1.5,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get titleMedium => _poppins(
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.15,
+        height: 1.5,
+      );
 
-  static const TextStyle titleSmall = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 0.1,
-    height: 1.43,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get titleSmall => _poppins(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.1,
+        height: 1.43,
+      );
 
   // ─── Body ────────────────────────────────────────────────────────────────────
-  static const TextStyle bodyLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 16,
-    fontWeight: FontWeight.w400,
-    letterSpacing: 0.5,
-    height: 1.5,
-    color: AppColors.textSecondary,
-  );
+  static TextStyle get bodyLarge => _poppins(
+        fontSize: 16,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.5,
+        height: 1.5,
+        color: AppColors.textSecondary,
+      );
 
-  static const TextStyle bodyMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 14,
-    fontWeight: FontWeight.w400,
-    letterSpacing: 0.25,
-    height: 1.43,
-    color: AppColors.textSecondary,
-  );
+  static TextStyle get bodyMedium => _poppins(
+        fontSize: 14,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.25,
+        height: 1.43,
+        color: AppColors.textSecondary,
+      );
 
-  static const TextStyle bodySmall = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 12,
-    fontWeight: FontWeight.w400,
-    letterSpacing: 0.4,
-    height: 1.33,
-    color: AppColors.textHint,
-  );
+  static TextStyle get bodySmall => _poppins(
+        fontSize: 12,
+        fontWeight: FontWeight.w400,
+        letterSpacing: 0.4,
+        height: 1.33,
+        color: AppColors.textHint,
+      );
 
   // ─── Label ───────────────────────────────────────────────────────────────────
-  static const TextStyle labelLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 14,
-    fontWeight: FontWeight.w600,
-    letterSpacing: 0.1,
-    height: 1.43,
-    color: AppColors.textPrimary,
-  );
+  static TextStyle get labelLarge => _poppins(
+        fontSize: 14,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.1,
+        height: 1.43,
+      );
 
-  static const TextStyle labelMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 12,
-    fontWeight: FontWeight.w500,
-    letterSpacing: 0.5,
-    height: 1.33,
-    color: AppColors.textSecondary,
-  );
+  static TextStyle get labelMedium => _poppins(
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.5,
+        height: 1.33,
+        color: AppColors.textSecondary,
+      );
 
-  static const TextStyle labelSmall = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 11,
-    fontWeight: FontWeight.w500,
-    letterSpacing: 0.5,
-    height: 1.45,
-    color: AppColors.textHint,
-  );
+  static TextStyle get labelSmall => _poppins(
+        fontSize: 11,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.5,
+        height: 1.45,
+        color: AppColors.textHint,
+      );
 
   // ─── Custom App-Specific Styles ───────────────────────────────────────────────
-  /// Digunakan untuk judul hero section di home
-  static const TextStyle heroTitle = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 30,
-    fontWeight: FontWeight.w800,
-    letterSpacing: -0.5,
-    height: 1.2,
-    color: AppColors.textOnPrimary,
-  );
+  /// Judul hero section di home
+  static TextStyle get heroTitle => _poppins(
+        fontSize: 30,
+        fontWeight: FontWeight.w800,
+        letterSpacing: -0.5,
+        height: 1.2,
+        color: AppColors.textOnPrimary,
+      );
 
-  /// Digunakan untuk nama bangun pada card
-  static const TextStyle cardTitle = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 18,
-    fontWeight: FontWeight.w700,
-    letterSpacing: 0,
-    height: 1.3,
-    color: AppColors.textPrimary,
-  );
+  /// Nama bangun pada card
+  static TextStyle get cardTitle => _poppins(
+        fontSize: 18,
+        fontWeight: FontWeight.w700,
+        height: 1.3,
+      );
 
-  /// Digunakan untuk rumus matematika
-  static const TextStyle formula = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 15,
-    fontWeight: FontWeight.w500,
-    letterSpacing: 0.3,
-    height: 1.6,
-    fontStyle: FontStyle.italic,
-    color: AppColors.primary,
-  );
+  /// Rumus matematika
+  static TextStyle get formula => _poppins(
+        fontSize: 15,
+        fontWeight: FontWeight.w500,
+        letterSpacing: 0.3,
+        height: 1.6,
+        color: AppColors.primary,
+        fontStyle: FontStyle.italic,
+      );
 
-  /// Digunakan untuk badge / chip kategori
-  static const TextStyle badge = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 10,
-    fontWeight: FontWeight.w700,
-    letterSpacing: 0.8,
-    height: 1.4,
-    color: AppColors.textOnPrimary,
-  );
+  /// Badge / chip kategori
+  static TextStyle get badge => _poppins(
+        fontSize: 10,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 0.8,
+        height: 1.4,
+        color: AppColors.textOnPrimary,
+      );
 
-  /// Digunakan untuk skor / angka di kuis
-  static const TextStyle scoreDisplay = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 48,
-    fontWeight: FontWeight.w800,
-    letterSpacing: -1,
-    height: 1.1,
-    color: AppColors.primary,
-  );
+  /// Skor / angka di kuis
+  static TextStyle get scoreDisplay => _poppins(
+        fontSize: 48,
+        fontWeight: FontWeight.w800,
+        letterSpacing: -1,
+        height: 1.1,
+        color: AppColors.primary,
+      );
 
-  static TextTheme get textTheme => const TextTheme(
+  // ─── TextTheme untuk ThemeData ────────────────────────────────────────────────
+  static TextTheme get textTheme => TextTheme(
         displayLarge: displayLarge,
         displayMedium: displayMedium,
         displaySmall: displaySmall,
