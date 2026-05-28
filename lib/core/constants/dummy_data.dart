@@ -137,4 +137,133 @@ abstract class DummyData {
       arModelId: 'bola_ar',
     ),
   ];
+
+  static const List<BangunModel> bangunDatarList = [
+    BangunModel(
+      id: 'bd_persegi',
+      nama: 'Persegi',
+      kategori: KategoriBangun.datar,
+      deskripsi:
+          'Bangun datar dua dimensi yang dibentuk oleh empat buah rusuk (a) yang sama panjang dan memiliki empat buah sudut yang kesemuanya adalah sudut siku-siku.',
+      rumusLuas: 'L = s × s',
+      rumusVolume: 'K = 4 × s', // Gunakan rumusVolume untuk menyimpan keliling khusus bangun datar
+      imagePath: '',
+      iconPath: '',
+      tingkat: TingkatKesulitan.mudah,
+      sifatSifat: [
+        'Memiliki 4 sisi yang sama panjang',
+        'Memiliki 4 sudut siku-siku (90 derajat)',
+        'Memiliki 2 diagonal yang saling berpotongan tegak lurus dan sama panjang'
+      ],
+      contohNyata: ['Ubin lantai', 'Papan catur', 'Roti tawar'],
+    ),
+    BangunModel(
+      id: 'bd_persegi_panjang',
+      nama: 'Persegi Panjang',
+      kategori: KategoriBangun.datar,
+      deskripsi:
+          'Bangun datar dua dimensi yang dibentuk oleh dua pasang rusuk yang masing-masing sama panjang dan sejajar dengan pasangannya, dan memiliki empat buah sudut siku-siku.',
+      rumusLuas: 'L = p × l',
+      rumusVolume: 'K = 2 × (p + l)',
+      imagePath: '',
+      iconPath: '',
+      tingkat: TingkatKesulitan.mudah,
+      sifatSifat: [
+        'Memiliki 4 sisi (2 pasang sisi sejajar dan sama panjang)',
+        'Memiliki 4 sudut siku-siku',
+        'Memiliki 2 diagonal yang sama panjang'
+      ],
+      contohNyata: ['Papan tulis', 'Buku', 'Lapangan sepak bola'],
+    ),
+    BangunModel(
+      id: 'bd_segitiga',
+      nama: 'Segitiga',
+      kategori: KategoriBangun.datar,
+      deskripsi:
+          'Bangun datar yang dibatasi oleh tiga buah sisi dan mempunyai tiga buah titik sudut. Total sudut dalam segitiga selalu 180 derajat.',
+      rumusLuas: 'L = ½ × a × t',
+      rumusVolume: 'K = a + b + c',
+      imagePath: '',
+      iconPath: '',
+      tingkat: TingkatKesulitan.sedang,
+      sifatSifat: [
+        'Memiliki 3 sisi (a, b, c)',
+        'Memiliki 3 titik sudut (A, B, C)',
+        'Jumlah ketiga sudutnya selalu 180°'
+      ],
+      contohNyata: ['Penggaris segitiga', 'Rambu lalu lintas', 'Potongan pizza'],
+    ),
+    BangunModel(
+      id: 'bd_jajargenjang',
+      nama: 'Jajar Genjang',
+      kategori: KategoriBangun.datar,
+      deskripsi:
+          'Bangun datar dua dimensi yang dibentuk oleh dua pasang rusuk yang masing-masing sama panjang dan sejajar dengan pasangannya, dan memiliki dua pasang sudut yang masing-masing sama besar dengan sudut di hadapannya.',
+      rumusLuas: 'L = a × t',
+      rumusVolume: 'K = 2 × (a + b)',
+      imagePath: '',
+      iconPath: '',
+      tingkat: TingkatKesulitan.sedang,
+      sifatSifat: [
+        'Sisi-sisi yang berhadapan sejajar dan sama panjang',
+        'Sudut-sudut yang berhadapan sama besar',
+        'Jumlah sudut-sudut yang berdekatan adalah 180°'
+      ],
+      contohNyata: ['Penghapus', 'Motif batik', 'Bayangan benda'],
+    ),
+    BangunModel(
+      id: 'bd_trapesium',
+      nama: 'Trapesium',
+      kategori: KategoriBangun.datar,
+      deskripsi:
+          'Bangun datar dua dimensi yang dibentuk oleh empat buah rusuk yang dua di antaranya saling sejajar namun tidak sama panjang.',
+      rumusLuas: 'L = ½ × (a + b) × t',
+      rumusVolume: 'K = a + b + c + d',
+      imagePath: '',
+      iconPath: '',
+      tingkat: TingkatKesulitan.sedang,
+      sifatSifat: [
+        'Memiliki tepat sepasang sisi yang sejajar',
+        'Jumlah sudut yang berdekatan di antara dua sisi sejajar adalah 180°',
+        'Trapesium sama kaki memiliki sepasang sisi yang sama panjang'
+      ],
+      contohNyata: ['Atap rumah', 'Tas jinjing', 'Perahu'],
+    ),
+    BangunModel(
+      id: 'bd_layang',
+      nama: 'Layang-layang',
+      kategori: KategoriBangun.datar,
+      deskripsi:
+          'Bangun datar dua dimensi yang dibentuk oleh dua pasang sisi yang masing-masing pasangannya sama panjang dan saling membentuk sudut.',
+      rumusLuas: 'L = ½ × d1 × d2',
+      rumusVolume: 'K = 2 × (a + b)',
+      imagePath: '',
+      iconPath: '',
+      tingkat: TingkatKesulitan.sulit,
+      sifatSifat: [
+        'Memiliki dua pasang sisi yang sama panjang',
+        'Kedua diagonalnya berpotongan saling tegak lurus',
+        'Salah satu diagonalnya membagi dua diagonal yang lain sama panjang'
+      ],
+      contohNyata: ['Layang-layang mainan', 'Motif dinding', 'Permata'],
+    ),
+    BangunModel(
+      id: 'bd_lingkaran',
+      nama: 'Lingkaran',
+      kategori: KategoriBangun.datar,
+      deskripsi:
+          'Himpunan semua titik pada bidang yang memiliki jarak yang sama dari suatu titik pusat tertentu.',
+      rumusLuas: 'L = π × r²',
+      rumusVolume: 'K = 2 × π × r',
+      imagePath: '',
+      iconPath: '',
+      tingkat: TingkatKesulitan.mudah,
+      sifatSifat: [
+        'Hanya memiliki satu sisi lengkung yang tertutup',
+        'Tidak memiliki titik sudut',
+        'Jarak dari titik pusat ke tepi selalu konstan (jari-jari)'
+      ],
+      contohNyata: ['Roda', 'Uang koin', 'Jam dinding'],
+    ),
+  ];
 }
