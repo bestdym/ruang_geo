@@ -7,6 +7,7 @@ import '../features/bangun_ruang/presentation/pages/bangun_ruang_detail_page.dar
 import '../features/bangun_datar/presentation/pages/bangun_datar_page.dart';
 import '../features/bangun_datar/presentation/pages/bangun_datar_detail_page.dart';
 import '../features/ar/presentation/pages/ar_page.dart';
+import '../features/ar/presentation/pages/ar_view_page.dart';
 import '../features/kuis/presentation/pages/kuis_page.dart';
 
 // ─── Placeholder pages untuk shell bottom nav ─────────────────────────────────
