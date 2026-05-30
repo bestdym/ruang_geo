@@ -137,39 +137,44 @@ class _BangunCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: AppColors.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withAlpha(10),
+              color: AppColors.primary.withAlpha(15),
               blurRadius: 10,
+              spreadRadius: 0,
               offset: const Offset(0, 4),
             ),
           ],
           border: Border.all(
             color: AppColors.outlineVariant,
-            width: 1,
+            width: 1.5,
           ),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ─── Bagian Gambar (Placeholder) ──────────────────────────────
+            // ─── Bagian Gambar ──────────────────────────────
             Expanded(
-              flex: 3,
+              flex: 4,
               child: Container(
-                decoration: BoxDecoration(
-                  color: AppColors.primary.withAlpha(15),
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(20),
+                decoration: const BoxDecoration(
+                  color: Colors.transparent,
+                  borderRadius: BorderRadius.vertical(
+                    top: Radius.circular(16),
                   ),
                 ),
                 child: Stack(
+                  clipBehavior: Clip.none,
                   children: [
                     // Bangun 3D Viewer di tengah
                     Center(
-                      child: Bangun3DViewer(
-                        bangunId: bangun.id,
-                        size: 80,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 12.0),
+                        child: Bangun3DViewer(
+                          bangunId: bangun.id,
+                          size: 90,
+                        ),
                       ),
                     ),
 
@@ -177,29 +182,23 @@ class _BangunCard extends StatelessWidget {
                     Positioned(
                       top: 8,
                       right: 8,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: AppColors.surface.withAlpha(200),
+                      child: IconButton(
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                        icon: const Icon(
+                          Icons.star_border_rounded,
+                          color: AppColors.textHint,
+                          size: 20,
                         ),
-                        child: IconButton(
-                          padding: EdgeInsets.zero,
-                          constraints: const BoxConstraints(),
-                          icon: const Icon(
-                            Icons.star_border_rounded,
-                            color: AppColors.textHint,
-                            size: 20,
-                          ),
-                          onPressed: () {
-                            // TODO: Implementasi logika favorit
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('${bangun.nama} ditambahkan ke favorit!'),
-                                duration: const Duration(seconds: 1),
-                              ),
-                            );
-                          },
-                        ),
+                        onPressed: () {
+                          // TODO: Implementasi logika favorit
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('${bangun.nama} ditambahkan ke favorit!'),
+                              duration: const Duration(seconds: 1),
+                            ),
+                          );
+                        },
                       ),
                     ),
                   ],
@@ -211,20 +210,18 @@ class _BangunCard extends StatelessWidget {
             Expanded(
               flex: 2,
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      bangun.nama,
-                      style: AppTypography.titleMedium.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Center(
+                  child: Text(
+                    bangun.nama,
+                    textAlign: TextAlign.center,
+                    style: AppTypography.titleSmall.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
                     ),
-                  ],
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
               ),
             ),

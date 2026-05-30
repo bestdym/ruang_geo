@@ -157,11 +157,11 @@ class _Solid3DPainter extends CustomPainter {
       ny /= nLen;
       nz /= nLen;
 
-      // Backface culling (if normal points away from camera, which is -Z)
+      // Backface culling (jika normal menghadap membelakangi kamera / nz > 0)
       if (nz > 0 && bangunId != 'br_bola') continue; // Bola is drawn as a whole, simple culling
 
-      // Shading based on dot product with light
-      double dot = -(nx * lightDir[0] + ny * lightDir[1] + nz * lightDir[2]);
+      // Shading based on dot product with light (normal sudah outward)
+      double dot = (nx * lightDir[0] + ny * lightDir[1] + nz * lightDir[2]);
       // Ambient + Diffuse
       double intensity = 0.4 + 0.6 * math.max(0.0, dot);
       
@@ -226,12 +226,12 @@ class _Solid3DPainter extends CustomPainter {
       [-w, -h, d], [w, -h, d], [w, h, d], [-w, h, d]
     ];
     return [
-      _Face([v[0], v[1], v[2], v[3]]), // Front
-      _Face([v[5], v[4], v[7], v[6]]), // Back
-      _Face([v[4], v[0], v[3], v[7]]), // Left
-      _Face([v[1], v[5], v[6], v[2]]), // Right
-      _Face([v[4], v[5], v[1], v[0]]), // Top
-      _Face([v[3], v[2], v[6], v[7]]), // Bottom
+      _Face([v[0], v[1], v[2], v[3]].reversed.toList()), // Front
+      _Face([v[5], v[4], v[7], v[6]].reversed.toList()), // Back
+      _Face([v[4], v[0], v[3], v[7]].reversed.toList()), // Left
+      _Face([v[1], v[5], v[6], v[2]].reversed.toList()), // Right
+      _Face([v[4], v[5], v[1], v[0]].reversed.toList()), // Top
+      _Face([v[3], v[2], v[6], v[7]].reversed.toList()), // Bottom
     ];
   }
 
@@ -241,11 +241,11 @@ class _Solid3DPainter extends CustomPainter {
       [0, -1, 1], [-1, 1, 1], [1, 1, 1]
     ];
     return [
-      _Face([v[0], v[2], v[1]]), // Front triangle
-      _Face([v[3], v[4], v[5]]), // Back triangle
-      _Face([v[0], v[1], v[4], v[3]]), // Left side
-      _Face([v[0], v[3], v[5], v[2]]), // Right side
-      _Face([v[1], v[2], v[5], v[4]]), // Bottom
+      _Face([v[0], v[2], v[1]].reversed.toList()), // Front triangle
+      _Face([v[3], v[4], v[5]].reversed.toList()), // Back triangle
+      _Face([v[0], v[1], v[4], v[3]].reversed.toList()), // Left side
+      _Face([v[0], v[3], v[5], v[2]].reversed.toList()), // Right side
+      _Face([v[1], v[2], v[5], v[4]].reversed.toList()), // Bottom
     ];
   }
 
@@ -255,11 +255,11 @@ class _Solid3DPainter extends CustomPainter {
       [0, -1, 0] // Apex
     ];
     return [
-      _Face([v[0], v[3], v[2], v[1]]), // Base
-      _Face([v[0], v[1], v[4]]), // Front
-      _Face([v[1], v[2], v[4]]), // Right
-      _Face([v[2], v[3], v[4]]), // Back
-      _Face([v[3], v[0], v[4]]), // Left
+      _Face([v[0], v[3], v[2], v[1]].reversed.toList()), // Base
+      _Face([v[0], v[1], v[4]].reversed.toList()), // Front
+      _Face([v[1], v[2], v[4]].reversed.toList()), // Right
+      _Face([v[2], v[3], v[4]].reversed.toList()), // Back
+      _Face([v[3], v[0], v[4]].reversed.toList()), // Left
     ];
   }
 
@@ -277,9 +277,10 @@ class _Solid3DPainter extends CustomPainter {
       faces.add(_Face([
         [x1, -1, z1], [x1, 1, z1], [x2, 1, z2], [x2, -1, z2]
       ]));
-      // Top/Bottom triangles (fan from center)
-      faces.add(_Face([[0, -1, 0], [x2, -1, z2], [x1, -1, z1]]));
-      faces.add(_Face([[0, 1, 0], [x1, 1, z1], [x2, 1, z2]]));
+      // Top circle
+      faces.add(_Face([[0, -1, 0], [x1, -1, z1], [x2, -1, z2]]));
+      // Bottom circle
+      faces.add(_Face([[0, 1, 0], [x2, 1, z2], [x1, 1, z1]]));
     }
     return faces;
   }
@@ -319,7 +320,7 @@ class _Solid3DPainter extends CustomPainter {
         List<double> v3 = [math.sin(theta2) * math.cos(phi2), math.cos(theta2), math.sin(theta2) * math.sin(phi2)];
         List<double> v4 = [math.sin(theta1) * math.cos(phi2), math.cos(theta1), math.sin(theta1) * math.sin(phi2)];
         
-        faces.add(_Face([v1, v2, v3, v4]));
+        faces.add(_Face([v1, v2, v3, v4].reversed.toList()));
       }
     }
     return faces;
