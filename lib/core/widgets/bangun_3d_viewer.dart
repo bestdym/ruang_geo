@@ -4,13 +4,11 @@ import 'package:flutter/material.dart';
 class Bangun3DViewer extends StatefulWidget {
   final String bangunId;
   final double size;
-  final Color color;
 
   const Bangun3DViewer({
     super.key,
     required this.bangunId,
     this.size = 100,
-    this.color = Colors.white,
   });
 
   @override
@@ -43,11 +41,10 @@ class _Bangun3DViewerState extends State<Bangun3DViewer>
       builder: (context, child) {
         return CustomPaint(
           size: Size(widget.size, widget.size),
-          painter: _Bangun3DPainter(
+          painter: _Solid3DPainter(
             bangunId: widget.bangunId,
             angleY: _controller.value * 2 * math.pi,
-            angleX: math.pi / 6, // Tilt slightly
-            color: widget.color,
+            angleX: math.pi / 8, // Tilt slightly down
           ),
         );
       },
@@ -55,189 +52,281 @@ class _Bangun3DViewerState extends State<Bangun3DViewer>
   }
 }
 
-class _Bangun3DPainter extends CustomPainter {
+class _Face {
+  final List<List<double>> vertices;
+  _Face(this.vertices);
+}
+
+class _Solid3DPainter extends CustomPainter {
   final String bangunId;
   final double angleX;
   final double angleY;
-  final Color color;
 
-  _Bangun3DPainter({
+  _Solid3DPainter({
     required this.bangunId,
     required this.angleX,
     required this.angleY,
-    required this.color,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = color
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.0
-      ..strokeJoin = StrokeJoin.round;
-
     final center = Offset(size.width / 2, size.height / 2);
     final scale = size.width / 2.5;
 
-    // List of 3D vertices
-    List<List<double>> vertices = [];
-    // List of edges connecting vertices (indices)
-    List<List<int>> edges = [];
+    List<_Face> faces = [];
+    Color baseColor = Colors.blue;
 
     switch (bangunId) {
       case 'br_kubus':
-        vertices = [
-          [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
-          [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]
-        ];
-        edges = [
-          [0, 1], [1, 2], [2, 3], [3, 0], // Back
-          [4, 5], [5, 6], [6, 7], [7, 4], // Front
-          [0, 4], [1, 5], [2, 6], [3, 7]  // Connectors
-        ];
+        baseColor = Colors.blue;
+        faces = _buildBox(1, 1, 1);
         break;
       case 'br_balok':
-        vertices = [
-          [-1.5, -1, -1], [1.5, -1, -1], [1.5, 1, -1], [-1.5, 1, -1],
-          [-1.5, -1, 1], [1.5, -1, 1], [1.5, 1, 1], [-1.5, 1, 1]
-        ];
-        edges = [
-          [0, 1], [1, 2], [2, 3], [3, 0],
-          [4, 5], [5, 6], [6, 7], [7, 4],
-          [0, 4], [1, 5], [2, 6], [3, 7]
-        ];
+        baseColor = Colors.purple;
+        faces = _buildBox(1.5, 0.8, 0.8);
         break;
       case 'br_prisma_segitiga':
-        vertices = [
-          [0, -1.2, -1], [-1, 1.2, -1], [1, 1.2, -1], // Back triangle
-          [0, -1.2, 1], [-1, 1.2, 1], [1, 1.2, 1]     // Front triangle
-        ];
-        edges = [
-          [0, 1], [1, 2], [2, 0], // Back
-          [3, 4], [4, 5], [5, 3], // Front
-          [0, 3], [1, 4], [2, 5]  // Connectors
-        ];
+        baseColor = Colors.green;
+        faces = _buildPrisma();
         break;
       case 'br_limas_segiempat':
-        vertices = [
-          [-1, 1, -1], [1, 1, -1], [1, 1, 1], [-1, 1, 1], // Base
-          [0, -1.5, 0] // Apex
-        ];
-        edges = [
-          [0, 1], [1, 2], [2, 3], [3, 0], // Base
-          [0, 4], [1, 4], [2, 4], [3, 4]  // Sides
-        ];
+        baseColor = Colors.orange;
+        faces = _buildLimas();
         break;
       case 'br_tabung':
-        // approximate cylinder with a prism of many sides
-        int segments = 16;
-        for (int i = 0; i < segments; i++) {
-          double theta = (i / segments) * 2 * math.pi;
-          double x = math.cos(theta);
-          double z = math.sin(theta);
-          vertices.add([x, -1.2, z]); // Top
-          vertices.add([x, 1.2, z]);  // Bottom
-        }
-        for (int i = 0; i < segments; i++) {
-          int next = (i + 1) % segments;
-          edges.add([i * 2, next * 2]); // Top circle
-          edges.add([i * 2 + 1, next * 2 + 1]); // Bottom circle
-          if (i % 4 == 0) {
-            edges.add([i * 2, i * 2 + 1]); // Vertical lines
-          }
-        }
+        baseColor = Colors.cyan;
+        faces = _buildTabung();
         break;
       case 'br_kerucut':
-        int cSegments = 16;
-        for (int i = 0; i < cSegments; i++) {
-          double theta = (i / cSegments) * 2 * math.pi;
-          double x = math.cos(theta);
-          double z = math.sin(theta);
-          vertices.add([x, 1.2, z]); // Base
-        }
-        vertices.add([0, -1.2, 0]); // Apex
-        int apexIdx = vertices.length - 1;
-        for (int i = 0; i < cSegments; i++) {
-          int next = (i + 1) % cSegments;
-          edges.add([i, next]); // Base circle
-          if (i % 4 == 0) {
-            edges.add([i, apexIdx]); // Lines to apex
-          }
-        }
+        baseColor = Colors.pink;
+        faces = _buildKerucut();
         break;
       case 'br_bola':
-        int bSegments = 12;
-        // draw rings
-        for (int j = 0; j <= bSegments; j++) {
-          double phi = (j / bSegments) * math.pi; // 0 to pi
-          double y = -math.cos(phi);
-          double r = math.sin(phi);
-          for (int i = 0; i < bSegments; i++) {
-            double theta = (i / bSegments) * 2 * math.pi;
-            double x = r * math.cos(theta);
-            double z = r * math.sin(theta);
-            vertices.add([x, y, z]);
-          }
-        }
-        for (int j = 0; j < bSegments; j++) {
-          for (int i = 0; i < bSegments; i++) {
-            int current = j * bSegments + i;
-            int nextH = j * bSegments + ((i + 1) % bSegments);
-            int nextV = (j + 1) * bSegments + i;
-            // horizontal line
-            if (j > 0 && j < bSegments) {
-              edges.add([current, nextH]);
-            }
-            // vertical line
-            edges.add([current, nextV]);
-          }
-        }
+        baseColor = Colors.indigo;
+        faces = _buildBola();
         break;
       default:
-        // Default to a cube if not found
-        vertices = [
-          [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
-          [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]
-        ];
-        edges = [
-          [0, 1], [1, 2], [2, 3], [3, 0],
-          [4, 5], [5, 6], [6, 7], [7, 4],
-          [0, 4], [1, 5], [2, 6], [3, 7]
-        ];
+        baseColor = Colors.grey;
+        faces = _buildBox(1, 1, 1);
     }
 
-    // Transform and project vertices
-    List<Offset> projected = [];
-    for (var v in vertices) {
-      double x = v[0];
-      double y = v[1];
-      double z = v[2];
+    // Light direction
+    final lightDir = [0.0, -1.0, -1.0];
+    // Normalize light
+    final lightLen = math.sqrt(lightDir[0]*lightDir[0] + lightDir[1]*lightDir[1] + lightDir[2]*lightDir[2]);
+    lightDir[0] /= lightLen;
+    lightDir[1] /= lightLen;
+    lightDir[2] /= lightLen;
 
-      // Rotate Y
-      double x2 = x * math.cos(angleY) - z * math.sin(angleY);
-      double z2 = x * math.sin(angleY) + z * math.cos(angleY);
+    // Projected faces with z-index
+    List<Map<String, dynamic>> projectedFaces = [];
 
-      // Rotate X
-      double y2 = y * math.cos(angleX) - z2 * math.sin(angleX);
-      double z3 = y * math.sin(angleX) + z2 * math.cos(angleX);
+    for (var face in faces) {
+      List<List<double>> transformedVertices = [];
+      for (var v in face.vertices) {
+        double x = v[0];
+        double y = v[1];
+        double z = v[2];
 
-      // Simple perspective
-      double distance = 4;
-      double factor = distance / (distance + z3);
+        // Rotate Y
+        double x2 = x * math.cos(angleY) - z * math.sin(angleY);
+        double z2 = x * math.sin(angleY) + z * math.cos(angleY);
 
-      double px = x2 * factor * scale + center.dx;
-      double py = y2 * factor * scale + center.dy;
-      projected.add(Offset(px, py));
+        // Rotate X
+        double y2 = y * math.cos(angleX) - z2 * math.sin(angleX);
+        double z3 = y * math.sin(angleX) + z2 * math.cos(angleX);
+
+        transformedVertices.add([x2, y2, z3]);
+      }
+
+      // Calculate Normal
+      final v0 = transformedVertices[0];
+      final v1 = transformedVertices[1];
+      final v2 = transformedVertices[2];
+      
+      final u = [v1[0] - v0[0], v1[1] - v0[1], v1[2] - v0[2]];
+      final w = [v2[0] - v0[0], v2[1] - v0[1], v2[2] - v0[2]];
+      
+      double nx = u[1] * w[2] - u[2] * w[1];
+      double ny = u[2] * w[0] - u[0] * w[2];
+      double nz = u[0] * w[1] - u[1] * w[0];
+      
+      final nLen = math.sqrt(nx*nx + ny*ny + nz*nz);
+      if (nLen == 0) continue;
+      nx /= nLen;
+      ny /= nLen;
+      nz /= nLen;
+
+      // Backface culling (if normal points away from camera, which is -Z)
+      if (nz > 0 && bangunId != 'br_bola') continue; // Bola is drawn as a whole, simple culling
+
+      // Shading based on dot product with light
+      double dot = -(nx * lightDir[0] + ny * lightDir[1] + nz * lightDir[2]);
+      // Ambient + Diffuse
+      double intensity = 0.4 + 0.6 * math.max(0.0, dot);
+      
+      // Average Z for sorting
+      double avgZ = 0;
+      List<Offset> pts = [];
+      for (var v in transformedVertices) {
+        avgZ += v[2];
+        double factor = 4 / (4 + v[2]); // Perspective
+        pts.add(Offset(v[0] * factor * scale + center.dx, v[1] * factor * scale + center.dy));
+      }
+      avgZ /= transformedVertices.length;
+
+      // Color adjustment
+      int r = (baseColor.red * intensity).clamp(0, 255).toInt();
+      int g = (baseColor.green * intensity).clamp(0, 255).toInt();
+      int b = (baseColor.blue * intensity).clamp(0, 255).toInt();
+      Color faceColor = Color.fromARGB(255, r, g, b);
+
+      projectedFaces.add({
+        'z': avgZ,
+        'pts': pts,
+        'color': faceColor,
+        'intensity': intensity,
+      });
     }
 
-    // Draw edges
-    for (var e in edges) {
-      canvas.drawLine(projected[e[0]], projected[e[1]], paint);
+    // Sort by Z (painter's algorithm)
+    projectedFaces.sort((a, b) => b['z'].compareTo(a['z']));
+
+    // Paint faces
+    for (var pf in projectedFaces) {
+      final path = Path();
+      List<Offset> pts = pf['pts'];
+      path.moveTo(pts[0].dx, pts[0].dy);
+      for (int i = 1; i < pts.length; i++) {
+        path.lineTo(pts[i].dx, pts[i].dy);
+      }
+      path.close();
+
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = pf['color']
+          ..style = PaintingStyle.fill,
+      );
+      
+      // Draw edges
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = Colors.white.withAlpha(50)
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.0,
+      );
     }
   }
 
+  List<_Face> _buildBox(double w, double h, double d) {
+    List<List<double>> v = [
+      [-w, -h, -d], [w, -h, -d], [w, h, -d], [-w, h, -d],
+      [-w, -h, d], [w, -h, d], [w, h, d], [-w, h, d]
+    ];
+    return [
+      _Face([v[0], v[1], v[2], v[3]]), // Front
+      _Face([v[5], v[4], v[7], v[6]]), // Back
+      _Face([v[4], v[0], v[3], v[7]]), // Left
+      _Face([v[1], v[5], v[6], v[2]]), // Right
+      _Face([v[4], v[5], v[1], v[0]]), // Top
+      _Face([v[3], v[2], v[6], v[7]]), // Bottom
+    ];
+  }
+
+  List<_Face> _buildPrisma() {
+    List<List<double>> v = [
+      [0, -1, -1], [-1, 1, -1], [1, 1, -1],
+      [0, -1, 1], [-1, 1, 1], [1, 1, 1]
+    ];
+    return [
+      _Face([v[0], v[2], v[1]]), // Front triangle
+      _Face([v[3], v[4], v[5]]), // Back triangle
+      _Face([v[0], v[1], v[4], v[3]]), // Left side
+      _Face([v[0], v[3], v[5], v[2]]), // Right side
+      _Face([v[1], v[2], v[5], v[4]]), // Bottom
+    ];
+  }
+
+  List<_Face> _buildLimas() {
+    List<List<double>> v = [
+      [-1, 1, -1], [1, 1, -1], [1, 1, 1], [-1, 1, 1], // Base
+      [0, -1, 0] // Apex
+    ];
+    return [
+      _Face([v[0], v[3], v[2], v[1]]), // Base
+      _Face([v[0], v[1], v[4]]), // Front
+      _Face([v[1], v[2], v[4]]), // Right
+      _Face([v[2], v[3], v[4]]), // Back
+      _Face([v[3], v[0], v[4]]), // Left
+    ];
+  }
+
+  List<_Face> _buildTabung() {
+    List<_Face> faces = [];
+    int segments = 24;
+    for (int i = 0; i < segments; i++) {
+      double t1 = (i / segments) * 2 * math.pi;
+      double t2 = ((i + 1) / segments) * 2 * math.pi;
+      
+      double x1 = math.cos(t1), z1 = math.sin(t1);
+      double x2 = math.cos(t2), z2 = math.sin(t2);
+      
+      // Side
+      faces.add(_Face([
+        [x1, -1, z1], [x1, 1, z1], [x2, 1, z2], [x2, -1, z2]
+      ]));
+      // Top/Bottom triangles (fan from center)
+      faces.add(_Face([[0, -1, 0], [x2, -1, z2], [x1, -1, z1]]));
+      faces.add(_Face([[0, 1, 0], [x1, 1, z1], [x2, 1, z2]]));
+    }
+    return faces;
+  }
+
+  List<_Face> _buildKerucut() {
+    List<_Face> faces = [];
+    int segments = 24;
+    for (int i = 0; i < segments; i++) {
+      double t1 = (i / segments) * 2 * math.pi;
+      double t2 = ((i + 1) / segments) * 2 * math.pi;
+      
+      double x1 = math.cos(t1), z1 = math.sin(t1);
+      double x2 = math.cos(t2), z2 = math.sin(t2);
+      
+      // Side
+      faces.add(_Face([[0, -1, 0], [x1, 1, z1], [x2, 1, z2]]));
+      // Bottom
+      faces.add(_Face([[0, 1, 0], [x2, 1, z2], [x1, 1, z1]]));
+    }
+    return faces;
+  }
+
+  List<_Face> _buildBola() {
+    List<_Face> faces = [];
+    int lat = 16;
+    int lon = 24;
+    for (int i = 0; i < lat; i++) {
+      double theta1 = (i / lat) * math.pi;
+      double theta2 = ((i + 1) / lat) * math.pi;
+      
+      for (int j = 0; j < lon; j++) {
+        double phi1 = (j / lon) * 2 * math.pi;
+        double phi2 = ((j + 1) / lon) * 2 * math.pi;
+        
+        List<double> v1 = [math.sin(theta1) * math.cos(phi1), math.cos(theta1), math.sin(theta1) * math.sin(phi1)];
+        List<double> v2 = [math.sin(theta2) * math.cos(phi1), math.cos(theta2), math.sin(theta2) * math.sin(phi1)];
+        List<double> v3 = [math.sin(theta2) * math.cos(phi2), math.cos(theta2), math.sin(theta2) * math.sin(phi2)];
+        List<double> v4 = [math.sin(theta1) * math.cos(phi2), math.cos(theta1), math.sin(theta1) * math.sin(phi2)];
+        
+        faces.add(_Face([v1, v2, v3, v4]));
+      }
+    }
+    return faces;
+  }
+
   @override
-  bool shouldRepaint(covariant _Bangun3DPainter oldDelegate) {
+  bool shouldRepaint(covariant _Solid3DPainter oldDelegate) {
     return oldDelegate.angleY != angleY || oldDelegate.bangunId != bangunId;
   }
 }

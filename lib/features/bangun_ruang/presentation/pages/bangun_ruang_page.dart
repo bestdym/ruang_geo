@@ -170,7 +170,6 @@ class _BangunCard extends StatelessWidget {
                       child: Bangun3DViewer(
                         bangunId: bangun.id,
                         size: 80,
-                        color: AppColors.primary,
                       ),
                     ),
 
@@ -224,11 +223,6 @@ class _BangunCard extends StatelessWidget {
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Tingkat: ${bangun.tingkat.label}',
-                      style: AppTypography.bodySmall,
                     ),
                   ],
                 ),

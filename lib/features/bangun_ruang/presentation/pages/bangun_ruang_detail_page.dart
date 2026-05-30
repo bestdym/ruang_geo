@@ -113,34 +113,11 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
                       child: Bangun3DViewer(
                         bangunId: bangun.id,
                         size: 120,
-                        color: Colors.white,
                       ),
                     ),
                   ),
                 ),
-                // Badge tingkat kesulitan
-                Positioned(
-                  bottom: 20,
-                  left: 20,
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withAlpha(60),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.speed_rounded, color: Colors.white, size: 14),
-                        const SizedBox(width: 6),
-                        Text(
-                          'Tingkat ${bangun.tingkat.label}',
-                          style: AppTypography.labelSmall.copyWith(color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
+
               ],
             ),
           ),
@@ -213,23 +190,17 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
         ),
         const SizedBox(height: 12),
         Container(
-          height: 120,
+          height: 160,
+          padding: const EdgeInsets.symmetric(vertical: 20),
           decoration: BoxDecoration(
             color: AppColors.surfaceVariant,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: AppColors.outlineVariant),
           ),
           child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.grid_on_rounded, size: 32, color: AppColors.textHint),
-                const SizedBox(height: 8),
-                Text(
-                  'Ilustrasi jaring-jaring ${bangun.nama}',
-                  style: AppTypography.bodySmall,
-                ),
-              ],
+            child: JaringJaringViewer(
+              bangunId: bangun.id,
+              color: AppColors.primary,
             ),
           ),
         ),

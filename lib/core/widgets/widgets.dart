@@ -9,3 +9,4 @@ export 'shape_card.dart';
 export 'stat_box.dart';
 export 'tab_bar_custom.dart';
 export 'bangun_3d_viewer.dart';
+export 'jaring_jaring_viewer.dart';
