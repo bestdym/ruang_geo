@@ -76,25 +76,25 @@ abstract class AppColors {
   static const LinearGradient heroGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF6C63FF), Color(0xFF4FC3F7)],
+    colors: [Color(0xFF42A5F5), Color(0xFF1976D2)],
   );
 
   static const LinearGradient bangunRuangGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [primary, primaryDark],
+    colors: [Color(0xFF5C6BC0), Color(0xFF3949AB)],
   );
 
   static const LinearGradient bangunDatarGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [success, secondary],
+    colors: [Color(0xFF26C6DA), Color(0xFF00838F)],
   );
 
   static const LinearGradient arGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [accent, accentLight],
+    colors: [Color(0xFFFF7043), Color(0xFFD84315)],
   );
 
   static const LinearGradient kuisGradient = LinearGradient(

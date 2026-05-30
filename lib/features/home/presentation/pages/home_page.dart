@@ -24,7 +24,7 @@ final List<_MenuData> _menus = [
   _MenuData(
     title: 'AR Kamera',
     description: 'Lihat bangun geometri nyata di sekitarmu',
-    icon: Icons.view_in_ar_outlined,
+    icon: Icons.center_focus_strong_rounded,
     gradient: AppColors.arGradient,
     route: '/ar',
     badge: 'AR',
@@ -104,7 +104,7 @@ class _HomePageState extends State<HomePage>
                   physics: const BouncingScrollPhysics(),
                   slivers: [
                     SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                      padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
                       sliver: SliverList(
                         delegate: SliverChildListDelegate([
                           // Header

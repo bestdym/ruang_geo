@@ -606,8 +606,21 @@ class _InteractiveAnswerState extends State<_InteractiveAnswer> {
               child: TextField(
                 controller: _controller,
                 keyboardType: TextInputType.number,
+                style: const TextStyle(color: Colors.black87),
                 decoration: InputDecoration(
                   hintText: 'Jawaban kamu...',
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.outlineVariant),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                  ),
                   suffixIcon: _isCorrect == null
                       ? null
                       : Icon(

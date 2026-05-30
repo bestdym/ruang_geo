@@ -378,7 +378,6 @@ class _AppShell extends StatelessWidget {
   }
 }
 
-/// Bottom navigation bar dengan style custom
 class _BottomNav extends StatelessWidget {
   const _BottomNav({
     required this.currentIndex,
@@ -390,131 +389,49 @@ class _BottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.primary.withAlpha(20),
-            blurRadius: 20,
-            offset: const Offset(0, -4),
-          ),
-        ],
+    return BottomNavigationBar(
+      currentIndex: currentIndex,
+      onTap: onTap,
+      type: BottomNavigationBarType.fixed,
+      backgroundColor: Colors.white,
+      selectedItemColor: const Color(0xFF6C63FF),
+      unselectedItemColor: const Color(0xFF9E9E9E),
+      selectedLabelStyle: const TextStyle(
+        fontWeight: FontWeight.w600,
+        fontSize: 11,
       ),
-      child: SafeArea(
-        top: false,
-        child: SizedBox(
-          height: 68,
-          child: Row(
-            children: [
-              _NavItem(
-                icon: Icons.home_outlined,
-                activeIcon: Icons.home_rounded,
-                label: 'Beranda',
-                isActive: currentIndex == 0,
-                onTap: () => onTap(0),
-                activeColor: AppColors.primary,
-              ),
-              _NavItem(
-                icon: Icons.menu_book_outlined,
-                activeIcon: Icons.menu_book_rounded,
-                label: 'Petunjuk',
-                isActive: currentIndex == 1,
-                onTap: () => onTap(1),
-                activeColor: AppColors.secondary,
-              ),
-              _NavItem(
-                icon: Icons.person_outline_rounded,
-                activeIcon: Icons.person_rounded,
-                label: 'Profil',
-                isActive: currentIndex == 2,
-                onTap: () => onTap(2),
-                activeColor: AppColors.success,
-              ),
-              _NavItem(
-                icon: Icons.emoji_events_outlined,
-                activeIcon: Icons.emoji_events_rounded,
-                label: 'Pencapaian',
-                isActive: currentIndex == 3,
-                onTap: () => onTap(3),
-                activeColor: AppColors.warning,
-              ),
-              _NavItem(
-                icon: Icons.settings_outlined,
-                activeIcon: Icons.settings_rounded,
-                label: 'Pengaturan',
-                isActive: currentIndex == 4,
-                onTap: () => onTap(4),
-                activeColor: AppColors.accent,
-              ),
-            ],
-          ),
+      unselectedLabelStyle: const TextStyle(
+        fontWeight: FontWeight.w400,
+        fontSize: 11,
+      ),
+      elevation: 8,
+      items: const [
+        BottomNavigationBarItem(
+          icon: Icon(Icons.home_outlined),
+          activeIcon: Icon(Icons.home),
+          label: 'Beranda',
         ),
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  const _NavItem({
-    required this.icon,
-    required this.activeIcon,
-    required this.label,
-    required this.isActive,
-    required this.onTap,
-    required this.activeColor,
-  });
-
-  final IconData icon;
-  final IconData activeIcon;
-  final String label;
-  final bool isActive;
-  final VoidCallback onTap;
-  final Color activeColor;
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: EdgeInsets.symmetric(
-                  horizontal: isActive ? 16 : 0,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: isActive ? activeColor.withAlpha(25) : Colors.transparent,
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: Icon(
-                  isActive ? activeIcon : icon,
-                  color: isActive ? activeColor : AppColors.textHint,
-                  size: 22,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                label,
-                style: AppTypography.labelSmall.copyWith(
-                  color: isActive ? activeColor : AppColors.textHint,
-                  fontWeight: isActive ? FontWeight.w600 : FontWeight.w400,
-                  fontSize: 10,
-                ),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
-          ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.menu_book_outlined),
+          activeIcon: Icon(Icons.menu_book),
+          label: 'Petunjuk',
         ),
-      ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.person_outline),
+          activeIcon: Icon(Icons.person),
+          label: 'Profil',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.emoji_events_outlined),
+          activeIcon: Icon(Icons.emoji_events),
+          label: 'Pencapaian',
+        ),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.settings_outlined),
+          activeIcon: Icon(Icons.settings),
+          label: 'Pengaturan',
+        ),
+      ],
     );
   }
 }

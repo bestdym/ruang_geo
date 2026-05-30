@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ruang_geo/core/core.dart';
 import 'package:ruang_geo/models/models.dart';
+import 'package:ruang_geo/features/bangun_datar/presentation/widgets/shape_icon.dart';
 
 /// Halaman daftar Bangun Datar
 class BangunDatarPage extends StatelessWidget {
@@ -21,12 +22,12 @@ class BangunDatarPage extends StatelessWidget {
         title: const Text('Bangun Datar'),
       ),
       body: GridView.builder(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 3, // Lebih compact (3 kolom)
+          crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-          childAspectRatio: 0.85,
+          mainAxisExtent: 100, // Card height: 100px
         ),
         itemCount: listBangunDatar.length,
         itemBuilder: (context, index) {
@@ -52,25 +53,25 @@ class _BangunDatarCard extends StatelessWidget {
   final BangunModel bangun;
   final VoidCallback onTap;
 
-  // Fungsi helper untuk mendapatkan ikon yang sesuai dengan nama bangun datar
-  IconData _getIconForBangunDatar(String id) {
+  // Fungsi helper untuk mendapatkan warna yang sesuai
+  Color _getColorForBangunDatar(String id) {
     switch (id) {
       case 'bd_persegi':
-        return Icons.crop_square_rounded;
+        return const Color(0xFF4CAF50); // Hijau
       case 'bd_persegi_panjang':
-        return Icons.rectangle_outlined;
+        return const Color(0xFF2196F3); // Biru
       case 'bd_segitiga':
-        return Icons.change_history_rounded; // Mirip segitiga
+        return const Color(0xFFFF9800); // Oranye
       case 'bd_jajargenjang':
-        return Icons.smart_display_outlined; // Mirip jajar genjang
+        return const Color(0xFF009688); // Teal
       case 'bd_trapesium':
-        return Icons.pentagon_outlined; // Placeholder
+        return const Color(0xFF9C27B0); // Ungu
       case 'bd_layang':
-        return Icons.diamond_outlined;
+        return const Color(0xFFE91E63); // Pink
       case 'bd_lingkaran':
-        return Icons.circle_outlined;
+        return const Color(0xFFFFC107); // Kuning
       default:
-        return Icons.category_rounded;
+        return AppColors.primary;
     }
   }
 
@@ -79,13 +80,14 @@ class _BangunDatarCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withAlpha(10),
-              blurRadius: 8,
+              color: Colors.black.withAlpha(10),
+              blurRadius: 10,
               offset: const Offset(0, 4),
             ),
           ],
@@ -94,31 +96,31 @@ class _BangunDatarCard extends StatelessWidget {
             width: 1,
           ),
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: Row(
           children: [
+            // Shape Icon
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.secondaryContainer.withAlpha(100),
-                shape: BoxShape.circle,
+                color: _getColorForBangunDatar(bangun.id).withAlpha(25),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Icon(
-                _getIconForBangunDatar(bangun.id),
-                color: AppColors.secondary,
-                size: 28,
+              child: ShapeIcon(
+                shapeId: bangun.id,
+                color: _getColorForBangunDatar(bangun.id),
+                size: 32,
               ),
             ),
-            const SizedBox(height: 12),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 4),
+            const SizedBox(width: 16),
+            // Nama Bangun
+            Expanded(
               child: Text(
                 bangun.nama,
-                style: AppTypography.labelMedium.copyWith(
+                style: AppTypography.titleSmall.copyWith(
                   fontWeight: FontWeight.w700,
                   color: AppColors.textPrimary,
+                  height: 1.2,
                 ),
-                textAlign: TextAlign.center,
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),

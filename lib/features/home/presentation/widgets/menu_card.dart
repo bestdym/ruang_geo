@@ -84,10 +84,10 @@ class _MenuCardState extends State<MenuCard>
         onTapUp: _onTapUp,
         onTapCancel: _onTapCancel,
         child: Container(
-          height: 90,
+          height: 72,
           decoration: BoxDecoration(
             gradient: widget.gradient,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
                 color: _extractShadowColor(widget.gradient),
@@ -128,27 +128,27 @@ class _MenuCardState extends State<MenuCard>
               // ─── Konten utama ───────────────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
+                  horizontal: 16,
+                  vertical: 10,
                 ),
                 child: Row(
                   children: [
                     // ikon
                     Container(
-                      width: 56,
-                      height: 56,
+                      width: 44,
+                      height: 44,
                       decoration: BoxDecoration(
                         color: Colors.white.withAlpha(35),
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(12),
                       ),
                       child: Icon(
                         widget.icon,
                         color: Colors.white,
-                        size: 30,
+                        size: 24,
                       ),
                     ),
 
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
 
                     // teks
                     Expanded(

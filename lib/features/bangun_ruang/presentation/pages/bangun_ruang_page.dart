@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ruang_geo/core/core.dart';
 import 'package:ruang_geo/models/models.dart';
+import '../widgets/isometric_shape_painter.dart';
 
 /// Halaman daftar Bangun Ruang
 class BangunRuangPage extends StatefulWidget {
@@ -40,13 +41,21 @@ class _BangunRuangPageState extends State<BangunRuangPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.background,
+      backgroundColor: const Color(0xFFF5F5FA),
       appBar: AppBar(
+        backgroundColor: const Color(0xFF1A1A2E),
+        centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
           onPressed: () => context.pop(),
         ),
-        title: const Text('Bangun Ruang'),
+        title: Text(
+          'Bangun Ruang',
+          style: AppTypography.titleMedium.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
       body: Column(
         children: [
@@ -55,7 +64,7 @@ class _BangunRuangPageState extends State<BangunRuangPage> {
             height: 60,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 0),
               itemCount: _filters.length,
               itemBuilder: (context, index) {
                 final filter = _filters[index];
@@ -66,22 +75,23 @@ class _BangunRuangPageState extends State<BangunRuangPage> {
                   child: FilterChip(
                     label: Text(filter),
                     selected: isSelected,
+                    showCheckmark: isSelected,
+                    checkmarkColor: Colors.white,
                     onSelected: (selected) {
                       setState(() {
                         _selectedFilter = filter;
                       });
                     },
-                    backgroundColor: Colors.transparent,
-                    selectedColor: AppColors.primary,
-                    checkmarkColor: Colors.white,
+                    backgroundColor: Colors.white,
+                    selectedColor: const Color(0xFF6C63FF),
                     labelStyle: AppTypography.labelMedium.copyWith(
-                      color: isSelected ? Colors.white : AppColors.textSecondary,
+                      color: isSelected ? Colors.white : const Color(0xFF555555),
                       fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                     ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(20),
                       side: BorderSide(
-                        color: isSelected ? AppColors.primary : AppColors.outline,
+                        color: isSelected ? Colors.transparent : const Color(0xFFE0E0E0),
                         width: 1,
                       ),
                     ),
@@ -95,12 +105,12 @@ class _BangunRuangPageState extends State<BangunRuangPage> {
           // ─── Grid View ───────────────────────────────────────────────────
           Expanded(
             child: GridView.builder(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.85,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                childAspectRatio: 1.0,
               ),
               itemCount: _filteredBangun.length,
               itemBuilder: (context, index) {
@@ -135,101 +145,75 @@ class _BangunCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: AppColors.primary.withAlpha(15),
-              blurRadius: 10,
+              color: Colors.grey.withOpacity(0.2),
+              blurRadius: 8,
               spreadRadius: 0,
               offset: const Offset(0, 4),
             ),
           ],
-          border: Border.all(
-            color: AppColors.outlineVariant,
-            width: 1.5,
-          ),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // ─── Bagian Gambar ──────────────────────────────
+            // Gambar dan Ikon Favorit
             Expanded(
-              flex: 4,
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.vertical(
-                    top: Radius.circular(16),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: getShapeWidget(bangun.id, 90),
+                    ),
                   ),
-                ),
-                child: Stack(
-                  clipBehavior: Clip.none,
-                  children: [
-                    // Bangun 3D Viewer di tengah
-                    Center(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 12.0),
-                        child: Bangun3DViewer(
-                          bangunId: bangun.id,
-                          size: 90,
-                        ),
+                  Positioned(
+                    top: -8,
+                    right: -8,
+                    child: IconButton(
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                      icon: const Icon(
+                        Icons.star_border_rounded,
+                        color: Colors.grey,
+                        size: 24,
                       ),
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${bangun.nama} ditambahkan ke favorit!'),
+                            duration: const Duration(seconds: 1),
+                          ),
+                        );
+                      },
                     ),
-
-                    // Tombol Favorit di pojok kanan atas
-                    Positioned(
-                      top: 8,
-                      right: 8,
-                      child: IconButton(
-                        padding: EdgeInsets.zero,
-                        constraints: const BoxConstraints(),
-                        icon: const Icon(
-                          Icons.star_border_rounded,
-                          color: AppColors.textHint,
-                          size: 20,
-                        ),
-                        onPressed: () {
-                          // TODO: Implementasi logika favorit
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('${bangun.nama} ditambahkan ke favorit!'),
-                              duration: const Duration(seconds: 1),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
-
-            // ─── Bagian Teks Nama Bangun ──────────────────────────────────
-            Expanded(
-              flex: 2,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                child: Center(
-                  child: Text(
-                    bangun.nama,
-                    textAlign: TextAlign.center,
-                    style: AppTypography.titleSmall.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                    ),
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
+            const SizedBox(height: 12),
+            // Nama Bangun
+            Text(
+              bangun.nama,
+              textAlign: TextAlign.center,
+              style: AppTypography.titleSmall.copyWith(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: const Color(0xFF333333),
               ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
       ),
     );
   }
+
 }
 
 

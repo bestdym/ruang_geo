@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:math' as math;
 import 'package:ruang_geo/core/core.dart';
 import 'package:ruang_geo/models/models.dart';
+import 'package:ruang_geo/features/bangun_datar/presentation/widgets/shape_painter_widget.dart';
 
 /// Halaman Detail Bangun Datar
 class BangunDatarDetailPage extends StatefulWidget {
@@ -139,7 +139,7 @@ class _BangunDatarDetailPageState extends State<BangunDatarDetailPage>
                     builder: (context, child) {
                       return CustomPaint(
                         size: const Size(double.infinity, double.infinity),
-                        painter: BangunDatarPainter(
+                        painter: ShapePainterFactory.getShapePainter(
                           bangunId: bangun.id,
                           progress: _drawController.value,
                         ),
@@ -149,16 +149,31 @@ class _BangunDatarDetailPageState extends State<BangunDatarDetailPage>
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: TextButton.icon(
-                  onPressed: () {
-                    _drawController.reset();
-                    _drawController.forward();
-                  },
-                  icon: const Icon(Icons.play_circle_fill_rounded, color: AppColors.secondary),
-                  label: Text(
-                    'Lihat Animasi',
-                    style: AppTypography.labelMedium.copyWith(color: AppColors.secondary),
+                padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      _drawController.reset();
+                      _drawController.forward();
+                    },
+                    icon: const Icon(Icons.play_circle_fill_rounded, color: Colors.white),
+                    label: const Text(
+                      'Lihat Animasi',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF6C63FF), // ungu
+                      foregroundColor: Colors.white,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12),
+                      elevation: 0,
+                    ),
                   ),
                 ),
               ),
@@ -372,8 +387,21 @@ class _InteractiveAnswerDatarState extends State<_InteractiveAnswerDatar> {
               child: TextField(
                 controller: _controller,
                 keyboardType: TextInputType.number,
+                style: const TextStyle(color: Colors.black87),
                 decoration: InputDecoration(
                   hintText: 'Jawaban kamu...',
+                  hintStyle: TextStyle(color: Colors.grey[500]),
+                  filled: true,
+                  fillColor: Colors.white,
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.outlineVariant),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                  ),
                   suffixIcon: _isCorrect == null
                       ? null
                       : Icon(
@@ -415,186 +443,4 @@ class _InteractiveAnswerDatarState extends State<_InteractiveAnswerDatar> {
   }
 }
 
-/// CustomPainter untuk menggambar bangun datar
-class BangunDatarPainter extends CustomPainter {
-  BangunDatarPainter({
-    required this.bangunId,
-    required this.progress,
-  });
 
-  final String bangunId;
-  final double progress;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppColors.primary
-      ..strokeWidth = 3
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final fillPaint = Paint()
-      ..color = AppColors.primary.withAlpha(30)
-      ..style = PaintingStyle.fill;
-
-    final textPainter = TextPainter(textDirection: TextDirection.ltr);
-
-    void drawLabel(String text, Offset offset, {Color color = Colors.black87, double fontSize = 14, bool bold = false}) {
-      textPainter.text = TextSpan(
-        text: text,
-        style: TextStyle(
-          color: color,
-          fontSize: fontSize,
-          fontWeight: bold ? FontWeight.bold : FontWeight.normal,
-        ),
-      );
-      textPainter.layout();
-      textPainter.paint(canvas, offset - Offset(textPainter.width / 2, textPainter.height / 2));
-    }
-
-    final double w = size.width;
-    final double h = size.height;
-    final Path path = Path();
-
-    // Default center
-    final cx = w / 2;
-    final cy = h / 2;
-
-    switch (bangunId) {
-      case 'bd_segitiga':
-        // Segitiga sama sisi / sama kaki
-        final p1 = Offset(cx, cy - h / 3); // Titik atas (A)
-        final p2 = Offset(cx - w / 3, cy + h / 3); // Titik kiri bawah (B)
-        final p3 = Offset(cx + w / 3, cy + h / 3); // Titik kanan bawah (C)
-
-        // Animasi gambar garis
-        path.moveTo(p1.dx, p1.dy);
-        if (progress > 0.33) {
-          path.lineTo(p2.dx, p2.dy);
-          if (progress > 0.66) {
-            path.lineTo(p3.dx, p3.dy);
-            if (progress >= 0.99) {
-              path.close();
-            } else {
-              // Interpolasi garis 3
-              final t = (progress - 0.66) * 3;
-              path.lineTo(p3.dx + (p1.dx - p3.dx) * t, p3.dy + (p1.dy - p3.dy) * t);
-            }
-          } else {
-            // Interpolasi garis 2
-            final t = (progress - 0.33) * 3;
-            path.lineTo(p2.dx + (p3.dx - p2.dx) * t, p2.dy + (p3.dy - p2.dy) * t);
-          }
-        } else {
-          // Interpolasi garis 1
-          final t = progress * 3;
-          path.lineTo(p1.dx + (p2.dx - p1.dx) * t, p1.dy + (p2.dy - p1.dy) * t);
-        }
-
-        if (progress >= 1.0) {
-          canvas.drawPath(path, fillPaint);
-          // Label Sudut
-          drawLabel('A', p1 - const Offset(0, 20), bold: true);
-          drawLabel('B', p2 - const Offset(20, -10), bold: true);
-          drawLabel('C', p3 + const Offset(20, 10), bold: true);
-          // Label Sisi
-          drawLabel('c', Offset((p1.dx + p2.dx) / 2 - 15, (p1.dy + p2.dy) / 2), color: Colors.grey[700]!);
-          drawLabel('a', Offset((p2.dx + p3.dx) / 2, p2.dy + 15), color: Colors.grey[700]!);
-          drawLabel('b', Offset((p1.dx + p3.dx) / 2 + 15, (p1.dy + p3.dy) / 2), color: Colors.grey[700]!);
-        }
-        canvas.drawPath(path, paint);
-        break;
-
-      case 'bd_persegi':
-      case 'bd_persegi_panjang':
-        final double rectW = bangunId == 'bd_persegi' ? w * 0.6 : w * 0.8;
-        final double rectH = bangunId == 'bd_persegi' ? w * 0.6 : h * 0.5;
-        
-        final p1 = Offset(cx - rectW / 2, cy - rectH / 2); // Kiri atas (A)
-        final p2 = Offset(cx + rectW / 2, cy - rectH / 2); // Kanan atas (B)
-        final p3 = Offset(cx + rectW / 2, cy + rectH / 2); // Kanan bawah (C)
-        final p4 = Offset(cx - rectW / 2, cy + rectH / 2); // Kiri bawah (D)
-
-        path.moveTo(p1.dx, p1.dy);
-        if (progress > 0.25) {
-          path.lineTo(p2.dx, p2.dy);
-          if (progress > 0.50) {
-            path.lineTo(p3.dx, p3.dy);
-            if (progress > 0.75) {
-              path.lineTo(p4.dx, p4.dy);
-              if (progress >= 0.99) {
-                path.close();
-              } else {
-                final t = (progress - 0.75) * 4;
-                path.lineTo(p4.dx + (p1.dx - p4.dx) * t, p4.dy + (p1.dy - p4.dy) * t);
-              }
-            } else {
-              final t = (progress - 0.50) * 4;
-              path.lineTo(p3.dx + (p4.dx - p3.dx) * t, p3.dy + (p4.dy - p3.dy) * t);
-            }
-          } else {
-            final t = (progress - 0.25) * 4;
-            path.lineTo(p2.dx + (p3.dx - p2.dx) * t, p2.dy + (p3.dy - p2.dy) * t);
-          }
-        } else {
-          final t = progress * 4;
-          path.lineTo(p1.dx + (p2.dx - p1.dx) * t, p1.dy + (p2.dy - p1.dy) * t);
-        }
-
-        if (progress >= 1.0) {
-          canvas.drawPath(path, fillPaint);
-          // Label Sudut
-          drawLabel('A', p1 - const Offset(15, 15), bold: true);
-          drawLabel('B', p2 + const Offset(15, -15), bold: true);
-          drawLabel('C', p3 + const Offset(15, 15), bold: true);
-          drawLabel('D', p4 - const Offset(15, -15), bold: true);
-          
-          if (bangunId == 'bd_persegi') {
-            drawLabel('s', Offset(cx, p1.dy - 15), color: Colors.grey[700]!);
-            drawLabel('s', Offset(p2.dx + 15, cy), color: Colors.grey[700]!);
-          } else {
-            drawLabel('p', Offset(cx, p1.dy - 15), color: Colors.grey[700]!);
-            drawLabel('l', Offset(p2.dx + 15, cy), color: Colors.grey[700]!);
-          }
-        }
-        canvas.drawPath(path, paint);
-        break;
-
-      case 'bd_lingkaran':
-        final double radius = math.min(w, h) * 0.4;
-        
-        // Animasi lingkaran menggunakan arc
-        final rect = Rect.fromCircle(center: Offset(cx, cy), radius: radius);
-        final sweepAngle = progress * 2 * math.pi;
-        path.addArc(rect, -math.pi / 2, sweepAngle);
-        
-        if (progress >= 1.0) {
-          canvas.drawCircle(Offset(cx, cy), radius, fillPaint);
-          
-          // Titik pusat
-          canvas.drawCircle(Offset(cx, cy), 3, Paint()..color = Colors.black);
-          drawLabel('O', Offset(cx - 10, cy + 10), bold: true);
-          
-          // Garis jari-jari
-          final pRadius = Offset(cx + radius, cy);
-          canvas.drawLine(Offset(cx, cy), pRadius, Paint()..color = Colors.grey[600]!..strokeWidth = 1.5..style = PaintingStyle.stroke);
-          drawLabel('r', Offset(cx + radius / 2, cy - 10), color: Colors.grey[700]!);
-        }
-        canvas.drawPath(path, paint);
-        break;
-
-      default:
-        // Placeholder untuk bentuk lain (gambar kotak saja)
-        final rect = Rect.fromCenter(center: Offset(cx, cy), width: w * 0.5, height: h * 0.5);
-        if (progress >= 1.0) canvas.drawRect(rect, fillPaint);
-        canvas.drawRect(rect, paint);
-        drawLabel('Ilustrasi ${bangunId.split('_')[1]}', Offset(cx, cy));
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant BangunDatarPainter oldDelegate) {
-    return oldDelegate.progress != progress || oldDelegate.bangunId != bangunId;
-  }
-}

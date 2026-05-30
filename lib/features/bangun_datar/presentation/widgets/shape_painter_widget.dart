@@ -8,9 +8,33 @@ import 'package:ruang_geo/core/core.dart';
 
 /// Factory untuk mendapatkan widget animasi sesuai nama/ID bangun datar.
 abstract class ShapePainterFactory {
-  /// Mengembalikan [AnimatedShapeWidget] yang sesuai berdasarkan ID bangun.
   static Widget getAnimatedShape(String bangunId) {
     return AnimatedShapeWidget(bangunId: bangunId);
+  }
+
+  /// Memilih CustomPainter yang sesuai berdasarkan bangunId
+  static CustomPainter getShapePainter({
+    required String bangunId,
+    required double progress,
+  }) {
+    switch (bangunId) {
+      case 'bd_segitiga':
+        return SegitigaPainter(progress: progress);
+      case 'bd_persegi':
+        return PersegiPainter(progress: progress, isSquare: true);
+      case 'bd_persegi_panjang':
+        return PersegiPainter(progress: progress, isSquare: false);
+      case 'bd_lingkaran':
+        return LingkaranPainter(progress: progress);
+      case 'bd_jajargenjang':
+        return JajarGenjangPainter(progress: progress);
+      case 'bd_trapesium':
+        return TrapesiumPainter(progress: progress);
+      case 'bd_layang':
+        return LayangLayangPainter(progress: progress);
+      default:
+        return _DefaultShapePainter(progress: progress, bangunId: bangunId);
+    }
   }
 }
 
@@ -108,7 +132,7 @@ class _AnimatedShapeWidgetState extends State<AnimatedShapeWidget>
             builder: (context, _) {
               return CustomPaint(
                 size: const Size(double.infinity, double.infinity),
-                painter: _getShapePainter(
+                painter: ShapePainterFactory.getShapePainter(
                   bangunId: widget.bangunId,
                   progress: _controller.value,
                 ),
@@ -206,31 +230,6 @@ class _AnimatedShapeWidgetState extends State<AnimatedShapeWidget>
     if (v <= 0.5) return '🐢 Lambat';
     if (v <= 1.0) return '▶ Normal';
     return '⚡ Cepat';
-  }
-
-  /// Memilih CustomPainter yang sesuai berdasarkan bangunId
-  CustomPainter _getShapePainter({
-    required String bangunId,
-    required double progress,
-  }) {
-    switch (bangunId) {
-      case 'bd_segitiga':
-        return SegitigaPainter(progress: progress);
-      case 'bd_persegi':
-        return PersegiPainter(progress: progress, isSquare: true);
-      case 'bd_persegi_panjang':
-        return PersegiPainter(progress: progress, isSquare: false);
-      case 'bd_lingkaran':
-        return LingkaranPainter(progress: progress);
-      case 'bd_jajargenjang':
-        return JajarGenjangPainter(progress: progress);
-      case 'bd_trapesium':
-        return TrapesiumPainter(progress: progress);
-      case 'bd_layang':
-        return LayangLayangPainter(progress: progress);
-      default:
-        return _DefaultShapePainter(progress: progress, bangunId: bangunId);
-    }
   }
 }
 

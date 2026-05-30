@@ -70,7 +70,7 @@ abstract class AppTheme {
       // ─── Bottom Navigation ────────────────────────────────────────────────────
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: AppColors.surface,
-        indicatorColor: AppColors.primaryContainer,
+        indicatorColor: Colors.transparent, // flat style, no background indicator
         iconTheme: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) {
             return const IconThemeData(color: AppColors.primary, size: 24);
