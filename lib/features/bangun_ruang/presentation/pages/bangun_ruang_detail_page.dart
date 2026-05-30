@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:ruang_geo/core/core.dart';
 import 'package:ruang_geo/models/models.dart';
 import 'package:ruang_geo/features/bangun_ruang/presentation/widgets/model_viewer_widget.dart';
-
+import 'package:ruang_geo/features/bangun_ruang/presentation/widgets/jaring_widget.dart';
 /// Halaman Detail Bangun Ruang
 class BangunRuangDetailPage extends StatefulWidget {
   const BangunRuangDetailPage({
@@ -21,6 +21,8 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
     with TickerProviderStateMixin {
   late final BangunModel bangun;
   late final TabController _tabController;
+  
+  bool _isJaringMode = false;
 
   @override
   void initState() {
@@ -64,9 +66,9 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
       ),
       body: Column(
         children: [
-          // ─── Area Atas (Placeholder 3D) ───────────────────────────────
+          // ─── Area Atas (Toggle Jaring & 3D) ─────────────────────────────
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.35,
+            height: MediaQuery.of(context).size.height * 0.40, // Sedikit lebih tinggi
             width: double.infinity,
             child: Stack(
               children: [
@@ -92,61 +94,102 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
                     ),
                   ),
                 ),
-                // Model 3D Viewer (dengan fallback ke Bangun3DViewer)
+                // Konten Aktif
                 Positioned.fill(
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.vertical(
-                      bottom: Radius.circular(32),
-                    ),
-                    child: RGModelViewer(
-                      bangunId: bangun.id,
-                      autoRotate: true,
-                      backgroundColor: const Color(0x006C63FF), // transparan
-                      fallbackSize: 120,
-                    ),
+                  child: AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: _isJaringMode
+                        ? JaringWidget(
+                            key: const ValueKey('jaring_mode'),
+                            bangunId: bangun.id,
+                          )
+                        : ClipRRect(
+                            key: const ValueKey('3d_mode'),
+                            borderRadius: const BorderRadius.vertical(
+                              bottom: Radius.circular(32),
+                            ),
+                            child: RGModelViewer(
+                              bangunId: bangun.id,
+                              autoRotate: true,
+                              backgroundColor: const Color(0x006C63FF),
+                              fallbackSize: 120,
+                            ),
+                          ),
                   ),
                 ),
-                // Tombol "Lihat Full 3D" di sudut kanan bawah area viewer
+                // Toggle Button
                 Positioned(
-                  bottom: 16,
-                  right: 16,
-                  child: GestureDetector(
-                    onTap: () {
-                      context.push('/bangun-ruang/${bangun.id}/model');
-                    },
+                  top: 8,
+                  left: 0,
+                  right: 0,
+                  child: Center(
                     child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 8),
+                      padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(220),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withAlpha(20),
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
+                        color: Colors.black.withAlpha(50),
+                        borderRadius: BorderRadius.circular(30),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.open_in_full_rounded,
-                              size: 16, color: AppColors.primary),
-                          const SizedBox(width: 6),
-                          Text(
-                            'Full 3D',
-                            style: AppTypography.labelSmall.copyWith(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w700,
-                            ),
+                          _buildModeToggle(
+                            title: 'Model 3D',
+                            icon: Icons.view_in_ar_rounded,
+                            isActive: !_isJaringMode,
+                            onTap: () => setState(() => _isJaringMode = false),
+                          ),
+                          _buildModeToggle(
+                            title: 'Jaring-jaring',
+                            icon: Icons.layers_rounded,
+                            isActive: _isJaringMode,
+                            onTap: () => setState(() => _isJaringMode = true),
                           ),
                         ],
                       ),
                     ),
                   ),
                 ),
-
+                // Tombol Full 3D
+                if (!_isJaringMode)
+                  Positioned(
+                    bottom: 16,
+                    right: 16,
+                    child: GestureDetector(
+                      onTap: () {
+                        context.push('/bangun-ruang/${bangun.id}/model');
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withAlpha(220),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(20),
+                              blurRadius: 8,
+                              offset: const Offset(0, 4),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.open_in_full_rounded,
+                                size: 16, color: AppColors.primary),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Full 3D',
+                              style: AppTypography.labelSmall.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
           ),
@@ -487,6 +530,43 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
       }
     }
     return '-'; // Jika tidak ada
+  }
+  // Helper widget untuk mode toggle
+  Widget _buildModeToggle({
+    required String title,
+    required IconData icon,
+    required bool isActive,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        decoration: BoxDecoration(
+          color: isActive ? Colors.white : Colors.transparent,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 16,
+              color: isActive ? AppColors.primary : Colors.white70,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              title,
+              style: AppTypography.labelSmall.copyWith(
+                color: isActive ? AppColors.primary : Colors.white70,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }
 
