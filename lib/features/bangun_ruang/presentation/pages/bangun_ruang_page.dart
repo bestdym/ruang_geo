@@ -165,12 +165,12 @@ class _BangunCard extends StatelessWidget {
                 ),
                 child: Stack(
                   children: [
-                    // Ikon/Gambar Placeholder di tengah
+                    // Bangun 3D Viewer di tengah
                     Center(
-                      child: Icon(
-                        Icons.view_in_ar_rounded,
-                        size: 60,
-                        color: AppColors.primary.withAlpha(100),
+                      child: Bangun3DViewer(
+                        bangunId: bangun.id,
+                        size: 80,
+                        color: AppColors.primary,
                       ),
                     ),
 

@@ -18,10 +18,9 @@ class BangunRuangDetailPage extends StatefulWidget {
 }
 
 class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late final BangunModel bangun;
   late final TabController _tabController;
-  late final AnimationController _rotateController;
 
   @override
   void initState() {
@@ -33,18 +32,11 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
     );
 
     _tabController = TabController(length: 4, vsync: this);
-    
-    // Animasi rotasi untuk placeholder 3D
-    _rotateController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 10),
-    )..repeat();
   }
 
   @override
   void dispose() {
     _tabController.dispose();
-    _rotateController.dispose();
     super.dispose();
   }
 
@@ -100,41 +92,28 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
                     ),
                   ),
                 ),
-                // Animasi Rotasi Placeholder
+                // Bangun 3D Viewer
                 Center(
-                  child: AnimatedBuilder(
-                    animation: _rotateController,
-                    builder: (context, child) {
-                      return Transform(
-                        alignment: Alignment.center,
-                        transform: Matrix4.identity()
-                          ..setEntry(3, 2, 0.001) // perspective
-                          ..rotateY(_rotateController.value * 2 * math.pi)
-                          ..rotateX(0.2), // sedikit miring ke bawah
-                        child: child,
-                      );
-                    },
-                    child: Container(
-                      width: 140,
-                      height: 140,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withAlpha(50),
-                        border: Border.all(color: Colors.white, width: 2),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withAlpha(20),
-                            blurRadius: 20,
-                            offset: const Offset(0, 10),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.view_in_ar_rounded,
-                          size: 60,
-                          color: Colors.white.withAlpha(200),
+                  child: Container(
+                    width: 160,
+                    height: 160,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withAlpha(30),
+                      border: Border.all(color: Colors.white.withAlpha(100), width: 2),
+                      borderRadius: BorderRadius.circular(30),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withAlpha(20),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
                         ),
+                      ],
+                    ),
+                    child: Center(
+                      child: Bangun3DViewer(
+                        bangunId: bangun.id,
+                        size: 120,
+                        color: Colors.white,
                       ),
                     ),
                   ),
