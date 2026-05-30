@@ -5,8 +5,8 @@ import 'package:ruang_geo/core/utils/model_path_helper.dart';
 
 /// Widget reusable untuk menampilkan model 3D menggunakan model_viewer_plus.
 ///
-/// Jika file .glb belum tersedia, otomatis fallback ke [Bangun3DViewer]
-/// (custom painter) agar tampilan tetap ada.
+/// Jika file .glb belum tersedia (path null), otomatis fallback ke
+/// [Bangun3DViewer] (custom painter) agar tampilan tetap ada.
 class RGModelViewer extends StatefulWidget {
   const RGModelViewer({
     super.key,
@@ -41,8 +41,6 @@ class RGModelViewer extends StatefulWidget {
 }
 
 class _RGModelViewerState extends State<RGModelViewer> {
-  bool _hasError = false;
-  bool _isLoading = true;
   late final String? _modelPath;
 
   @override
@@ -53,71 +51,29 @@ class _RGModelViewerState extends State<RGModelViewer> {
 
   @override
   Widget build(BuildContext context) {
-    // Jika path tidak ditemukan atau sudah error, tampilkan fallback
-    if (_modelPath == null || _hasError) {
-      return _buildFallback();
+    // Jika path tidak ditemukan, tampilkan fallback Bangun3DViewer
+    if (_modelPath == null) {
+      return _buildFallback(hasError: false);
     }
 
-    return Stack(
-      children: [
-        // ─── Model Viewer ───────────────────────────────────────────────
-        ModelViewer(
-          src: _modelPath!,
-          autoRotate: widget.autoRotate,
-          cameraControls: widget.cameraControls,
-          backgroundColor: widget.backgroundColor,
-          shadowIntensity: widget.shadowIntensity,
-          autoRotateDelay: 0,
-          rotationPerSecond: '30deg',
-          onWebViewCreated: (controller) {
-            // Model mulai loading
-            setState(() => _isLoading = true);
-          },
-          onPageFinished: (url) {
-            // Halaman WebView selesai load
-            if (mounted) setState(() => _isLoading = false);
-          },
-          onPageStarted: (url) {
-            if (mounted) setState(() => _isLoading = true);
-          },
-          onWebResourceError: (error) {
-            // Error loading model
-            if (mounted) setState(() {
-              _hasError = true;
-              _isLoading = false;
-            });
-          },
-        ),
-
-        // ─── Loading Indicator ──────────────────────────────────────────
-        if (_isLoading)
-          Container(
-            color: widget.backgroundColor,
-            child: Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  CircularProgressIndicator(
-                    color: AppColors.primary,
-                    strokeWidth: 3,
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'Memuat model 3D...',
-                    style: AppTypography.bodySmall.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-      ],
+    // Render ModelViewer jika path tersedia
+    return ModelViewer(
+      src: _modelPath,
+      autoRotate: widget.autoRotate,
+      cameraControls: widget.cameraControls,
+      backgroundColor: widget.backgroundColor,
+      shadowIntensity: widget.shadowIntensity,
+      autoRotateDelay: 0,
+      rotationPerSecond: '30deg',
+      debugLogging: false,
+      onWebViewCreated: (controller) {
+        // WebView berhasil dibuat; model mulai loading di WebGL
+      },
     );
   }
 
   /// Fallback: tampilkan Bangun3DViewer jika .glb belum tersedia
-  Widget _buildFallback() {
+  Widget _buildFallback({required bool hasError}) {
     return Container(
       color: widget.backgroundColor,
       child: Center(
@@ -128,7 +84,7 @@ class _RGModelViewerState extends State<RGModelViewer> {
               bangunId: widget.bangunId,
               size: widget.fallbackSize,
             ),
-            if (_hasError) ...[
+            if (hasError) ...[
               const SizedBox(height: 8),
               Text(
                 'Model 3D belum tersedia',
