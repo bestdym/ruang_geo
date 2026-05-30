@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'dart:math' as math;
 import 'package:ruang_geo/core/core.dart';
 import 'package:ruang_geo/models/models.dart';
+import 'package:ruang_geo/features/bangun_ruang/presentation/widgets/model_viewer_widget.dart';
 
 /// Halaman Detail Bangun Ruang
 class BangunRuangDetailPage extends StatefulWidget {
@@ -92,27 +93,56 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
                     ),
                   ),
                 ),
-                // Bangun 3D Viewer
-                Center(
-                  child: Container(
-                    width: 160,
-                    height: 160,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withAlpha(30),
-                      border: Border.all(color: Colors.white.withAlpha(100), width: 2),
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withAlpha(20),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
+                // Model 3D Viewer (dengan fallback ke Bangun3DViewer)
+                Positioned.fill(
+                  child: ClipRRect(
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(32),
                     ),
-                    child: Center(
-                      child: Bangun3DViewer(
-                        bangunId: bangun.id,
-                        size: 120,
+                    child: RGModelViewer(
+                      bangunId: bangun.id,
+                      autoRotate: true,
+                      backgroundColor: const Color(0x006C63FF), // transparan
+                      fallbackSize: 120,
+                    ),
+                  ),
+                ),
+                // Tombol "Lihat Full 3D" di sudut kanan bawah area viewer
+                Positioned(
+                  bottom: 16,
+                  right: 16,
+                  child: GestureDetector(
+                    onTap: () {
+                      context.push('/bangun-ruang/${bangun.id}/model');
+                    },
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withAlpha(220),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withAlpha(20),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.open_in_full_rounded,
+                              size: 16, color: AppColors.primary),
+                          const SizedBox(width: 6),
+                          Text(
+                            'Full 3D',
+                            style: AppTypography.labelSmall.copyWith(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
@@ -206,16 +236,38 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
         ),
         const SizedBox(height: 32),
 
-        ElevatedButton.icon(
-          onPressed: () {
-            context.push('${AppConstants.routeAR}/${bangun.id}');
-          },
-          icon: const Icon(Icons.view_in_ar_rounded),
-          label: const Text('Lihat di AR'),
-          style: ElevatedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            textStyle: AppTypography.titleSmall.copyWith(fontWeight: FontWeight.w700),
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  context.push('/bangun-ruang/${bangun.id}/model');
+                },
+                icon: const Icon(Icons.view_in_ar_rounded),
+                label: const Text('Model 3D'),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  textStyle: AppTypography.labelMedium
+                      .copyWith(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  context.push('${AppConstants.routeAR}/${bangun.id}');
+                },
+                icon: const Icon(Icons.camera_alt_rounded),
+                label: const Text('Lihat di AR'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                  textStyle: AppTypography.labelMedium
+                      .copyWith(fontWeight: FontWeight.w700),
+                ),
+              ),
+            ),
+          ],
         ),
       ],
     );

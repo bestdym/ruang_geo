@@ -4,6 +4,7 @@ import '../core/core.dart';
 import '../features/home/presentation/pages/home_page.dart';
 import '../features/bangun_ruang/presentation/pages/bangun_ruang_page.dart';
 import '../features/bangun_ruang/presentation/pages/bangun_ruang_detail_page.dart';
+import '../features/bangun_ruang/presentation/pages/model_viewer_screen.dart';
 import '../features/bangun_datar/presentation/pages/bangun_datar_page.dart';
 import '../features/bangun_datar/presentation/pages/bangun_datar_detail_page.dart';
 import '../features/ar/presentation/pages/ar_page.dart';
@@ -200,6 +201,17 @@ final GoRouter appRouter = GoRouter(
             BangunRuangDetailPage(
                 bangunId: state.pathParameters['id']!),
           ),
+          routes: [
+            GoRoute(
+              path: 'model',
+              name: 'bangun-ruang-model',
+              pageBuilder: (context, state) => _slidePageBuilder(
+                state,
+                ModelViewerScreen(
+                    bangunId: state.pathParameters['id']!),
+              ),
+            ),
+          ],
         ),
       ],
     ),
