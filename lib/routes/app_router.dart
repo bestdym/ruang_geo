@@ -12,6 +12,12 @@ import '../features/ar/presentation/pages/ar_view_page.dart';
 import '../features/kuis/presentation/pages/kuis_page.dart';
 import '../features/kuis/presentation/pages/kuis_play_page.dart';
 import '../features/kuis/presentation/pages/kuis_hasil_page.dart';
+import '../features/auth/screens/login_screen.dart';
+import '../features/auth/screens/register_screen.dart';
+import '../features/profil/screens/lengkapi_profil_screen.dart';
+import '../features/profil/widgets/profil_guard.dart';
+import '../features/auth/services/auth_notifier.dart';
+import '../core/services/supabase_service.dart';
 // ─── Placeholder pages untuk shell bottom nav ─────────────────────────────────
 
 class _PetunjukPage extends StatelessWidget {
@@ -121,10 +127,48 @@ class _PengaturanPage extends StatelessWidget {
 ///   - /kuis
 ///   - /kuis/:kategori
 ///   - /kuis/:kategori/hasil
+final _authNotifier = AuthNotifier();
+
 final GoRouter appRouter = GoRouter(
   initialLocation: AppConstants.routeHome,
   debugLogDiagnostics: false,
+  refreshListenable: _authNotifier,
+  redirect: (context, state) {
+    final session = supabase.auth.currentSession;
+    final isLoggedIn = session != null;
+    final isGoingToLogin = state.matchedLocation == '/login' || state.matchedLocation == '/register';
+
+    if (!isLoggedIn) {
+      if (!isGoingToLogin) return '/login';
+      return null;
+    }
+
+    if (isLoggedIn) {
+      if (isGoingToLogin || state.matchedLocation == AppConstants.routeSplash) {
+        return AppConstants.routeHome;
+      }
+    }
+    
+    return null;
+  },
   routes: [
+    // ─── Auth Routes ────────────────────────────────────────────────────────
+    GoRoute(
+      path: '/login',
+      name: 'login',
+      pageBuilder: (context, state) => _fadePageBuilder(state, const LoginScreen()),
+    ),
+    GoRoute(
+      path: '/register',
+      name: 'register',
+      pageBuilder: (context, state) => _slidePageBuilder(state, const RegisterScreen()),
+    ),
+    GoRoute(
+      path: '/lengkapi-profil',
+      name: 'lengkapi-profil',
+      pageBuilder: (context, state) => _fadePageBuilder(state, const LengkapiProfilScreen()),
+    ),
+
     // ─── Splash redirect ────────────────────────────────────────────────────
     GoRoute(
       path: AppConstants.routeSplash,
@@ -160,7 +204,7 @@ final GoRouter appRouter = GoRouter(
           GoRoute(
             path: '/pencapaian',
             name: 'pencapaian',
-            builder: (context, state) => const _PencapaianPage(),
+            builder: (context, state) => ProfilGuard(child: const _PencapaianPage()),
           ),
         ]),
 
@@ -260,7 +304,7 @@ final GoRouter appRouter = GoRouter(
       name: 'kuis',
       pageBuilder: (context, state) => _slidePageBuilder(
         state,
-        const KuisPage(),
+        ProfilGuard(child: const KuisPage()),
       ),
       routes: [
         GoRoute(

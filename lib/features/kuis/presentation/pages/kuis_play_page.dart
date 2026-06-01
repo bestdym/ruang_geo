@@ -1,10 +1,13 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:ruang_geo/core/core.dart';
 import 'package:ruang_geo/models/models.dart';
+import 'package:ruang_geo/features/kuis/services/kuis_service.dart';
+import 'package:ruang_geo/core/services/supabase_service.dart';
 
-/// Halaman bermain kuis
+/// Halaman bermain kuis - data dari Supabase
 class KuisPlayPage extends StatefulWidget {
   const KuisPlayPage({super.key, required this.kategori});
 
@@ -15,14 +18,23 @@ class KuisPlayPage extends StatefulWidget {
 }
 
 class _KuisPlayPageState extends State<KuisPlayPage> {
-  late final List<SoalModel> _soalList;
+  final _kuisService = KuisService();
+
+  List<SoalModel> _soalList = [];
   int _currentIndex = 0;
   int _score = 0;
   int _poinDidapat = 0;
+  String? _sesiId;
+  int _totalDurasi = 0;
+
+  // Loading & Error state
+  bool _isLoading = true;
+  String? _errorMessage;
 
   // Timer
   Timer? _timer;
-  int _timeLeft = 30; // 30 detik per soal
+  Timer? _durasiTimer;
+  int _timeLeft = 30;
 
   // State Jawaban
   int? _selectedAnswerIndex;
@@ -31,21 +43,45 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
   @override
   void initState() {
     super.initState();
-    _initSoal();
-    _startTimer();
+    _loadSoal();
   }
 
-  void _initSoal() {
-    // Filter soal berdasarkan kategori
-    final allSoal = List<SoalModel>.from(DummyData.soalKuisList);
-    allSoal.shuffle(); // Acak urutan soal
+  Future<void> _loadSoal() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+    try {
+      final soalList = await _kuisService.getSoalByKategori(widget.kategori);
 
-    if (widget.kategori == 'ruang') {
-      _soalList = allSoal.where((s) => s.bangunId.startsWith('br_')).take(10).toList();
-    } else if (widget.kategori == 'datar') {
-      _soalList = allSoal.where((s) => s.bangunId.startsWith('bd_')).take(10).toList();
-    } else {
-      _soalList = allSoal.take(10).toList();
+      if (soalList.isEmpty) {
+        setState(() {
+          _isLoading = false;
+          _errorMessage = 'Belum ada soal untuk kategori ini.\nCek kembali nanti ya!';
+        });
+        return;
+      }
+
+      soalList.shuffle();
+      final userId = supabase.auth.currentUser?.id;
+      String? sesiId;
+      if (userId != null) {
+        sesiId = await _kuisService.mulaiSesi(userId, widget.kategori, soalList.length);
+      }
+
+      setState(() {
+        _soalList = soalList;
+        _sesiId = sesiId;
+        _isLoading = false;
+      });
+
+      _startTimer();
+      _startDurasiTimer();
+    } catch (e) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Gagal memuat soal. Periksa koneksi internet Anda.';
+      });
     }
   }
 
@@ -54,44 +90,56 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
     _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_timeLeft > 0) {
-        setState(() {
-          _timeLeft--;
-        });
+        setState(() => _timeLeft--);
       } else {
-        // Waktu habis
         _timer?.cancel();
-        if (!_isAnswerRevealed) {
-          _handleAnswerTimeout();
-        }
+        if (!_isAnswerRevealed) _handleAnswerTimeout();
       }
+    });
+  }
+
+  void _startDurasiTimer() {
+    _durasiTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+      _totalDurasi++;
     });
   }
 
   void _handleAnswerTimeout() {
     setState(() {
       _isAnswerRevealed = true;
-      _selectedAnswerIndex = -1; // -1 berarti tidak menjawab
+      _selectedAnswerIndex = -1;
     });
   }
 
   void _handleAnswerSelect(int index) {
-    if (_isAnswerRevealed) return; // Tidak bisa pilih lagi jika sudah terjawab
-    
+    if (_isAnswerRevealed) return;
+
+    final currentSoal = _soalList[_currentIndex];
+    final isBenar = index == currentSoal.jawabanBenar;
+
     setState(() {
       _selectedAnswerIndex = index;
       _isAnswerRevealed = true;
       _timer?.cancel();
-
-      // Cek benar/salah
-      final currentSoal = _soalList[_currentIndex];
-      if (index == currentSoal.jawabanBenar) {
+      if (isBenar) {
         _score++;
         _poinDidapat += currentSoal.poin;
       }
     });
+
+    // Simpan jawaban ke Supabase (async, tidak menunggu)
+    if (_sesiId != null) {
+      _kuisService.simpanJawaban(
+        sesiId: _sesiId!,
+        soalId: currentSoal.id,
+        jawabanDipilih: index,
+        isBenar: isBenar,
+        poin: currentSoal.poin,
+      );
+    }
   }
 
-  void _nextSoal() {
+  Future<void> _nextSoal() async {
     if (_currentIndex < _soalList.length - 1) {
       setState(() {
         _currentIndex++;
@@ -100,22 +148,48 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
         _startTimer();
       });
     } else {
-      // Selesai, ke halaman hasil
-      context.pushReplacement(
-        '/kuis/${widget.kategori}/hasil',
-        extra: {'score': _score, 'total': _soalList.length, 'poin': _poinDidapat},
-      );
+      // Selesai
+      _timer?.cancel();
+      _durasiTimer?.cancel();
+
+      // Selesaikan sesi di Supabase
+      final userId = supabase.auth.currentUser?.id;
+      if (_sesiId != null && userId != null) {
+        await _kuisService.selesaikanSesi(
+          sesiId: _sesiId!,
+          userId: userId,
+          kategori: widget.kategori,
+          soalBenar: _score,
+          totalSoal: _soalList.length,
+          totalPoin: _poinDidapat,
+          durasiDetik: _totalDurasi,
+        );
+      }
+
+      if (mounted) {
+        context.pushReplacement(
+          '/kuis/${widget.kategori}/hasil',
+          extra: {
+            'score': _score,
+            'total': _soalList.length,
+            'poin': _poinDidapat,
+          },
+        );
+      }
     }
   }
 
   @override
   void dispose() {
     _timer?.cancel();
+    _durasiTimer?.cancel();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) return _buildLoadingShimmer();
+    if (_errorMessage != null) return _buildErrorState();
     if (_soalList.isEmpty) {
       return const Scaffold(body: Center(child: Text('Tidak ada soal.')));
     }
@@ -129,6 +203,7 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
       appBar: AppBarCustom(
         onBack: () {
           _timer?.cancel();
+          _durasiTimer?.cancel();
           context.pop();
         },
         title: 'Soal ${_currentIndex + 1} dari ${_soalList.length}',
@@ -251,7 +326,7 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 12),
                         child: _JawabanCard(
-                          abjad: String.fromCharCode(65 + index), // A, B, C, D
+                          abjad: String.fromCharCode(65 + index),
                           teks: soal.pilihan[index],
                           isRevealed: _isAnswerRevealed,
                           isSelected: _selectedAnswerIndex == index,
@@ -262,7 +337,7 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
                     }),
 
                     // ─── Penjelasan (Muncul setelah jawab) ─────────────────
-                    if (_isAnswerRevealed) ...[
+                    if (_isAnswerRevealed && soal.penjelasan != null && soal.penjelasan!.isNotEmpty) ...[
                       const SizedBox(height: 16),
                       Container(
                         padding: const EdgeInsets.all(16),
@@ -278,15 +353,12 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
                               style: AppTypography.labelMedium.copyWith(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              soal.penjelasan,
-                              style: AppTypography.bodyMedium,
-                            ),
+                            Text(soal.penjelasan!, style: AppTypography.bodyMedium),
                           ],
                         ),
                       ),
                     ],
-                    const SizedBox(height: 100), // padding untuk button
+                    const SizedBox(height: 100),
                   ],
                 ),
               ),
@@ -294,7 +366,7 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
           ],
         ),
       ),
-      
+
       // ─── Tombol Selanjutnya ───────────────────────────────────────────
       bottomSheet: Container(
         color: AppColors.background,
@@ -309,7 +381,68 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
       ),
     );
   }
+
+  // ─── Shimmer Loading ────────────────────────────────────────────────────────
+  Widget _buildLoadingShimmer() {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBarCustom(title: 'Memuat Soal...'),
+      body: Shimmer.fromColors(
+        baseColor: AppColors.surfaceVariant,
+        highlightColor: AppColors.surface,
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Container(height: 24, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(8))),
+              const SizedBox(height: 12),
+              Container(height: 120, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
+              const SizedBox(height: 32),
+              ...List.generate(4, (i) => Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Container(height: 64, decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16))),
+              )),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ─── Error State ────────────────────────────────────────────────────────────
+  Widget _buildErrorState() {
+    return Scaffold(
+      backgroundColor: AppColors.background,
+      appBar: AppBarCustom(title: 'Kuis', onBack: () => context.pop()),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(32),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.wifi_off_rounded, size: 72, color: AppColors.error),
+              const SizedBox(height: 16),
+              Text(
+                _errorMessage ?? 'Terjadi kesalahan',
+                style: AppTypography.bodyLarge,
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: _loadSoal,
+                icon: const Icon(Icons.refresh_rounded),
+                label: const Text('Coba Lagi'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
+
+// ─── Widget Jawaban Card ─────────────────────────────────────────────────────
 
 class _JawabanCard extends StatelessWidget {
   const _JawabanCard({
