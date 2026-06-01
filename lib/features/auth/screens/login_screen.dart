@@ -107,6 +107,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () => context.push('/register'),
                   child: const Text('Belum punya akun? Daftar'),
                 ),
+                TextButton(
+                  onPressed: () => context.go('/home'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.textSecondary,
+                  ),
+                  child: const Text('Masuk sebagai Tamu'),
+                ),
               ],
             ),
           ),

@@ -27,8 +27,12 @@ class _ProfilGuardState extends State<ProfilGuard> {
   Future<void> _checkProfil() async {
     final userId = supabase.auth.currentUser?.id;
     if (userId == null) {
+      if (!mounted) return;
       setState(() {
         _isChecking = false;
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showLoginBottomSheet();
       });
       return;
     }
@@ -45,6 +49,87 @@ class _ProfilGuardState extends State<ProfilGuard> {
         _showProfilBottomSheet();
       });
     }
+  }
+
+  void _showLoginBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      isDismissible: false,
+      enableDrag: false,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (ctx) => Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppColors.outlineVariant,
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withAlpha(30),
+                shape: BoxShape.circle,
+              ),
+              child: const Icon(Icons.person_rounded, size: 40, color: AppColors.primary),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              'Akses Terbatas',
+              style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Anda harus masuk atau mendaftar untuk mengakses fitur ini (seperti kuis dan pencapaian).',
+              style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                context.push('/login');
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 52),
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              child: const Text(
+                'Masuk / Daftar',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextButton(
+              onPressed: () {
+                Navigator.pop(ctx);
+                context.go('/home'); // Kembali ke home
+              },
+              style: TextButton.styleFrom(
+                minimumSize: const Size(double.infinity, 52),
+                foregroundColor: AppColors.textSecondary,
+              ),
+              child: const Text('Nanti saja, kembali ke Beranda'),
+            ),
+            SizedBox(height: MediaQuery.paddingOf(context).bottom),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showProfilBottomSheet() {

@@ -123,6 +123,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   onPressed: () => context.pop(),
                   child: const Text('Sudah punya akun? Login'),
                 ),
+                TextButton(
+                  onPressed: () => context.go('/home'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: AppColors.textSecondary,
+                  ),
+                  child: const Text('Masuk sebagai Tamu'),
+                ),
               ],
             ),
           ),
