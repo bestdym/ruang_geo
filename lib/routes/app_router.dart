@@ -387,46 +387,130 @@ class _BottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
+  Widget build(BuildContext context) {
+    return Container(
+      color: AppColors.background,
+      padding: EdgeInsets.only(
+        bottom: MediaQuery.paddingOf(context).bottom + 12,
+        top: 12,
+        left: 16,
+        right: 16,
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: [
+          _NavItem(
+            icon: Icons.home_rounded,
+            label: 'Beranda',
+            isSelected: currentIndex == 0,
+            onTap: () => onTap(0),
+          ),
+          _NavItem(
+            icon: Icons.menu_book_rounded,
+            label: 'Petunjuk',
+            isSelected: currentIndex == 1,
+            onTap: () => onTap(1),
+          ),
+          _NavItem(
+            icon: Icons.emoji_events_rounded,
+            label: 'Pencapaian',
+            isSelected: currentIndex == 2,
+            onTap: () => onTap(2),
+          ),
+          _NavItem(
+            icon: Icons.settings_rounded,
+            label: 'Pengaturan',
+            isSelected: currentIndex == 3,
+            onTap: () => onTap(3),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatefulWidget {
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  @override
+  State<_NavItem> createState() => _NavItemState();
+}
+
+class _NavItemState extends State<_NavItem> {
+  bool _isHovered = false;
+
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      currentIndex: currentIndex,
-      onTap: onTap,
-      type: BottomNavigationBarType.fixed,
-      backgroundColor: Colors.white,
-      selectedItemColor: const Color(0xFF6C63FF),
-      unselectedItemColor: const Color(0xFF9E9E9E),
-      selectedLabelStyle: const TextStyle(
-        fontWeight: FontWeight.w600,
-        fontSize: 11,
+    final bool isActive = widget.isSelected;
+    final bool isEnlarged = isActive || _isHovered;
+    
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isHovered = true),
+        onTapUp: (_) {
+          setState(() => _isHovered = false);
+          widget.onTap();
+        },
+        onTapCancel: () => setState(() => _isHovered = false),
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutBack,
+          transform: Matrix4.identity()
+            ..translate(0.0, isEnlarged ? -5.0 : 0.0)
+            ..scale(isEnlarged ? 1.15 : 1.0),
+          transformAlignment: Alignment.bottomCenter,
+          padding: EdgeInsets.symmetric(
+            horizontal: isActive ? 18 : 12,
+            vertical: isActive ? 10 : 8,
+          ),
+          decoration: BoxDecoration(
+            color: isActive 
+                ? AppColors.primary.withAlpha(25)
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutBack,
+                transform: Matrix4.identity()..scale(isEnlarged ? 1.15 : 1.0),
+                transformAlignment: Alignment.center,
+                child: Icon(
+                  widget.icon,
+                  color: isActive ? AppColors.primary : AppColors.textHint,
+                  size: 24,
+                ),
+              ),
+              const SizedBox(height: 6),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 300),
+                curve: Curves.easeOutBack,
+                style: AppTypography.labelSmall.copyWith(
+                  color: isActive ? AppColors.primary : AppColors.textHint,
+                  fontWeight: isActive ? FontWeight.w800 : FontWeight.w600,
+                  fontSize: isEnlarged ? 13 : 11,
+                ),
+                child: Text(widget.label),
+              ),
+            ],
+          ),
+        ),
       ),
-      unselectedLabelStyle: const TextStyle(
-        fontWeight: FontWeight.w400,
-        fontSize: 11,
-      ),
-      elevation: 8,
-      items: const [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.home_outlined),
-          activeIcon: Icon(Icons.home),
-          label: 'Beranda',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.menu_book_outlined),
-          activeIcon: Icon(Icons.menu_book),
-          label: 'Petunjuk',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.emoji_events_outlined),
-          activeIcon: Icon(Icons.emoji_events),
-          label: 'Pencapaian',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.settings_outlined),
-          activeIcon: Icon(Icons.settings),
-          label: 'Pengaturan',
-        ),
-      ],
     );
   }
 }
