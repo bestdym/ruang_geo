@@ -22,6 +22,9 @@ class AppBarCustom extends StatelessWidget implements PreferredSizeWidget {
     this.onBack,
     this.actionIcon,
     this.onActionPressed,
+    this.actions,
+    this.bottom,
+    this.backgroundColor,
     this.centerTitle = true,
   });
 
@@ -29,35 +32,76 @@ class AppBarCustom extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback? onBack;
   final IconData? actionIcon;
   final VoidCallback? onActionPressed;
+  final List<Widget>? actions;
+  final PreferredSizeWidget? bottom;
+  final Color? backgroundColor;
   final bool centerTitle;
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      backgroundColor: AppColors.background,
+      backgroundColor: backgroundColor ?? AppColors.background,
       elevation: 0,
       centerTitle: centerTitle,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
-        onPressed: onBack ?? () {
-          if (context.canPop()) context.pop();
-        },
+      leadingWidth: 64, // Beri sedikit ruang agar padding di leading pas
+      leading: Center(
+        child: _AppBarIconButton(
+          icon: Icons.arrow_back_ios_new_rounded,
+          onTap: onBack ?? () {
+            if (context.canPop()) context.pop();
+          },
+        ),
       ),
       title: Text(
         title,
-        style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w600),
+        style: AppTypography.titleLarge.copyWith(fontWeight: FontWeight.w800, color: AppColors.textPrimary),
       ),
-      actions: [
+      actions: actions ?? [
         if (actionIcon != null)
-          IconButton(
-            icon: Icon(actionIcon, color: AppColors.textPrimary),
-            onPressed: onActionPressed,
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.only(right: 16),
+              child: _AppBarIconButton(
+                icon: actionIcon!,
+                onTap: onActionPressed ?? () {},
+              ),
+            ),
           ),
-        const SizedBox(width: 8),
       ],
+      bottom: bottom,
     );
   }
 
   @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+  Size get preferredSize => Size.fromHeight(kToolbarHeight + (bottom?.preferredSize.height ?? 0));
+}
+
+class _AppBarIconButton extends StatelessWidget {
+  const _AppBarIconButton({
+    required this.icon,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.surfaceVariant,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(12),
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(10),
+          child: Icon(
+            icon,
+            color: AppColors.textPrimary,
+            size: 20,
+          ),
+        ),
+      ),
+    );
+  }
 }

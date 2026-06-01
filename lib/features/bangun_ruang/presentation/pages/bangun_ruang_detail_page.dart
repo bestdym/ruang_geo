@@ -46,23 +46,14 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(bangun.nama),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.favorite_border_rounded),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${bangun.nama} ditambahkan ke favorit!')),
-              );
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
+      appBar: AppBarCustom(
+        title: bangun.nama,
+        actionIcon: Icons.favorite_border_rounded,
+        onActionPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${bangun.nama} ditambahkan ke favorit!')),
+          );
+        },
       ),
       body: Column(
         children: [
@@ -72,13 +63,20 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
             width: double.infinity,
             child: Stack(
               children: [
-                // Background gradient
+                // Background
                 Container(
                   decoration: BoxDecoration(
-                    gradient: AppColors.primaryGradient,
+                    color: Colors.white,
                     borderRadius: const BorderRadius.vertical(
                       bottom: Radius.circular(32),
                     ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(10),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
                   ),
                 ),
                 // Ornamen Lingkaran
@@ -90,7 +88,7 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
                     height: 200,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withAlpha(20),
+                      color: AppColors.primary.withAlpha(10),
                     ),
                   ),
                 ),
@@ -126,8 +124,9 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
                     child: Container(
                       padding: const EdgeInsets.all(4),
                       decoration: BoxDecoration(
-                        color: Colors.black.withAlpha(50),
+                        color: AppColors.surfaceVariant,
                         borderRadius: BorderRadius.circular(30),
+                        border: Border.all(color: AppColors.outlineVariant),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -546,6 +545,15 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
         decoration: BoxDecoration(
           color: isActive ? Colors.white : Colors.transparent,
           borderRadius: BorderRadius.circular(24),
+          boxShadow: isActive
+              ? [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(10),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  )
+                ]
+              : [],
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -553,13 +561,13 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
             Icon(
               icon,
               size: 16,
-              color: isActive ? AppColors.primary : Colors.white70,
+              color: isActive ? AppColors.primary : AppColors.textSecondary,
             ),
             const SizedBox(width: 6),
             Text(
               title,
               style: AppTypography.labelSmall.copyWith(
-                color: isActive ? AppColors.primary : Colors.white70,
+                color: isActive ? AppColors.primary : AppColors.textSecondary,
                 fontWeight: isActive ? FontWeight.w700 : FontWeight.w600,
               ),
             ),

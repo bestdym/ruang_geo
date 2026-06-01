@@ -46,62 +46,18 @@ class _ModelViewerScreenState extends State<ModelViewerScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
+      appBar: AppBarCustom(
         backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: Colors.white.withAlpha(220),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(20),
-                  blurRadius: 8,
-                ),
-              ],
+        title: _bangun.nama,
+        actionIcon: Icons.favorite_border_rounded,
+        onActionPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${_bangun.nama} ditambahkan ke favorit!'),
+              duration: const Duration(seconds: 1),
             ),
-            child: const Icon(
-              Icons.arrow_back_ios_new_rounded,
-              color: AppColors.textPrimary,
-              size: 18,
-            ),
-          ),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          _bangun.nama,
-          style: AppTypography.titleMedium.copyWith(
-            color: AppColors.textPrimary,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        actions: [
-          IconButton(
-            icon: Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: Colors.white.withAlpha(220),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(
-                Icons.favorite_border_rounded,
-                color: AppColors.textPrimary,
-                size: 20,
-              ),
-            ),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('${_bangun.nama} ditambahkan ke favorit!'),
-                  duration: const Duration(seconds: 1),
-                ),
-              );
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
+          );
+        },
       ),
 
       body: Column(

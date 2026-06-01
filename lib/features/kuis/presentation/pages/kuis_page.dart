@@ -10,10 +10,7 @@ class KuisPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        title: const Text('Kuis & Latihan'),
-        centerTitle: true,
-      ),
+      appBar: const AppBarCustom(title: 'Kuis & Latihan'),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
         child: Column(

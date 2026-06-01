@@ -54,23 +54,14 @@ class _BangunDatarDetailPageState extends State<BangunDatarDetailPage>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(bangun.nama),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.favorite_border_rounded),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('${bangun.nama} ditambahkan ke favorit!')),
-              );
-            },
-          ),
-          const SizedBox(width: 8),
-        ],
+      appBar: AppBarCustom(
+        title: bangun.nama,
+        actionIcon: Icons.favorite_border_rounded,
+        onActionPressed: () {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('${bangun.nama} ditambahkan ke favorit!')),
+          );
+        },
       ),
       body: Column(
         children: [

@@ -126,16 +126,12 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.close_rounded),
-          onPressed: () {
-            _timer?.cancel();
-            context.pop();
-          },
-        ),
-        title: Text('Soal ${_currentIndex + 1} dari ${_soalList.length}'),
-        centerTitle: true,
+      appBar: AppBarCustom(
+        onBack: () {
+          _timer?.cancel();
+          context.pop();
+        },
+        title: 'Soal ${_currentIndex + 1} dari ${_soalList.length}',
         actions: [
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),

@@ -19,7 +19,7 @@ class _PetunjukPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(title: const Text('Petunjuk')),
+        appBar: const AppBarCustom(title: 'Petunjuk'),
         body: Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             const Icon(Icons.menu_book_rounded,
@@ -38,7 +38,7 @@ class _ProfilPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(title: const Text('Profil')),
+        appBar: const AppBarCustom(title: 'Profil'),
         body: Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             Container(
@@ -65,7 +65,7 @@ class _PencapaianPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(title: const Text('Pencapaian')),
+        appBar: const AppBarCustom(title: 'Pencapaian'),
         body: Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             const Icon(Icons.emoji_events_rounded,
@@ -85,7 +85,7 @@ class _PengaturanPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppColors.background,
-        appBar: AppBar(title: const Text('Pengaturan')),
+        appBar: const AppBarCustom(title: 'Pengaturan'),
         body: Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
             const Icon(Icons.settings_rounded,

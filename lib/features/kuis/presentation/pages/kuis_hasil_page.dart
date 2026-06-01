@@ -49,10 +49,9 @@ class KuisHasilPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: const Text('Hasil Kuis'),
-        centerTitle: true,
+      appBar: AppBarCustom(
+        title: 'Hasil Kuis',
+        onBack: () => context.pop(),
       ),
       body: SafeArea(
         child: Padding(

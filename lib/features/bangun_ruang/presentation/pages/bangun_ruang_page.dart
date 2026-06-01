@@ -42,21 +42,7 @@ class _BangunRuangPageState extends State<BangunRuangPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5FA),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF1A1A2E),
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          'Bangun Ruang',
-          style: AppTypography.titleMedium.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+      appBar: const AppBarCustom(title: 'Bangun Ruang'),
       body: Column(
         children: [
           // ─── Filter Chips ────────────────────────────────────────────────

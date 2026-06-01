@@ -12,7 +12,7 @@ class ArPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(title: const Text('Augmented Reality')),
+      appBar: const AppBarCustom(title: 'Augmented Reality'),
       body: const Center(
         child: Text('🚧 AR Mode - Dalam Pengembangan'),
       ),
