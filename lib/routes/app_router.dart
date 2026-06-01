@@ -16,6 +16,7 @@ import '../features/auth/screens/login_screen.dart';
 import '../features/auth/screens/register_screen.dart';
 import '../features/profil/screens/lengkapi_profil_screen.dart';
 import '../features/profil/widgets/profil_guard.dart';
+import '../features/pencapaian/screens/pencapaian_screen.dart';
 import '../features/auth/services/auth_notifier.dart';
 import '../core/services/supabase_service.dart';
 // ─── Placeholder pages untuk shell bottom nav ─────────────────────────────────
@@ -138,15 +139,12 @@ final GoRouter appRouter = GoRouter(
     final isLoggedIn = session != null;
     final isGoingToLogin = state.matchedLocation == '/login' || state.matchedLocation == '/register';
 
-    if (!isLoggedIn) {
-      if (!isGoingToLogin) return '/login';
-      return null;
+    if (isLoggedIn && (isGoingToLogin || state.matchedLocation == AppConstants.routeSplash)) {
+      return AppConstants.routeHome;
     }
-
-    if (isLoggedIn) {
-      if (isGoingToLogin || state.matchedLocation == AppConstants.routeSplash) {
-        return AppConstants.routeHome;
-      }
+    
+    if (!isLoggedIn && state.matchedLocation == AppConstants.routeSplash) {
+      return AppConstants.routeHome;
     }
     
     return null;
@@ -204,7 +202,7 @@ final GoRouter appRouter = GoRouter(
           GoRoute(
             path: '/pencapaian',
             name: 'pencapaian',
-            builder: (context, state) => ProfilGuard(child: const _PencapaianPage()),
+            builder: (context, state) => ProfilGuard(child: const PencapaianScreen()),
           ),
         ]),
 

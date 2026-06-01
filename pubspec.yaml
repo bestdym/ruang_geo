@@ -43,7 +43,7 @@ dependencies:
 
   # Supabase & QR
   supabase_flutter: ^2.3.4
-  qr_code_scanner: ^1.0.1
+  mobile_scanner: ^5.0.0
 
   # Math formula display
   flutter_math_fork: ^0.7.2

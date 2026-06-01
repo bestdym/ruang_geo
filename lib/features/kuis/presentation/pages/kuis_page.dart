@@ -97,6 +97,12 @@ class KuisPage extends StatelessWidget {
                   color: AppColors.warning,
                   onTap: () => context.push('/kuis/campuran'),
                 ),
+                _KategoriCard(
+                  title: 'TKA',
+                  icon: Icons.psychology_rounded,
+                  color: AppColors.error,
+                  onTap: () => context.push('/kuis/tka'),
+                ),
               ],
             ),
           ],

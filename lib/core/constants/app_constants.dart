@@ -68,6 +68,7 @@ abstract class AppConstants {
   static const String kategoriRuang = 'bangun_ruang';
   static const String kategoriDatar = 'bangun_datar';
   static const String kategoriSemua = 'semua';
+  static const String kategoriTKA = 'tka';
 
   // ─── Asset Paths ─────────────────────────────────────────────────────────────
   static const String assetImages = 'assets/images/';
