@@ -155,16 +155,7 @@ final GoRouter appRouter = GoRouter(
           ),
         ]),
 
-        // 2: Profil
-        StatefulShellBranch(routes: [
-          GoRoute(
-            path: '/profil',
-            name: 'profil',
-            builder: (context, state) => const _ProfilPage(),
-          ),
-        ]),
-
-        // 3: Pencapaian
+        // 2: Pencapaian
         StatefulShellBranch(routes: [
           GoRoute(
             path: '/pencapaian',
@@ -173,7 +164,7 @@ final GoRouter appRouter = GoRouter(
           ),
         ]),
 
-        // 4: Pengaturan
+        // 3: Pengaturan
         StatefulShellBranch(routes: [
           GoRoute(
             path: AppConstants.routeSettings,
@@ -185,6 +176,15 @@ final GoRouter appRouter = GoRouter(
     ),
 
     // ─── Feature Pages (Full-screen, di luar shell) ──────────────────────────
+    GoRoute(
+      path: '/profil',
+      name: 'profil',
+      pageBuilder: (context, state) => _slidePageBuilder(
+        state,
+        const _ProfilPage(),
+      ),
+    ),
+
     GoRoute(
       path: '/bangun-ruang',
       name: 'bangun-ruang',
@@ -415,11 +415,6 @@ class _BottomNav extends StatelessWidget {
           icon: Icon(Icons.menu_book_outlined),
           activeIcon: Icon(Icons.menu_book),
           label: 'Petunjuk',
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.person_outline),
-          activeIcon: Icon(Icons.person),
-          label: 'Profil',
         ),
         BottomNavigationBarItem(
           icon: Icon(Icons.emoji_events_outlined),

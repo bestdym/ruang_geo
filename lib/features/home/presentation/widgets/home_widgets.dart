@@ -29,11 +29,11 @@ class HomeHeader extends StatelessWidget {
   const HomeHeader({
     super.key,
     required this.onMenuTap,
-    required this.onAudioTap,
+    required this.onProfileTap,
   });
 
   final VoidCallback onMenuTap;
-  final VoidCallback onAudioTap;
+  final VoidCallback onProfileTap;
 
   @override
   Widget build(BuildContext context) {
@@ -76,11 +76,11 @@ class HomeHeader extends StatelessWidget {
           ],
         ),
 
-        // ─── Audio ────────────────────────────────────────────────────────
+        // ─── Profil ────────────────────────────────────────────────────────
         _HeaderIconButton(
-          icon: Icons.volume_up_rounded,
-          onTap: onAudioTap,
-          semanticLabel: 'Aktifkan suara',
+          icon: Icons.person_rounded,
+          onTap: onProfileTap,
+          semanticLabel: 'Buka profil',
         ),
       ],
     );

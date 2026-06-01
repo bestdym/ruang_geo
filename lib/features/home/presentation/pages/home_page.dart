@@ -53,6 +53,7 @@ class _HomePageState extends State<HomePage>
   late final AnimationController _fadeController;
   late final Animation<double> _fadeAnim;
   late final Animation<Offset> _slideAnim;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -88,7 +89,9 @@ class _HomePageState extends State<HomePage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.background,
+      drawer: const _DrawerMenu(),
       body: Stack(
         children: [
           // ─── Background dekorasi ───────────────────────────────────────────
@@ -109,8 +112,8 @@ class _HomePageState extends State<HomePage>
                         delegate: SliverChildListDelegate([
                           // Header
                           HomeHeader(
-                            onMenuTap: () => _showDrawerMenu(context),
-                            onAudioTap: () => _toggleAudio(context),
+                            onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
+                            onProfileTap: () => context.push('/profil'),
                           ),
 
                           const SizedBox(height: 20),
@@ -182,26 +185,6 @@ class _HomePageState extends State<HomePage>
       );
     });
   }
-
-  void _showDrawerMenu(BuildContext context) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const _DrawerMenu(),
-    );
-  }
-
-  void _toggleAudio(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('🔊 Fitur suara segera hadir!'),
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-        duration: const Duration(seconds: 2),
-      ),
-    );
-  }
 }
 
 /// Wrapper untuk animasi staggered pada tiap card
@@ -246,26 +229,13 @@ class _DrawerMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: const BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 12),
-          // Handle
-          Container(
-            width: 40,
-            height: 4,
-            decoration: BoxDecoration(
-              color: AppColors.outlineVariant,
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 20),
-          Text('Menu', style: AppTypography.titleMedium),
+    return Drawer(
+      backgroundColor: AppColors.surface,
+      child: SafeArea(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Text('Menu', style: AppTypography.titleMedium),
           const SizedBox(height: 16),
           const Divider(height: 1),
           _DrawerItem(
@@ -292,8 +262,9 @@ class _DrawerMenu extends StatelessWidget {
           const SizedBox(height: 16),
         ],
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 class _DrawerItem extends StatelessWidget {
