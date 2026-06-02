@@ -46,45 +46,45 @@ class _BangunRuangPageState extends State<BangunRuangPage> {
       body: Column(
         children: [
           // ─── Filter Chips ────────────────────────────────────────────────
-          SizedBox(
-            height: 60,
-            child: ListView.builder(
+          Padding(
+            padding: const EdgeInsets.only(top: 14, bottom: 0),
+            child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.only(left: 16, right: 16, top: 16, bottom: 0),
-              itemCount: _filters.length,
-              itemBuilder: (context, index) {
-                final filter = _filters[index];
-                final isSelected = filter == _selectedFilter;
-
-                return Padding(
-                  padding: const EdgeInsets.only(right: 8),
-                  child: FilterChip(
-                    label: Text(filter),
-                    selected: isSelected,
-                    showCheckmark: isSelected,
-                    checkmarkColor: Colors.white,
-                    onSelected: (selected) {
-                      setState(() {
-                        _selectedFilter = filter;
-                      });
-                    },
-                    backgroundColor: Colors.white,
-                    selectedColor: const Color(0xFF6C63FF),
-                    labelStyle: AppTypography.labelMedium.copyWith(
-                      color: isSelected ? Colors.white : const Color(0xFF555555),
-                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(20),
-                      side: BorderSide(
-                        color: isSelected ? Colors.transparent : const Color(0xFFE0E0E0),
-                        width: 1,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: _filters.map((filter) {
+                  final isSelected = filter == _selectedFilter;
+                  return Padding(
+                    padding: const EdgeInsets.only(right: 8),
+                    child: FilterChip(
+                      label: Text(filter),
+                      selected: isSelected,
+                      showCheckmark: isSelected,
+                      checkmarkColor: Colors.white,
+                      onSelected: (selected) {
+                        setState(() {
+                          _selectedFilter = filter;
+                        });
+                      },
+                      backgroundColor: Colors.white,
+                      selectedColor: const Color(0xFF6C63FF),
+                      labelStyle: AppTypography.labelMedium.copyWith(
+                        color: isSelected ? Colors.white : const Color(0xFF555555),
+                        fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
                       ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        side: BorderSide(
+                          color: isSelected ? Colors.transparent : const Color(0xFFE0E0E0),
+                          width: 1,
+                        ),
+                      ),
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                     ),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                  ),
-                );
-              },
+                  );
+                }).toList(),
+              ),
             ),
           ),
 

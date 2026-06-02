@@ -19,9 +19,9 @@ class BangunDatarPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 14,
-          mainAxisSpacing: 14,
-          childAspectRatio: 0.82, // sedikit lebih tinggi dari persegi
+          crossAxisSpacing: 12,
+          mainAxisSpacing: 12,
+          childAspectRatio: 1.0, // sama persis kayak Bangun Ruang
         ),
         itemCount: listBangunDatar.length,
         itemBuilder: (context, index) {
@@ -95,14 +95,14 @@ class _BangunDatarCardState extends State<_BangunDatarCard>
 
   Color _getColor(String id) {
     switch (id) {
-      case 'bd_persegi':       return const Color(0xFF4CAF50);
+      case 'bd_persegi':         return const Color(0xFF4CAF50);
       case 'bd_persegi_panjang': return const Color(0xFF2196F3);
-      case 'bd_segitiga':      return const Color(0xFFFF9800);
-      case 'bd_jajargenjang':  return const Color(0xFF009688);
-      case 'bd_trapesium':     return const Color(0xFF9C27B0);
-      case 'bd_layang':        return const Color(0xFFE91E63);
-      case 'bd_lingkaran':     return const Color(0xFFFFC107);
-      default:                 return AppColors.primary;
+      case 'bd_segitiga':        return const Color(0xFFFF9800);
+      case 'bd_jajargenjang':    return const Color(0xFF009688);
+      case 'bd_trapesium':       return const Color(0xFF9C27B0);
+      case 'bd_layang':          return const Color(0xFFE91E63);
+      case 'bd_lingkaran':       return const Color(0xFFFFC107);
+      default:                   return AppColors.primary;
     }
   }
 
@@ -112,6 +112,7 @@ class _BangunDatarCardState extends State<_BangunDatarCard>
     return GestureDetector(
       onTap: widget.onTap,
       child: Container(
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
@@ -122,53 +123,45 @@ class _BangunDatarCardState extends State<_BangunDatarCard>
               offset: const Offset(0, 4),
             ),
           ],
-          border: Border.all(color: AppColors.outlineVariant, width: 1),
         ),
         child: Stack(
           children: [
             // ─── Konten utama ─────────────────────────────────────────
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Shape Icon besar dalam lingkaran
-                  Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: color.withAlpha(30),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
+            Column(
+              children: [
+                // Shape Icon besar, tanpa lingkaran, di tengah
+                Expanded(
+                  child: Center(
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
                       child: ShapeIcon(
                         shapeId: widget.bangun.id,
                         color: color,
-                        size: 58,
+                        size: 90, // ukuran sama kayak Bangun Ruang
                       ),
                     ),
                   ),
-                  const SizedBox(height: 14),
-                  // Nama Bangun
-                  Text(
-                    widget.bangun.nama,
-                    style: AppTypography.titleSmall.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimary,
-                      fontSize: 14,
-                    ),
-                    textAlign: TextAlign.center,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 8),
+                // Nama Bangun
+                Text(
+                  widget.bangun.nama,
+                  textAlign: TextAlign.center,
+                  style: AppTypography.titleSmall.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: const Color(0xFF333333),
                   ),
-                ],
-              ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
 
             // ─── Tombol Bintang ────────────────────────────────────────
             Positioned(
-              top: 4,
-              right: 4,
+              top: -4,
+              right: -4,
               child: GestureDetector(
                 onTap: _toggleFavorit,
                 child: Padding(
