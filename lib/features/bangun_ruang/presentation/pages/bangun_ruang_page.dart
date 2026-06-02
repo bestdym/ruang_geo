@@ -117,7 +117,7 @@ class _BangunRuangPageState extends State<BangunRuangPage> {
 }
 
 /// Widget Card untuk menampilkan item Bangun Ruang
-class _BangunCard extends StatelessWidget {
+class _BangunCard extends StatefulWidget {
   const _BangunCard({
     required this.bangun,
     required this.onTap,
@@ -127,79 +127,127 @@ class _BangunCard extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
+  State<_BangunCard> createState() => _BangunCardState();
+}
+
+class _BangunCardState extends State<_BangunCard>
+    with SingleTickerProviderStateMixin {
+  bool _isFavorit = false;
+  late AnimationController _starController;
+  late Animation<double> _starScale;
+
+  @override
+  void initState() {
+    super.initState();
+    _starController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _starScale = Tween<double>(begin: 1.0, end: 1.4).animate(
+      CurvedAnimation(parent: _starController, curve: Curves.elasticOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _starController.dispose();
+    super.dispose();
+  }
+
+  void _toggleFavorit() {
+    setState(() => _isFavorit = !_isFavorit);
+    _starController.forward(from: 0);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          _isFavorit
+              ? '${widget.bangun.nama} ditambahkan ke favorit!'
+              : '${widget.bangun.nama} dihapus dari favorit.',
+        ),
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.grey.withOpacity(0.2),
-              blurRadius: 8,
-              spreadRadius: 0,
+              color: Colors.black.withAlpha(15),
+              blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
         ),
-        child: Column(
+        child: Stack(
           children: [
-            // Gambar dan Ikon Favorit
-            Expanded(
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  Center(
+            // ─── Konten utama ─────────────────────────────────────────
+            Column(
+              children: [
+                // Shape 3D
+                Expanded(
+                  child: Center(
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: getShapeWidget(bangun.id, 90),
+                      child: getShapeWidget(widget.bangun.id, 90),
                     ),
                   ),
-                  Positioned(
-                    top: -8,
-                    right: -8,
-                    child: IconButton(
-                      padding: EdgeInsets.zero,
-                      constraints: const BoxConstraints(),
-                      icon: const Icon(
-                        Icons.star_border_rounded,
-                        color: Colors.grey,
-                        size: 24,
-                      ),
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('${bangun.nama} ditambahkan ke favorit!'),
-                            duration: const Duration(seconds: 1),
-                          ),
-                        );
-                      },
-                    ),
+                ),
+                const SizedBox(height: 8),
+                // Nama Bangun
+                Text(
+                  widget.bangun.nama,
+                  textAlign: TextAlign.center,
+                  style: AppTypography.titleSmall.copyWith(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 14,
+                    color: const Color(0xFF333333),
                   ),
-                ],
-              ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
-            const SizedBox(height: 12),
-            // Nama Bangun
-            Text(
-              bangun.nama,
-              textAlign: TextAlign.center,
-              style: AppTypography.titleSmall.copyWith(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: const Color(0xFF333333),
+
+            // ─── Tombol Bintang ────────────────────────────────────────
+            Positioned(
+              top: -4,
+              right: -4,
+              child: GestureDetector(
+                onTap: _toggleFavorit,
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: ScaleTransition(
+                    scale: _starScale,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      child: Icon(
+                        _isFavorit
+                            ? Icons.star_rounded
+                            : Icons.star_border_rounded,
+                        key: ValueKey(_isFavorit),
+                        color: _isFavorit
+                            ? const Color(0xFFFFB300)
+                            : Colors.grey.shade400,
+                        size: 26,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
       ),
     );
   }
-
 }
-
-

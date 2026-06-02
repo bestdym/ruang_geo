@@ -57,9 +57,15 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
       ),
       body: Column(
         children: [
+          // ─── Pill Tab Bar ─────────────────────────────────────────────
+          _PillTabBar(
+            controller: _tabController,
+            tabs: const ['Informasi', 'Rumus', 'Sifat', 'Contoh Soal'],
+          ),
+
           // ─── Area Atas (Toggle Jaring & 3D) ─────────────────────────────
           SizedBox(
-            height: MediaQuery.of(context).size.height * 0.40, // Sedikit lebih tinggi
+            height: MediaQuery.of(context).size.height * 0.38,
             width: double.infinity,
             child: Stack(
               children: [
@@ -115,9 +121,9 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
                           ),
                   ),
                 ),
-                // Toggle Button
+                // Toggle Button (Model 3D / Jaring-jaring) di tengah atas
                 Positioned(
-                  top: 8,
+                  top: 12,
                   left: 0,
                   right: 0,
                   child: Center(
@@ -193,20 +199,6 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
             ),
           ),
 
-          // ─── Tab Bar ──────────────────────────────────────────────────
-          TabBar(
-            controller: _tabController,
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            tabs: const [
-              Tab(text: 'Informasi'),
-              Tab(text: 'Rumus'),
-              Tab(text: 'Sifat'),
-              Tab(text: 'Contoh Soal'),
-            ],
-          ),
-          
           // ─── Tab Bar View ─────────────────────────────────────────────
           Expanded(
             child: TabBarView(
@@ -577,6 +569,77 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
     );
   }
 }
+
+// ─── Pill Tab Bar Widget ────────────────────────────────────────────────────
+class _PillTabBar extends StatefulWidget {
+  const _PillTabBar({
+    required this.controller,
+    required this.tabs,
+  });
+
+  final TabController controller;
+  final List<String> tabs;
+
+  @override
+  State<_PillTabBar> createState() => _PillTabBarState();
+}
+
+class _PillTabBarState extends State<_PillTabBar> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onTabChanged);
+  }
+
+  void _onTabChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onTabChanged);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      color: AppColors.background,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: List.generate(widget.tabs.length, (index) {
+            final isSelected = widget.controller.index == index;
+            return Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: GestureDetector(
+                onTap: () => widget.controller.animateTo(index),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: isSelected ? AppColors.primary : Colors.transparent,
+                    borderRadius: BorderRadius.circular(30),
+                  ),
+                  child: Text(
+                    widget.tabs[index],
+                    style: AppTypography.labelMedium.copyWith(
+                      color: isSelected ? Colors.white : AppColors.textSecondary,
+                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }),
+        ),
+      ),
+    );
+  }
+}
+
 
 /// Widget untuk input jawaban soal
 class _InteractiveAnswer extends StatefulWidget {

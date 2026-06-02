@@ -65,18 +65,10 @@ class _BangunDatarDetailPageState extends State<BangunDatarDetailPage>
       ),
       body: Column(
         children: [
-          // ─── Tab Bar ──────────────────────────────────────────────────
-          TabBar(
+          // ─── Pill Tab Bar ────────────────────────────────────────────────
+          _PillTabBar(
             controller: _tabController,
-            isScrollable: true,
-            tabAlignment: TabAlignment.start,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            tabs: const [
-              Tab(text: 'Informasi'),
-              Tab(text: 'Rumus'),
-              Tab(text: 'Sifat'),
-              Tab(text: 'Contoh Soal'),
-            ],
+            tabs: const ['Informasi', 'Rumus', 'Sifat', 'Contoh Soal'],
           ),
 
           // ─── Tab Bar View ─────────────────────────────────────────────
@@ -343,6 +335,74 @@ class _BangunDatarDetailPageState extends State<BangunDatarDetailPage>
   }
 }
 
+// ─── Pill Tab Bar Widget ────────────────────────────────────────────────────
+class _PillTabBar extends StatefulWidget {
+  const _PillTabBar({
+    required this.controller,
+    required this.tabs,
+  });
+
+  final TabController controller;
+  final List<String> tabs;
+
+  @override
+  State<_PillTabBar> createState() => _PillTabBarState();
+}
+
+class _PillTabBarState extends State<_PillTabBar> {
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_onTabChanged);
+  }
+
+  void _onTabChanged() {
+    if (mounted) setState(() {});
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_onTabChanged);
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      color: AppColors.background,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: List.generate(widget.tabs.length, (index) {
+          final isSelected = widget.controller.index == index;
+          return Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: GestureDetector(
+              onTap: () => widget.controller.animateTo(index),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: isSelected ? AppColors.primary : Colors.transparent,
+                  borderRadius: BorderRadius.circular(30),
+                ),
+                child: Text(
+                  widget.tabs[index],
+                  style: AppTypography.labelMedium.copyWith(
+                    color: isSelected ? Colors.white : AppColors.textSecondary,
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+}
+
 class _InteractiveAnswerDatar extends StatefulWidget {
   const _InteractiveAnswerDatar({required this.jawabanBenar});
   final String jawabanBenar;
@@ -433,5 +493,3 @@ class _InteractiveAnswerDatarState extends State<_InteractiveAnswerDatar> {
     );
   }
 }
-
-

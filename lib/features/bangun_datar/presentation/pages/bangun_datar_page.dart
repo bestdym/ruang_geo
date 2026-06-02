@@ -19,9 +19,9 @@ class BangunDatarPage extends StatelessWidget {
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          mainAxisExtent: 100, // Card height: 100px
+          crossAxisSpacing: 14,
+          mainAxisSpacing: 14,
+          childAspectRatio: 0.82, // sedikit lebih tinggi dari persegi
         ),
         itemCount: listBangunDatar.length,
         itemBuilder: (context, index) {
@@ -38,7 +38,8 @@ class BangunDatarPage extends StatelessWidget {
   }
 }
 
-class _BangunDatarCard extends StatelessWidget {
+/// Card dengan bintang favorit yang bisa di-toggle
+class _BangunDatarCard extends StatefulWidget {
   const _BangunDatarCard({
     required this.bangun,
     required this.onTap,
@@ -47,76 +48,148 @@ class _BangunDatarCard extends StatelessWidget {
   final BangunModel bangun;
   final VoidCallback onTap;
 
-  // Fungsi helper untuk mendapatkan warna yang sesuai
-  Color _getColorForBangunDatar(String id) {
+  @override
+  State<_BangunDatarCard> createState() => _BangunDatarCardState();
+}
+
+class _BangunDatarCardState extends State<_BangunDatarCard>
+    with SingleTickerProviderStateMixin {
+  bool _isFavorit = false;
+  late AnimationController _starController;
+  late Animation<double> _starScale;
+
+  @override
+  void initState() {
+    super.initState();
+    _starController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _starScale = Tween<double>(begin: 1.0, end: 1.4).animate(
+      CurvedAnimation(parent: _starController, curve: Curves.elasticOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _starController.dispose();
+    super.dispose();
+  }
+
+  void _toggleFavorit() {
+    setState(() => _isFavorit = !_isFavorit);
+    _starController.forward(from: 0);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          _isFavorit
+              ? '${widget.bangun.nama} ditambahkan ke favorit!'
+              : '${widget.bangun.nama} dihapus dari favorit.',
+        ),
+        duration: const Duration(seconds: 1),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      ),
+    );
+  }
+
+  Color _getColor(String id) {
     switch (id) {
-      case 'bd_persegi':
-        return const Color(0xFF4CAF50); // Hijau
-      case 'bd_persegi_panjang':
-        return const Color(0xFF2196F3); // Biru
-      case 'bd_segitiga':
-        return const Color(0xFFFF9800); // Oranye
-      case 'bd_jajargenjang':
-        return const Color(0xFF009688); // Teal
-      case 'bd_trapesium':
-        return const Color(0xFF9C27B0); // Ungu
-      case 'bd_layang':
-        return const Color(0xFFE91E63); // Pink
-      case 'bd_lingkaran':
-        return const Color(0xFFFFC107); // Kuning
-      default:
-        return AppColors.primary;
+      case 'bd_persegi':       return const Color(0xFF4CAF50);
+      case 'bd_persegi_panjang': return const Color(0xFF2196F3);
+      case 'bd_segitiga':      return const Color(0xFFFF9800);
+      case 'bd_jajargenjang':  return const Color(0xFF009688);
+      case 'bd_trapesium':     return const Color(0xFF9C27B0);
+      case 'bd_layang':        return const Color(0xFFE91E63);
+      case 'bd_lingkaran':     return const Color(0xFFFFC107);
+      default:                 return AppColors.primary;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final color = _getColor(widget.bangun.id);
     return GestureDetector(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withAlpha(10),
-              blurRadius: 10,
+              color: Colors.black.withAlpha(15),
+              blurRadius: 12,
               offset: const Offset(0, 4),
             ),
           ],
-          border: Border.all(
-            color: AppColors.outlineVariant,
-            width: 1,
-          ),
+          border: Border.all(color: AppColors.outlineVariant, width: 1),
         ),
-        child: Row(
+        child: Stack(
           children: [
-            // Shape Icon
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: _getColorForBangunDatar(bangun.id).withAlpha(25),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ShapeIcon(
-                shapeId: bangun.id,
-                color: _getColorForBangunDatar(bangun.id),
-                size: 32,
+            // ─── Konten utama ─────────────────────────────────────────
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Shape Icon besar dalam lingkaran
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: color.withAlpha(30),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Center(
+                      child: ShapeIcon(
+                        shapeId: widget.bangun.id,
+                        color: color,
+                        size: 58,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  // Nama Bangun
+                  Text(
+                    widget.bangun.nama,
+                    style: AppTypography.titleSmall.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.textPrimary,
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
-            const SizedBox(width: 16),
-            // Nama Bangun
-            Expanded(
-              child: Text(
-                bangun.nama,
-                style: AppTypography.titleSmall.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.textPrimary,
-                  height: 1.2,
+
+            // ─── Tombol Bintang ────────────────────────────────────────
+            Positioned(
+              top: 4,
+              right: 4,
+              child: GestureDetector(
+                onTap: _toggleFavorit,
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: ScaleTransition(
+                    scale: _starScale,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 200),
+                      child: Icon(
+                        _isFavorit
+                            ? Icons.star_rounded
+                            : Icons.star_border_rounded,
+                        key: ValueKey(_isFavorit),
+                        color: _isFavorit
+                            ? const Color(0xFFFFB300)
+                            : Colors.grey.shade400,
+                        size: 26,
+                      ),
+                    ),
+                  ),
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

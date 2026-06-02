@@ -137,13 +137,14 @@ final GoRouter appRouter = GoRouter(
   redirect: (context, state) {
     final session = supabase.auth.currentSession;
     final isLoggedIn = session != null;
-    final isGoingToLogin = state.matchedLocation == '/login' || state.matchedLocation == '/register';
+    final path = state.uri.path;
+    final isGoingToAuth = path == '/login' || path == '/register';
 
-    if (isLoggedIn && (isGoingToLogin || state.matchedLocation == AppConstants.routeSplash)) {
+    if (isLoggedIn && (isGoingToAuth || path == AppConstants.routeSplash)) {
       return AppConstants.routeHome;
     }
     
-    if (!isLoggedIn && state.matchedLocation == AppConstants.routeSplash) {
+    if (!isLoggedIn && path == AppConstants.routeSplash) {
       return AppConstants.routeHome;
     }
     
