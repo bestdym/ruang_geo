@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ruang_geo/core/core.dart';
@@ -198,7 +199,7 @@ class _BangunCardState extends State<_BangunCard>
                   child: Center(
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: getShapeWidget(widget.bangun.id, 120),
+                      child: getShapeWidget(widget.bangun.id, 140),
                     ),
                   ),
                 ),
