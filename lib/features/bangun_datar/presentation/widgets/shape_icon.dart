@@ -59,6 +59,9 @@ class ShapeIconPainter extends CustomPainter {
       case 'bd_layang':
         drawLayangLayang(canvas, size, paint);
         break;
+      case 'bd_belah_ketupat':
+        drawBelahKetupat(canvas, size, paint);
+        break;
       case 'bd_lingkaran':
         drawLingkaran(canvas, size, paint);
         break;
@@ -146,6 +149,22 @@ class ShapeIconPainter extends CustomPainter {
     path.lineTo(cx + w / 2, cy - h / 6); // Right
     path.lineTo(cx, cy + h / 2); // Bottom
     path.lineTo(cx - w / 2, cy - h / 6); // Left
+    path.close();
+
+    canvas.drawPath(path, paint);
+  }
+
+  void drawBelahKetupat(Canvas canvas, Size size, Paint paint) {
+    final path = Path();
+    final double w = size.width * 0.85;
+    final double h = size.height * 0.85;
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    path.moveTo(cx, cy - h / 2);       // Top
+    path.lineTo(cx + w / 2, cy);       // Right
+    path.lineTo(cx, cy + h / 2);       // Bottom
+    path.lineTo(cx - w / 2, cy);       // Left
     path.close();
 
     canvas.drawPath(path, paint);

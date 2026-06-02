@@ -101,6 +101,7 @@ class _BangunDatarCardState extends State<_BangunDatarCard>
       case 'bd_jajargenjang':    return const Color(0xFF009688);
       case 'bd_trapesium':       return const Color(0xFF9C27B0);
       case 'bd_layang':          return const Color(0xFFE91E63);
+      case 'bd_belah_ketupat':   return const Color(0xFF3F51B5);
       case 'bd_lingkaran':       return const Color(0xFFFFC107);
       default:                   return AppColors.primary;
     }
@@ -137,7 +138,7 @@ class _BangunDatarCardState extends State<_BangunDatarCard>
                       child: ShapeIcon(
                         shapeId: widget.bangun.id,
                         color: color,
-                        size: 90, // ukuran sama kayak Bangun Ruang
+                        size: 110, // diperbesar
                       ),
                     ),
                   ),

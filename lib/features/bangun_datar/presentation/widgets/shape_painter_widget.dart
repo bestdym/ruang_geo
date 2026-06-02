@@ -32,6 +32,8 @@ abstract class ShapePainterFactory {
         return TrapesiumPainter(progress: progress);
       case 'bd_layang':
         return LayangLayangPainter(progress: progress);
+      case 'bd_belah_ketupat':
+        return BelahKetupatPainter(progress: progress);
       default:
         return _DefaultShapePainter(progress: progress, bangunId: bangunId);
     }
@@ -805,8 +807,89 @@ class LayangLayangPainter extends _BaseShapePainter {
   }
 }
 
+// ───────────────────────────────────────────────────────────────────────────────
+// 7. BELAH KETUPAT PAINTER
+// ───────────────────────────────────────────────────────────────────────────────
+
+class BelahKetupatPainter extends _BaseShapePainter {
+  BelahKetupatPainter({required super.progress});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+
+    final pTop   = Offset(cx, cy - size.height * 0.40);
+    final pRight = Offset(cx + size.width * 0.38, cy);
+    final pBot   = Offset(cx, cy + size.height * 0.40);
+    final pLeft  = Offset(cx - size.width * 0.38, cy);
+
+    // Fill (0.8–1.0)
+    final fillOp = opacityInRange(0.8, 1.0);
+    if (fillOp > 0) {
+      final fp = Path()
+        ..moveTo(pTop.dx, pTop.dy)
+        ..lineTo(pRight.dx, pRight.dy)
+        ..lineTo(pBot.dx, pBot.dy)
+        ..lineTo(pLeft.dx, pLeft.dy)
+        ..close();
+      canvas.drawPath(fp, Paint()
+        ..color = AppColors.primary.withAlpha((25 * fillOp).round())
+        ..style = PaintingStyle.fill);
+    }
+
+    // Garis sisi (0.0–0.7)
+    final sp = progressInRange(0.0, 0.7);
+    drawPartialPath(canvas, [pTop, pRight, pBot, pLeft], sp, strokePaint, close: true);
+
+    // Diagonal d1 vertikal (0.65–0.8)
+    final d1Op = opacityInRange(0.65, 0.8);
+    if (d1Op > 0) {
+      final dp = Paint()
+        ..color = AppColors.secondary.withAlpha((d1Op * 160).round())
+        ..strokeWidth = 1.5
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+      drawPartialPath(canvas, [pTop, pBot], progressInRange(0.65, 0.8), dp);
+    }
+
+    // Diagonal d2 horizontal (0.75–0.88)
+    final d2Op = opacityInRange(0.75, 0.88);
+    if (d2Op > 0) {
+      final dp = Paint()
+        ..color = AppColors.secondary.withAlpha((d2Op * 130).round())
+        ..strokeWidth = 1.5
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round;
+      drawPartialPath(canvas, [pLeft, pRight], progressInRange(0.75, 0.88), dp);
+
+      // Tanda siku-siku di tengah
+      const sq = 7.0;
+      canvas.drawRect(
+        Rect.fromLTWH(cx, cy - sq / 2, sq, sq),
+        Paint()
+          ..color = AppColors.secondary.withAlpha((d2Op * 150).round())
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1.5,
+      );
+    }
+
+    // Label d1, d2, s (0.78–0.95)
+    final lOp = opacityInRange(0.78, 0.95);
+    if (lOp > 0) {
+      final lc = AppColors.textSecondary.withAlpha((lOp * 220).round());
+      drawLabel(canvas, 'd₁', Offset(cx + 18, cy - size.height * 0.15),
+          color: AppColors.secondary.withAlpha((lOp * 200).round()), italic: true, bold: true);
+      drawLabel(canvas, 'd₂', Offset((pLeft.dx + cx) / 2, cy - 16),
+          color: lc, italic: true);
+      drawLabel(canvas, 's', Offset(cx + size.width * 0.22, cy - size.height * 0.22),
+          color: lc, italic: true);
+    }
+  }
+}
+
 // ─────────────────────────────────────────────────────────────────────────────
-// 7. DEFAULT PAINTER (fallback)
+// 8. DEFAULT PAINTER (fallback)
 // ─────────────────────────────────────────────────────────────────────────────
 
 class _DefaultShapePainter extends _BaseShapePainter {

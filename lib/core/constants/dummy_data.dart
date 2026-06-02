@@ -248,6 +248,25 @@ abstract class DummyData {
       contohNyata: ['Layang-layang mainan', 'Motif dinding', 'Permata'],
     ),
     BangunModel(
+      id: 'bd_belah_ketupat',
+      nama: 'Belah Ketupat',
+      kategori: KategoriBangun.datar,
+      deskripsi:
+          'Bangun datar dua dimensi yang memiliki empat sisi sama panjang dengan dua pasang sudut yang berhadapan sama besar. Diagonal-diagonalnya saling tegak lurus dan membagi satu sama lain menjadi dua bagian sama panjang.',
+      rumusLuas: 'L = ½ × d1 × d2',
+      rumusVolume: 'K = 4 × s',
+      imagePath: '',
+      iconPath: '',
+      tingkat: TingkatKesulitan.sedang,
+      sifatSifat: [
+        'Memiliki 4 sisi yang sama panjang',
+        'Sudut-sudut yang berhadapan sama besar',
+        'Kedua diagonalnya saling tegak lurus',
+        'Diagonal-diagonalnya saling membagi dua sama panjang',
+      ],
+      contohNyata: ['Berlian / Intan', 'Motif kartu layang', 'Ubin hias'],
+    ),
+    BangunModel(
       id: 'bd_lingkaran',
       nama: 'Lingkaran',
       kategori: KategoriBangun.datar,
