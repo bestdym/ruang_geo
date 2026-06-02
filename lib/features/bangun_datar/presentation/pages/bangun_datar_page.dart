@@ -138,7 +138,7 @@ class _BangunDatarCardState extends State<_BangunDatarCard>
                       child: ShapeIcon(
                         shapeId: widget.bangun.id,
                         color: color,
-                        size: 110, // diperbesar
+                        size: 120,
                       ),
                     ),
                   ),

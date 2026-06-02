@@ -198,7 +198,7 @@ class _BangunCardState extends State<_BangunCard>
                   child: Center(
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
-                      child: getShapeWidget(widget.bangun.id, 110),
+                      child: getShapeWidget(widget.bangun.id, 120),
                     ),
                   ),
                 ),
