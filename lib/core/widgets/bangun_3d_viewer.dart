@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 
 class Bangun3DViewer extends StatefulWidget {
@@ -63,51 +64,72 @@ class _Bangun3DViewerState extends State<Bangun3DViewer>
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onScaleStart: (details) {
-        _resumeTimer?.cancel();
-        setState(() {
-          _isInteracting = true;
-          _baseAngleX = _dragAngleX;
-          _baseAngleY = _dragAngleY;
-          _baseZoom = _zoom;
-          _startFocalPoint = details.localFocalPoint;
-        });
+    return Listener(
+      onPointerSignal: (pointerSignal) {
+        if (pointerSignal is PointerScrollEvent) {
+          _resumeTimer?.cancel();
+          setState(() {
+            _isInteracting = true;
+            // Scroll delta Y negatif = scroll up (zoom in), positif = scroll down (zoom out)
+            const double scrollSensitivity = 0.001;
+            _zoom = (_zoom - pointerSignal.scrollDelta.dy * scrollSensitivity).clamp(0.5, 2.5);
+          });
+          // Lanjutkan putar otomatis setelah 3 detik tidak disentuh/discroll
+          _resumeTimer = Timer(const Duration(seconds: 3), () {
+            if (mounted) {
+              setState(() {
+                _isInteracting = false;
+              });
+            }
+          });
+        }
       },
-      onScaleUpdate: (details) {
-        setState(() {
-          final Offset delta = details.localFocalPoint - _startFocalPoint;
-          // Sensitivitas pergeseran rotasi
-          const double sensitivity = 0.007;
-          
-          _dragAngleY = _baseAngleY - delta.dx * sensitivity;
-          _dragAngleX = (_baseAngleX + delta.dy * sensitivity)
-              .clamp(-math.pi / 2.2, math.pi / 2.2); // Batasi agar tidak berputar terbalik vertikal
+      child: GestureDetector(
+        onScaleStart: (details) {
+          _resumeTimer?.cancel();
+          setState(() {
+            _isInteracting = true;
+            _baseAngleX = _dragAngleX;
+            _baseAngleY = _dragAngleY;
+            _baseZoom = _zoom;
+            _startFocalPoint = details.localFocalPoint;
+          });
+        },
+        onScaleUpdate: (details) {
+          setState(() {
+            final Offset delta = details.localFocalPoint - _startFocalPoint;
+            // Sensitivitas pergeseran rotasi
+            const double sensitivity = 0.007;
+            
+            _dragAngleY = _baseAngleY - delta.dx * sensitivity;
+            _dragAngleX = (_baseAngleX + delta.dy * sensitivity)
+                .clamp(-math.pi / 2.2, math.pi / 2.2); // Batasi agar tidak berputar terbalik vertikal
 
-          // Zoom/Pinch
-          if (details.scale != 1.0) {
-            _zoom = (_baseZoom * details.scale).clamp(0.5, 2.5);
-          }
-        });
-      },
-      onScaleEnd: (details) {
-        _resumeTimer?.cancel();
-        // Lanjutkan putar otomatis setelah 3 detik tidak disentuh
-        _resumeTimer = Timer(const Duration(seconds: 3), () {
-          if (mounted) {
-            setState(() {
-              _isInteracting = false;
-            });
-          }
-        });
-      },
-      child: CustomPaint(
-        size: Size(widget.size, widget.size),
-        painter: _Solid3DPainter(
-          bangunId: widget.bangunId,
-          angleY: _dragAngleY,
-          angleX: _dragAngleX,
-          zoom: _zoom,
+            // Zoom/Pinch
+            if (details.scale != 1.0) {
+              _zoom = (_baseZoom * details.scale).clamp(0.5, 2.5);
+            }
+          });
+        },
+        onScaleEnd: (details) {
+          _resumeTimer?.cancel();
+          // Lanjutkan putar otomatis setelah 3 detik tidak disentuh
+          _resumeTimer = Timer(const Duration(seconds: 3), () {
+            if (mounted) {
+              setState(() {
+                _isInteracting = false;
+              });
+            }
+          });
+        },
+        child: CustomPaint(
+          size: Size(widget.size, widget.size),
+          painter: _Solid3DPainter(
+            bangunId: widget.bangunId,
+            angleY: _dragAngleY,
+            angleX: _dragAngleX,
+            zoom: _zoom,
+          ),
         ),
       ),
     );
