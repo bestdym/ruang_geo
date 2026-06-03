@@ -65,7 +65,7 @@ class _RGModelViewerState extends State<RGModelViewer> {
   Widget build(BuildContext context) {
     // Jika path tidak ditemukan, tampilkan fallback Bangun3DViewer
     if (_modelPath == null) {
-      return _buildFallback(hasError: false);
+      return _buildFallback();
     }
 
     return FutureBuilder<bool>(
@@ -82,7 +82,7 @@ class _RGModelViewerState extends State<RGModelViewer> {
 
         final assetExists = snapshot.data ?? false;
         if (!assetExists) {
-          return _buildFallback(hasError: true);
+          return _buildFallback();
         }
 
         // Render ModelViewer jika file .glb benar-benar tersedia di bundle
@@ -104,27 +104,13 @@ class _RGModelViewerState extends State<RGModelViewer> {
   }
 
   /// Fallback: tampilkan Bangun3DViewer jika .glb belum tersedia
-  Widget _buildFallback({required bool hasError}) {
+  Widget _buildFallback() {
     return Container(
       color: widget.backgroundColor,
       child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Bangun3DViewer(
-              bangunId: widget.bangunId,
-              size: widget.fallbackSize,
-            ),
-            if (hasError) ...[
-              const SizedBox(height: 8),
-              Text(
-                'Model 3D belum tersedia',
-                style: AppTypography.labelSmall.copyWith(
-                  color: AppColors.textHint,
-                ),
-              ),
-            ],
-          ],
+        child: Bangun3DViewer(
+          bangunId: widget.bangunId,
+          size: widget.fallbackSize,
         ),
       ),
     );

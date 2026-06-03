@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
@@ -18,36 +19,97 @@ class Bangun3DViewer extends StatefulWidget {
 class _Bangun3DViewerState extends State<Bangun3DViewer>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  Timer? _resumeTimer;
+
+  // Nilai sudut rotasi dan zoom interaktif
+  double _dragAngleX = math.pi / 8; // Kemiringan awal (tilt down)
+  double _dragAngleY = 0.0;
+  double _zoom = 1.0;
+
+  // Variabel penampung saat gesture dimulai
+  double _baseAngleX = 0.0;
+  double _baseAngleY = 0.0;
+  double _baseZoom = 1.0;
+  Offset _startFocalPoint = Offset.zero;
+  bool _isInteracting = false;
 
   @override
   void initState() {
     super.initState();
+    // Gunakan controller untuk memicu auto-rotate jika sedang tidak berinteraksi
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 10),
-    )..repeat();
+      duration: const Duration(seconds: 15),
+    );
+    _controller.addListener(() {
+      if (!_isInteracting) {
+        setState(() {
+          _dragAngleY += 0.012; // Rotasi otomatis yang halus
+          if (_dragAngleY > 2 * math.pi) {
+            _dragAngleY -= 2 * math.pi;
+          }
+        });
+      }
+    });
+    _controller.repeat();
   }
 
   @override
   void dispose() {
+    _resumeTimer?.cancel();
     _controller.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return CustomPaint(
-          size: Size(widget.size, widget.size),
-          painter: _Solid3DPainter(
-            bangunId: widget.bangunId,
-            angleY: _controller.value * 2 * math.pi,
-            angleX: math.pi / 8, // Tilt slightly down
-          ),
-        );
+    return GestureDetector(
+      onScaleStart: (details) {
+        _resumeTimer?.cancel();
+        setState(() {
+          _isInteracting = true;
+          _baseAngleX = _dragAngleX;
+          _baseAngleY = _dragAngleY;
+          _baseZoom = _zoom;
+          _startFocalPoint = details.localFocalPoint;
+        });
       },
+      onScaleUpdate: (details) {
+        setState(() {
+          final Offset delta = details.localFocalPoint - _startFocalPoint;
+          // Sensitivitas pergeseran rotasi
+          const double sensitivity = 0.007;
+          
+          _dragAngleY = _baseAngleY - delta.dx * sensitivity;
+          _dragAngleX = (_baseAngleX + delta.dy * sensitivity)
+              .clamp(-math.pi / 2.2, math.pi / 2.2); // Batasi agar tidak berputar terbalik vertikal
+
+          // Zoom/Pinch
+          if (details.scale != 1.0) {
+            _zoom = (_baseZoom * details.scale).clamp(0.5, 2.5);
+          }
+        });
+      },
+      onScaleEnd: (details) {
+        _resumeTimer?.cancel();
+        // Lanjutkan putar otomatis setelah 3 detik tidak disentuh
+        _resumeTimer = Timer(const Duration(seconds: 3), () {
+          if (mounted) {
+            setState(() {
+              _isInteracting = false;
+            });
+          }
+        });
+      },
+      child: CustomPaint(
+        size: Size(widget.size, widget.size),
+        painter: _Solid3DPainter(
+          bangunId: widget.bangunId,
+          angleY: _dragAngleY,
+          angleX: _dragAngleX,
+          zoom: _zoom,
+        ),
+      ),
     );
   }
 }
@@ -61,17 +123,19 @@ class _Solid3DPainter extends CustomPainter {
   final String bangunId;
   final double angleX;
   final double angleY;
+  final double zoom;
 
   _Solid3DPainter({
     required this.bangunId,
     required this.angleX,
     required this.angleY,
+    required this.zoom,
   });
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final scale = size.width / 2.5;
+    final scale = (size.width / 2.5) * zoom;
 
     List<_Face> faces = [];
     Color baseColor = Colors.blue;
@@ -328,6 +392,9 @@ class _Solid3DPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant _Solid3DPainter oldDelegate) {
-    return oldDelegate.angleY != angleY || oldDelegate.bangunId != bangunId;
+    return oldDelegate.angleY != angleY ||
+        oldDelegate.angleX != angleX ||
+        oldDelegate.zoom != zoom ||
+        oldDelegate.bangunId != bangunId;
   }
 }
