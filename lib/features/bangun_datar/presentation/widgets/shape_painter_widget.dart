@@ -363,11 +363,15 @@ class SegitigaPainter extends _BaseShapePainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
+    final minSize = math.min(size.width, size.height);
 
-    // Titik-titik segitiga sama sisi
-    final pA = Offset(cx, cy - size.height * 0.35); // Atas
-    final pB = Offset(cx - size.width * 0.35, cy + size.height * 0.28); // Kiri bawah
-    final pC = Offset(cx + size.width * 0.35, cy + size.height * 0.28); // Kanan bawah
+    // Titik-titik segitiga sama sisi berdasarkan minSize agar tidak terdistorsi
+    final double side = minSize * 0.72;
+    final double h = side * math.sqrt(3) / 2; // Tinggi segitiga sama sisi
+
+    final pA = Offset(cx, cy - h / 2); // Atas
+    final pB = Offset(cx - side / 2, cy + h / 2); // Kiri bawah
+    final pC = Offset(cx + side / 2, cy + h / 2); // Kanan bawah
 
     // ─── Fase 4 (0.9–1.0): Fill area ──────────────────────────────────────
     final fillOpacity = opacityInRange(0.9, 1.0);
@@ -409,15 +413,15 @@ class SegitigaPainter extends _BaseShapePainter {
     // Label titik A, B, C (muncul di fase 1)
     final labelVertexOpacity = opacityInRange(0.15, 0.3);
     if (labelVertexOpacity > 0) {
-      drawLabel(canvas, 'A', pA - const Offset(0, 20),
+      drawLabel(canvas, 'A', pA - const Offset(0, 18),
           color: AppColors.primary.withAlpha((labelVertexOpacity * 255).round()),
-          bold: true, fontSize: 14);
-      drawLabel(canvas, 'B', pB + const Offset(-20, 14),
+          bold: true, fontSize: 13);
+      drawLabel(canvas, 'B', pB + const Offset(-18, 12),
           color: AppColors.primary.withAlpha((labelVertexOpacity * 255).round()),
-          bold: true, fontSize: 14);
-      drawLabel(canvas, 'C', pC + const Offset(20, 14),
+          bold: true, fontSize: 13);
+      drawLabel(canvas, 'C', pC + const Offset(18, 12),
           color: AppColors.primary.withAlpha((labelVertexOpacity * 255).round()),
-          bold: true, fontSize: 14);
+          bold: true, fontSize: 13);
     }
 
     // ─── Fase 3 (0.7–0.9): Label sisi a, b, c ─────────────────────────────
@@ -426,15 +430,15 @@ class SegitigaPainter extends _BaseShapePainter {
       final labelColor = AppColors.textSecondary.withAlpha((labelSisiOpacity * 220).round());
       // Sisi a (B-C)
       drawLabel(canvas, 'a',
-          Offset((pB.dx + pC.dx) / 2, pB.dy + 18),
+          Offset((pB.dx + pC.dx) / 2, pB.dy + 16),
           color: labelColor, italic: true);
       // Sisi b (A-C)
       drawLabel(canvas, 'b',
-          Offset((pA.dx + pC.dx) / 2 + 22, (pA.dy + pC.dy) / 2),
+          Offset((pA.dx + pC.dx) / 2 + 18, (pA.dy + pC.dy) / 2),
           color: labelColor, italic: true);
       // Sisi c (A-B)
       drawLabel(canvas, 'c',
-          Offset((pA.dx + pB.dx) / 2 - 22, (pA.dy + pB.dy) / 2),
+          Offset((pA.dx + pB.dx) / 2 - 18, (pA.dy + pB.dy) / 2),
           color: labelColor, italic: true);
     }
   }
@@ -460,9 +464,19 @@ class PersegiPainter extends _BaseShapePainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
+    final minSize = math.min(size.width, size.height);
 
-    final double rectW = isSquare ? size.width * 0.6 : size.width * 0.75;
-    final double rectH = isSquare ? size.width * 0.6 : size.height * 0.45;
+    // Hitung ukuran berdasarkan minSize agar pas di container
+    final double rectW;
+    final double rectH;
+    if (isSquare) {
+      final double side = minSize * 0.70;
+      rectW = side;
+      rectH = side;
+    } else {
+      rectH = minSize * 0.62;
+      rectW = rectH * 1.5;
+    }
 
     // Titik-titik (CW dari kiri-atas)
     final pA = Offset(cx - rectW / 2, cy - rectH / 2);
@@ -482,10 +496,6 @@ class PersegiPainter extends _BaseShapePainter {
     // ─── Diagonal (muncul di 0.75–0.9 dengan warna secondary) ──────────────
     final diagOpacity = opacityInRange(0.75, 0.9);
     if (diagOpacity > 0) {
-      final dp = Paint()
-        ..color = AppColors.secondary.withAlpha((diagOpacity * 180).round())
-        ..strokeWidth = 1.5
-        ..style = PaintingStyle.stroke;
       final diagT = progressInRange(0.75, 0.9);
       // Diagonal AC
       final diagAC = [pA, pC];
@@ -530,18 +540,18 @@ class PersegiPainter extends _BaseShapePainter {
     if (labelOpacity > 0) {
       final lc = AppColors.textSecondary.withAlpha((labelOpacity * 220).round());
       if (isSquare) {
-        drawLabel(canvas, 's', Offset(cx, pA.dy - 16), color: lc, italic: true);
-        drawLabel(canvas, 's', Offset(pB.dx + 16, cy), color: lc, italic: true);
+        drawLabel(canvas, 's', Offset(cx, pA.dy - 14), color: lc, italic: true);
+        drawLabel(canvas, 's', Offset(pB.dx + 14, cy), color: lc, italic: true);
       } else {
-        drawLabel(canvas, 'p', Offset(cx, pA.dy - 16), color: lc, italic: true);
-        drawLabel(canvas, 'l', Offset(pB.dx + 16, cy), color: lc, italic: true);
+        drawLabel(canvas, 'p', Offset(cx, pA.dy - 14), color: lc, italic: true);
+        drawLabel(canvas, 'l', Offset(pB.dx + 14, cy), color: lc, italic: true);
       }
       // Label sudut A, B, C, D
       final pc = AppColors.primary.withAlpha((labelOpacity * 200).round());
-      drawLabel(canvas, 'A', pA - const Offset(14, 14), color: pc, bold: true, fontSize: 12);
-      drawLabel(canvas, 'B', pB + const Offset(14, -14), color: pc, bold: true, fontSize: 12);
-      drawLabel(canvas, 'C', pC + const Offset(14, 14), color: pc, bold: true, fontSize: 12);
-      drawLabel(canvas, 'D', pD + const Offset(-14, 14), color: pc, bold: true, fontSize: 12);
+      drawLabel(canvas, 'A', pA - const Offset(12, 12), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'B', pB + const Offset(12, -12), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'C', pC + const Offset(12, 12), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'D', pD + const Offset(-12, 12), color: pc, bold: true, fontSize: 11);
     }
   }
 }
@@ -642,9 +652,11 @@ class JajarGenjangPainter extends _BaseShapePainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
-    final double w = size.width * 0.7;
-    final double h = size.height * 0.4;
-    final double skew = size.width * 0.15; // Geser horizontal
+    final minSize = math.min(size.width, size.height);
+
+    final double h = minSize * 0.58;
+    final double w = h * 1.5;
+    final double skew = w * 0.18; // Geser horizontal
 
     final pA = Offset(cx - w / 2 + skew, cy - h / 2); // Kiri atas
     final pB = Offset(cx + w / 2 + skew, cy - h / 2); // Kanan atas
@@ -701,9 +713,11 @@ class TrapesiumPainter extends _BaseShapePainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
-    final double topW = size.width * 0.4; // sisi atas lebih pendek
-    final double botW = size.width * 0.72; // sisi bawah lebih panjang
-    final double h = size.height * 0.42;
+    final minSize = math.min(size.width, size.height);
+
+    final double h = minSize * 0.58;
+    final double topW = h * 1.0; // sisi atas lebih pendek
+    final double botW = h * 1.7; // sisi bawah lebih panjang
 
     final pA = Offset(cx - topW / 2, cy - h / 2); // Kiri atas
     final pB = Offset(cx + topW / 2, cy - h / 2); // Kanan atas
@@ -758,11 +772,20 @@ class LayangLayangPainter extends _BaseShapePainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
+    final minSize = math.min(size.width, size.height);
 
-    final pTop = Offset(cx, cy - size.height * 0.42);
-    final pLeft = Offset(cx - size.width * 0.35, cy + size.height * 0.05);
-    final pBot = Offset(cx, cy + size.height * 0.42);
-    final pRight = Offset(cx + size.width * 0.35, cy + size.height * 0.05);
+    // Layang-layang proporsional berdasarkan minSize agar tidak terdistorsi horizontal
+    final double h = minSize * 0.76;
+    final double w = minSize * 0.65;
+    
+    // Titik diagonal horizontal digeser ke atas dari pusat vertikal (cy)
+    final double offsetY = h * 0.16; // Geser ke atas sebesar 16% dari tinggi bangun
+    final double iy = cy - offsetY;  // Titik potong diagonal
+
+    final pTop = Offset(cx, cy - h / 2);
+    final pLeft = Offset(cx - w / 2, iy);
+    final pBot = Offset(cx, cy + h / 2);
+    final pRight = Offset(cx + w / 2, iy);
 
     // Fill (0.8–1.0)
     final fillOp = opacityInRange(0.8, 1.0);
@@ -790,9 +813,8 @@ class LayangLayangPainter extends _BaseShapePainter {
 
       // Tanda siku-siku di titik potong diagonal
       const sq = 7.0;
-      final iy = (pLeft.dy + pTop.dy * 0.2) * 0.8 + cy * 0.3;
       canvas.drawRect(
-        Rect.fromLTWH(cx, cy - sq / 2, sq, sq),
+        Rect.fromLTWH(cx, iy - sq / 2, sq, sq),
         Paint()..color = AppColors.secondary.withAlpha((d2Op * 150).round())..style = PaintingStyle.stroke..strokeWidth = 1.5,
       );
     }
@@ -801,8 +823,8 @@ class LayangLayangPainter extends _BaseShapePainter {
     final lOp = opacityInRange(0.78, 0.95);
     if (lOp > 0) {
       final lc = AppColors.textSecondary.withAlpha((lOp * 220).round());
-      drawLabel(canvas, 'd₁', Offset(cx + 18, cy - size.height * 0.15), color: AppColors.secondary.withAlpha((lOp * 200).round()), italic: true, bold: true);
-      drawLabel(canvas, 'd₂', Offset((pLeft.dx + cx) / 2, cy - 16), color: lc, italic: true);
+      drawLabel(canvas, 'd₁', Offset(cx + 18, cy + h * 0.18), color: AppColors.secondary.withAlpha((lOp * 200).round()), italic: true, bold: true);
+      drawLabel(canvas, 'd₂', Offset((pLeft.dx + cx) / 2, iy - 14), color: lc, italic: true);
     }
   }
 }
@@ -818,11 +840,16 @@ class BelahKetupatPainter extends _BaseShapePainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
+    final minSize = math.min(size.width, size.height);
 
-    final pTop   = Offset(cx, cy - size.height * 0.40);
-    final pRight = Offset(cx + size.width * 0.38, cy);
-    final pBot   = Offset(cx, cy + size.height * 0.40);
-    final pLeft  = Offset(cx - size.width * 0.38, cy);
+    // Belah ketupat simetris dan proporsional menggunakan minSize
+    final double h = minSize * 0.74;
+    final double w = minSize * 0.65;
+
+    final pTop   = Offset(cx, cy - h / 2);
+    final pRight = Offset(cx + w / 2, cy);
+    final pBot   = Offset(cx, cy + h / 2);
+    final pLeft  = Offset(cx - w / 2, cy);
 
     // Fill (0.8–1.0)
     final fillOp = opacityInRange(0.8, 1.0);
@@ -878,11 +905,11 @@ class BelahKetupatPainter extends _BaseShapePainter {
     final lOp = opacityInRange(0.78, 0.95);
     if (lOp > 0) {
       final lc = AppColors.textSecondary.withAlpha((lOp * 220).round());
-      drawLabel(canvas, 'd₁', Offset(cx + 18, cy - size.height * 0.15),
+      drawLabel(canvas, 'd₁', Offset(cx + 18, cy - h * 0.15),
           color: AppColors.secondary.withAlpha((lOp * 200).round()), italic: true, bold: true);
-      drawLabel(canvas, 'd₂', Offset((pLeft.dx + cx) / 2, cy - 16),
+      drawLabel(canvas, 'd₂', Offset((pLeft.dx + cx) / 2, cy - 14),
           color: lc, italic: true);
-      drawLabel(canvas, 's', Offset(cx + size.width * 0.22, cy - size.height * 0.22),
+      drawLabel(canvas, 's', Offset(cx + w * 0.32, cy - h * 0.28),
           color: lc, italic: true);
     }
   }
