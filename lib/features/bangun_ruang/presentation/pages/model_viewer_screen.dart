@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ruang_geo/core/core.dart';
@@ -28,6 +29,7 @@ class _ModelViewerScreenState extends State<ModelViewerScreen> {
   late final BangunModel _bangun;
   bool _autoRotate = true;
   bool _hasModel = false;
+  bool _isCheckingModel = true;
 
   @override
   void initState() {
@@ -36,7 +38,38 @@ class _ModelViewerScreenState extends State<ModelViewerScreen> {
       (b) => b.id == widget.bangunId,
       orElse: () => DummyData.bangunRuangList.first,
     );
-    _hasModel = ModelPathHelper.getModelPath(widget.bangunId) != null;
+    _checkModelExistence();
+  }
+
+  Future<void> _checkModelExistence() async {
+    final path = ModelPathHelper.getModelPath(widget.bangunId);
+    if (path == null) {
+      if (mounted) {
+        setState(() {
+          _hasModel = false;
+          _isCheckingModel = false;
+        });
+      }
+      return;
+    }
+
+    try {
+      final manifestContent = await DefaultAssetBundle.of(context).loadString('AssetManifest.json');
+      final Map<String, dynamic> manifestMap = json.decode(manifestContent);
+      if (mounted) {
+        setState(() {
+          _hasModel = manifestMap.containsKey(path);
+          _isCheckingModel = false;
+        });
+      }
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _hasModel = false;
+          _isCheckingModel = false;
+        });
+      }
+    }
   }
 
   @override
@@ -175,6 +208,14 @@ class _ModelViewerScreenState extends State<ModelViewerScreen> {
   }
 
   Widget _buildModelStatus() {
+    if (_isCheckingModel) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(16.0),
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     if (_hasModel) {
       return Container(
         padding: const EdgeInsets.all(16),

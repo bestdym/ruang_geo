@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:model_viewer_plus/model_viewer_plus.dart';
 import 'package:ruang_geo/core/core.dart';
@@ -5,7 +6,7 @@ import 'package:ruang_geo/core/utils/model_path_helper.dart';
 
 /// Widget reusable untuk menampilkan model 3D menggunakan model_viewer_plus.
 ///
-/// Jika file .glb belum tersedia (path null), otomatis fallback ke
+/// Jika file .glb belum tersedia (path null atau tidak ada di bundle), otomatis fallback ke
 /// [Bangun3DViewer] (custom painter) agar tampilan tetap ada.
 class RGModelViewer extends StatefulWidget {
   const RGModelViewer({
@@ -49,6 +50,17 @@ class _RGModelViewerState extends State<RGModelViewer> {
     _modelPath = ModelPathHelper.getModelPath(widget.bangunId);
   }
 
+  Future<bool> _checkAssetExists(BuildContext context, String? path) async {
+    if (path == null) return false;
+    try {
+      final manifestContent = await DefaultAssetBundle.of(context).loadString('AssetManifest.json');
+      final Map<String, dynamic> manifestMap = json.decode(manifestContent);
+      return manifestMap.containsKey(path);
+    } catch (_) {
+      return false;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     // Jika path tidak ditemukan, tampilkan fallback Bangun3DViewer
@@ -56,18 +68,37 @@ class _RGModelViewerState extends State<RGModelViewer> {
       return _buildFallback(hasError: false);
     }
 
-    // Render ModelViewer jika path tersedia
-    return ModelViewer(
-      src: _modelPath,
-      autoRotate: widget.autoRotate,
-      cameraControls: widget.cameraControls,
-      backgroundColor: widget.backgroundColor,
-      shadowIntensity: widget.shadowIntensity,
-      autoRotateDelay: 0,
-      rotationPerSecond: '30deg',
-      debugLogging: false,
-      onWebViewCreated: (controller) {
-        // WebView berhasil dibuat; model mulai loading di WebGL
+    return FutureBuilder<bool>(
+      future: _checkAssetExists(context, _modelPath),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Container(
+            color: widget.backgroundColor,
+            child: const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+
+        final assetExists = snapshot.data ?? false;
+        if (!assetExists) {
+          return _buildFallback(hasError: true);
+        }
+
+        // Render ModelViewer jika file .glb benar-benar tersedia di bundle
+        return ModelViewer(
+          src: _modelPath,
+          autoRotate: widget.autoRotate,
+          cameraControls: widget.cameraControls,
+          backgroundColor: widget.backgroundColor,
+          shadowIntensity: widget.shadowIntensity,
+          autoRotateDelay: 0,
+          rotationPerSecond: '30deg',
+          debugLogging: false,
+          onWebViewCreated: (controller) {
+            // WebView berhasil dibuat; model mulai loading di WebGL
+          },
+        );
       },
     );
   }
