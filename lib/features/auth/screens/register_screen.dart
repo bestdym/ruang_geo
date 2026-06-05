@@ -19,8 +19,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
   bool _isLoading = false;
 
   Future<void> _register() async {
-    if (_nameController.text.trim().isEmpty || 
-        _emailController.text.trim().isEmpty || 
+    String emailOrUsername = _emailController.text.trim();
+    if (emailOrUsername.isEmpty ||
+        _nameController.text.trim().isEmpty || 
         _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Semua field harus diisi'), backgroundColor: AppColors.error),
@@ -28,10 +29,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    // Jika tidak ada @ (berarti user hanya memasukkan username/nama bebas), tambahkan domain dummy
+    if (!emailOrUsername.contains('@')) {
+      emailOrUsername = '$emailOrUsername@ruanggeo.app';
+    }
+
     setState(() => _isLoading = true);
     try {
       await _authService.signUp(
-        _emailController.text.trim(),
+        emailOrUsername,
         _passwordController.text,
         _nameController.text.trim(),
       );
@@ -90,11 +96,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(
-                    labelText: 'Email',
+                    labelText: 'Username atau Email (Bebas)',
                     prefixIcon: Icon(Icons.email_outlined),
                     border: OutlineInputBorder(),
                   ),
-                  keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 16),
                 TextField(

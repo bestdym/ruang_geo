@@ -18,17 +18,22 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isLoading = false;
 
   Future<void> _login() async {
-    if (_emailController.text.trim().isEmpty || _passwordController.text.isEmpty) {
+    String emailOrUsername = _emailController.text.trim();
+    if (emailOrUsername.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email dan password harus diisi'), backgroundColor: AppColors.error),
+        const SnackBar(content: Text('Username/Email dan password harus diisi'), backgroundColor: AppColors.error),
       );
       return;
+    }
+
+    if (!emailOrUsername.contains('@')) {
+      emailOrUsername = '$emailOrUsername@ruanggeo.app';
     }
 
     setState(() => _isLoading = true);
     try {
       await _authService.signIn(
-        _emailController.text.trim(),
+        emailOrUsername,
         _passwordController.text,
       );
       // Navigation handled by GoRouter redirect automatically
@@ -74,11 +79,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 TextField(
                   controller: _emailController,
                   decoration: const InputDecoration(
-                    labelText: 'Email',
+                    labelText: 'Username atau Email',
                     prefixIcon: Icon(Icons.email_outlined),
                     border: OutlineInputBorder(),
                   ),
-                  keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(height: 16),
                 TextField(
