@@ -10,30 +10,13 @@ class AuthService {
     );
   }
 
-  /// Registrasi dengan email, password, dan nama lengkap
+  /// Registrasi dengan email, password, dan nama
   Future<AuthResponse> signUp(String email, String password, String fullName) async {
     final response = await supabase.auth.signUp(
       email: email,
       password: password,
       data: {'full_name': fullName},
     );
-
-    // Jika registrasi berhasil, manual buatkan data di tabel 'profiles'
-    final user = response.user;
-    if (user != null) {
-      try {
-        await supabase.from('profiles').insert({
-          'id': user.id,
-          'full_name': fullName,
-          'username': email.split('@')[0], // Buat username default dari email
-          'is_profile_complete': false,
-          'created_at': DateTime.now().toIso8601String(),
-        });
-      } catch (e) {
-        print('Peringatan: Gagal insert ke tabel profiles (mungkin karena RLS): $e');
-      }
-    }
-
     return response;
   }
 

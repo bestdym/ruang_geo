@@ -13,33 +13,30 @@ class RegisterScreen extends StatefulWidget {
 
 class _RegisterScreenState extends State<RegisterScreen> {
   final _nameController = TextEditingController();
-  final _emailController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _authService = AuthService();
   bool _isLoading = false;
 
   Future<void> _register() async {
-    String emailOrUsername = _emailController.text.trim();
-    if (emailOrUsername.isEmpty ||
-        _nameController.text.trim().isEmpty || 
-        _passwordController.text.isEmpty) {
+    String name = _nameController.text.trim();
+    String username = _usernameController.text.trim();
+    if (name.isEmpty || username.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Semua field harus diisi'), backgroundColor: AppColors.error),
       );
       return;
     }
 
-    // Jika tidak ada @ (berarti user hanya memasukkan username/nama bebas), tambahkan domain dummy
-    if (!emailOrUsername.contains('@')) {
-      emailOrUsername = '$emailOrUsername@ruanggeo.app';
-    }
+    // Tambahkan domain dummy ke username agar bisa dipakai sebagai email di Supabase
+    String email = '$username@ruanggeo.app';
 
     setState(() => _isLoading = true);
     try {
       await _authService.signUp(
-        emailOrUsername,
+        email,
         _passwordController.text,
-        _nameController.text.trim(),
+        name,
       );
       // Navigation handled by GoRouter redirect
     } on AuthException catch (e) {
@@ -87,17 +84,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 TextField(
                   controller: _nameController,
                   decoration: const InputDecoration(
-                    labelText: 'Nama Lengkap',
+                    labelText: 'Nama',
                     prefixIcon: Icon(Icons.person_outline),
                     border: OutlineInputBorder(),
                   ),
                 ),
                 const SizedBox(height: 16),
                 TextField(
-                  controller: _emailController,
+                  controller: _usernameController,
                   decoration: const InputDecoration(
-                    labelText: 'Username atau Email (Bebas)',
-                    prefixIcon: Icon(Icons.email_outlined),
+                    labelText: 'Username',
+                    prefixIcon: Icon(Icons.alternate_email_rounded),
                     border: OutlineInputBorder(),
                   ),
                 ),
