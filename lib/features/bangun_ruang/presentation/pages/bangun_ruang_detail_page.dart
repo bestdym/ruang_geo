@@ -267,41 +267,7 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
             ),
           ),
         ),
-        const SizedBox(height: 32),
 
-        Row(
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: () {
-                  context.push('/bangun-ruang/${bangun.id}/model');
-                },
-                icon: const Icon(Icons.view_in_ar_rounded),
-                label: const Text('Model 3D'),
-                style: OutlinedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  textStyle: AppTypography.labelMedium
-                      .copyWith(fontWeight: FontWeight.w700),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: ElevatedButton.icon(
-                onPressed: () {
-                  context.push('${AppConstants.routeAR}/${bangun.id}');
-                },
-                icon: const Icon(Icons.camera_alt_rounded),
-                label: const Text('Lihat di AR'),
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  textStyle: AppTypography.labelMedium
-                      .copyWith(fontWeight: FontWeight.w700),
-                ),
-              ),
-            ),
-          ],
-        ),
       ],
     );
   }
