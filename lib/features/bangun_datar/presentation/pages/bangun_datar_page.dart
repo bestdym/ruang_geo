@@ -15,24 +15,29 @@ class BangunDatarPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: const AppBarCustom(title: 'Bangun Datar'),
-      body: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 12,
-          mainAxisSpacing: 12,
-          childAspectRatio: 1.0, // sama persis kayak Bangun Ruang
-        ),
-        itemCount: listBangunDatar.length,
-        itemBuilder: (context, index) {
-          final bangun = listBangunDatar[index];
-          return _BangunDatarCard(
-            bangun: bangun,
-            onTap: () {
-              context.push('/bangun-datar/${bangun.id}');
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: GridView.builder(
+            padding: EdgeInsets.zero,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+              childAspectRatio: 1.0, // sama persis kayak Bangun Ruang
+            ),
+            itemCount: listBangunDatar.length,
+            itemBuilder: (context, index) {
+              final bangun = listBangunDatar[index];
+              return _BangunDatarCard(
+                bangun: bangun,
+                onTap: () {
+                  context.push('/bangun-datar/${bangun.id}');
+                },
+              );
             },
-          );
-        },
+          ),
+        ),
       ),
     );
   }
