@@ -10,12 +10,16 @@ class AuthService {
     );
   }
 
-  /// Registrasi dengan email, password, dan nama
-  Future<AuthResponse> signUp(String email, String password, String fullName) async {
+  /// Registrasi dengan email, password, nama, asal sekolah, dan kelas
+  Future<AuthResponse> signUp(String email, String password, String fullName, String asalSekolah, String kelas) async {
     final response = await supabase.auth.signUp(
       email: email,
       password: password,
-      data: {'full_name': fullName},
+      data: {
+        'full_name': fullName,
+        'asal_sekolah': asalSekolah,
+        'kelas': kelas,
+      },
     );
     return response;
   }

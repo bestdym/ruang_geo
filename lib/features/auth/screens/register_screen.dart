@@ -15,15 +15,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _nameController = TextEditingController();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _sekolahController = TextEditingController();
+  String? _selectedKelas;
+  
   final _authService = AuthService();
   bool _isLoading = false;
 
   Future<void> _register() async {
     String name = _nameController.text.trim();
     String username = _usernameController.text.trim();
-    if (name.isEmpty || username.isEmpty || _passwordController.text.isEmpty) {
+    String sekolah = _sekolahController.text.trim();
+    String password = _passwordController.text;
+
+    if (name.isEmpty || username.isEmpty || password.isEmpty || sekolah.isEmpty || _selectedKelas == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Semua field harus diisi'), backgroundColor: AppColors.error),
+        const SnackBar(content: Text('Semua field harus diisi, termasuk asal sekolah dan kelas'), backgroundColor: AppColors.error),
       );
       return;
     }
@@ -35,8 +41,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     try {
       await _authService.signUp(
         email,
-        _passwordController.text,
+        password,
         name,
+        sekolah,
+        _selectedKelas!,
       );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -63,14 +71,129 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String labelText,
+    required IconData icon,
+    bool obscureText = false,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.outline.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
+        obscureText: obscureText,
+        decoration: InputDecoration(
+          labelText: labelText,
+          labelStyle: const TextStyle(color: AppColors.textHint),
+          floatingLabelBehavior: FloatingLabelBehavior.auto,
+          prefixIcon: Icon(icon, color: AppColors.primary),
+          filled: true,
+          fillColor: Colors.transparent,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: AppColors.outlineVariant),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: AppColors.outlineVariant),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: AppColors.primary, width: 2),
+          ),
+          contentPadding: const EdgeInsets.symmetric(vertical: 18, horizontal: 16),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildKelasSelector() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 4, bottom: 12),
+          child: Text(
+            'Pilih Kelas',
+            style: TextStyle(
+              color: AppColors.textSecondary,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: ['7', '8', '9'].map((kelas) {
+            final isSelected = _selectedKelas == kelas;
+            return Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 4),
+                child: GestureDetector(
+                  onTap: () => setState(() => _selectedKelas = kelas),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.primary : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isSelected ? AppColors.primary : AppColors.outlineVariant,
+                        width: 2,
+                      ),
+                      boxShadow: isSelected ? [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.3),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        )
+                      ] : [
+                        BoxShadow(
+                          color: AppColors.outline.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        )
+                      ],
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      'Kelas $kelas',
+                      style: TextStyle(
+                        color: isSelected ? Colors.white : AppColors.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text('Daftar Akun'),
+        title: const Text('Daftar Akun', style: TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.bold)),
         backgroundColor: Colors.transparent,
         elevation: 0,
+        iconTheme: const IconThemeData(color: AppColors.textPrimary),
       ),
       body: SafeArea(
         child: Center(
@@ -82,111 +205,83 @@ class _RegisterScreenState extends State<RegisterScreen> {
               children: [
                 Text(
                   'Buat Akun Baru',
-                  style: AppTypography.headlineSmall.copyWith(fontWeight: FontWeight.bold),
+                  style: AppTypography.headlineSmall.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primaryDark,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Lengkapi data di bawah untuk bergabung',
+                  style: TextStyle(
+                    color: AppColors.textSecondary,
+                    fontSize: 14,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
-                TextField(
+                _buildTextField(
                   controller: _nameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Nama',
-                    labelStyle: const TextStyle(color: AppColors.textSecondary),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    filled: true,
-                    fillColor: AppColors.darkSurfaceVariant,
-                    prefixIcon: const Icon(Icons.person_outline, color: AppColors.darkTextSecondary),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                    ),
-                  ),
+                  labelText: 'Nama Lengkap',
+                  icon: Icons.person_outline,
                 ),
                 const SizedBox(height: 16),
-                TextField(
+                _buildTextField(
                   controller: _usernameController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Username',
-                    labelStyle: const TextStyle(color: AppColors.textSecondary),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    filled: true,
-                    fillColor: AppColors.darkSurfaceVariant,
-                    prefixIcon: const Icon(Icons.alternate_email_rounded, color: AppColors.darkTextSecondary),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                    ),
-                  ),
+                  labelText: 'Username',
+                  icon: Icons.alternate_email_rounded,
                 ),
                 const SizedBox(height: 16),
-                TextField(
-                  controller: _passwordController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    labelText: 'Password',
-                    labelStyle: const TextStyle(color: AppColors.textSecondary),
-                    floatingLabelBehavior: FloatingLabelBehavior.always,
-                    filled: true,
-                    fillColor: AppColors.darkSurfaceVariant,
-                    prefixIcon: const Icon(Icons.lock_outline, color: AppColors.darkTextSecondary),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                    ),
-                  ),
-                  obscureText: true,
+                _buildTextField(
+                  controller: _sekolahController,
+                  labelText: 'Asal Sekolah',
+                  icon: Icons.school_outlined,
                 ),
                 const SizedBox(height: 24),
+                _buildKelasSelector(),
+                const SizedBox(height: 24),
+                _buildTextField(
+                  controller: _passwordController,
+                  labelText: 'Password',
+                  icon: Icons.lock_outline,
+                  obscureText: true,
+                ),
+                const SizedBox(height: 32),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _register,
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 18),
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
+                    elevation: 4,
+                    shadowColor: AppColors.primary.withOpacity(0.5),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(16),
                     ),
                   ),
                   child: _isLoading 
-                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                      : const Text('Daftar', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(strokeWidth: 3, color: Colors.white))
+                      : const Text('Daftar Sekarang', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Sudah punya akun? ', style: TextStyle(color: AppColors.textSecondary)),
+                    GestureDetector(
+                      onTap: () => context.pop(),
+                      child: const Text('Login di sini', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
                 ),
                 const SizedBox(height: 16),
-                TextButton(
-                  onPressed: () => context.pop(),
-                  child: const Text('Sudah punya akun? Login'),
-                ),
                 TextButton(
                   onPressed: () => context.go('/home'),
                   style: TextButton.styleFrom(
                     foregroundColor: AppColors.textSecondary,
                   ),
-                  child: const Text('Masuk sebagai Tamu'),
+                  child: const Text('Masuk sebagai Tamu', style: TextStyle(fontWeight: FontWeight.w600)),
                 ),
               ],
             ),
