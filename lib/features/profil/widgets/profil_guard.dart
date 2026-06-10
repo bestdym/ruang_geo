@@ -56,6 +56,7 @@ class _ProfilGuardState extends State<ProfilGuard> {
       context: context,
       isDismissible: false,
       enableDrag: false,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
@@ -137,6 +138,7 @@ class _ProfilGuardState extends State<ProfilGuard> {
       context: context,
       isDismissible: false,
       enableDrag: false,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),

@@ -20,6 +20,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   
   final _authService = AuthService();
   bool _isLoading = false;
+  bool _isPasswordVisible = false;
 
   Future<void> _register() async {
     String name = _nameController.text.trim();
@@ -75,7 +76,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     required TextEditingController controller,
     required String labelText,
     required IconData icon,
-    bool obscureText = false,
+    bool isPassword = false,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -92,12 +93,25 @@ class _RegisterScreenState extends State<RegisterScreen> {
       child: TextField(
         controller: controller,
         style: const TextStyle(color: AppColors.textPrimary, fontWeight: FontWeight.w500),
-        obscureText: obscureText,
+        obscureText: isPassword && !_isPasswordVisible,
         decoration: InputDecoration(
           labelText: labelText,
           labelStyle: const TextStyle(color: AppColors.textHint),
           floatingLabelBehavior: FloatingLabelBehavior.auto,
           prefixIcon: Icon(icon, color: AppColors.primary),
+          suffixIcon: isPassword
+              ? IconButton(
+                  icon: Icon(
+                    _isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+                    color: AppColors.textHint,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _isPasswordVisible = !_isPasswordVisible;
+                    });
+                  },
+                )
+              : null,
           filled: true,
           fillColor: Colors.transparent,
           border: OutlineInputBorder(
@@ -245,7 +259,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   controller: _passwordController,
                   labelText: 'Password',
                   icon: Icons.lock_outline,
-                  obscureText: true,
+                  isPassword: true,
                 ),
                 const SizedBox(height: 32),
                 ElevatedButton(
