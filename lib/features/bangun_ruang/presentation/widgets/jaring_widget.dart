@@ -491,9 +491,15 @@ class JaringLimasPainter extends CustomPainter {
     final st = s * 0.9;
     
     // Sudut maksimum saat melipat (membentuk limas tertutup)
-    final maxFold = math.acos((s / 2) / st);
+    // Sudut antara bidang alas dan sisi tegak = acos((s/2) / st)
+    // Karena segitiga dimulai dari posisi datar (terbuka 180 derajat dari pusat),
+    // maka sudut putarnya adalah 180 - sudut_dalam
+    final maxFold = math.pi - math.acos((s / 2) / st);
     final fold = progress * (-maxFold);
-    final tiltX = progress * (math.pi / 4); // Miringkan alas agar terlihat 3D
+    
+    // Miringkan alas agar terlihat 3D menghadap atas (Isometric View)
+    final tiltZ = progress * (math.pi / 4);  // Putar alas jadi belah ketupat
+    final tiltX = progress * (-math.pi / 3); // Miringkan ke atas agar puncak terlihat tinggi
 
     void drawAlas() {
       final rect = Rect.fromCenter(center: Offset(cx, cy), width: s, height: s);
@@ -525,38 +531,40 @@ class JaringLimasPainter extends CustomPainter {
       canvas.drawPath(path, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
     }
 
-    // ALAS (Tengah)
+    // URUTAN MENGGAMBAR SANGAT PENTING (Z-Sorting)
+    
+    // SISI ATAS (Sisi Belakang Kanan saat dilipat isometric)
     canvas.drawFace(
       globalPivot: Offset(cx, cy),
-      pivot: Offset(cx, cy), foldAngle: 0, isAxisX: true, globalTiltX: tiltX,
-      drawCallback: () => drawAlas(),
-    );
-
-    // SISI ATAS
-    canvas.drawFace(
-      globalPivot: Offset(cx, cy),
-      pivot: Offset(cx, cy - s/2), foldAngle: -fold, isAxisX: true, globalTiltX: tiltX,
+      pivot: Offset(cx, cy - s/2), foldAngle: -fold, isAxisX: true, globalTiltX: tiltX, globalTiltZ: tiltZ,
       drawCallback: () => drawTriangle(Colors.red.shade400, Offset(cx, cy - s/2), isTop: true),
     );
 
-    // SISI BAWAH
+    // SISI KIRI (Sisi Belakang Kiri saat dilipat isometric)
     canvas.drawFace(
       globalPivot: Offset(cx, cy),
-      pivot: Offset(cx, cy + s/2), foldAngle: fold, isAxisX: true, globalTiltX: tiltX,
-      drawCallback: () => drawTriangle(Colors.green.shade400, Offset(cx, cy + s/2), isBottom: true),
-    );
-
-    // SISI KIRI
-    canvas.drawFace(
-      globalPivot: Offset(cx, cy),
-      pivot: Offset(cx - s/2, cy), foldAngle: fold, isAxisX: false, globalTiltX: tiltX,
+      pivot: Offset(cx - s/2, cy), foldAngle: fold, isAxisX: false, globalTiltX: tiltX, globalTiltZ: tiltZ,
       drawCallback: () => drawTriangle(Colors.blue.shade400, Offset(cx - s/2, cy), isLeft: true),
     );
 
-    // SISI KANAN
+    // ALAS (Tengah)
     canvas.drawFace(
       globalPivot: Offset(cx, cy),
-      pivot: Offset(cx + s/2, cy), foldAngle: -fold, isAxisX: false, globalTiltX: tiltX,
+      pivot: Offset(cx, cy), foldAngle: 0, isAxisX: true, globalTiltX: tiltX, globalTiltZ: tiltZ,
+      drawCallback: () => drawAlas(),
+    );
+
+    // SISI BAWAH (Sisi Depan Kiri saat dilipat isometric)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(cx, cy + s/2), foldAngle: fold, isAxisX: true, globalTiltX: tiltX, globalTiltZ: tiltZ,
+      drawCallback: () => drawTriangle(Colors.green.shade400, Offset(cx, cy + s/2), isBottom: true),
+    );
+
+    // SISI KANAN (Sisi Depan Kanan saat dilipat isometric)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(cx + s/2, cy), foldAngle: -fold, isAxisX: false, globalTiltX: tiltX, globalTiltZ: tiltZ,
       drawCallback: () => drawTriangle(Colors.orange.shade400, Offset(cx + s/2, cy), isRight: true),
     );
   }
