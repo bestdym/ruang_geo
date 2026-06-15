@@ -276,63 +276,10 @@ class JaringKubusPainter extends CustomPainter {
     final offsetX = cx;
     final offsetY = cy;
 
-    // SISI DEPAN (Tengah, Statis tapi ikut tilt global)
-    canvas.drawFace(
-      globalPivot: Offset(cx, cy),
-      pivot: Offset(offsetX, offsetY),
-      foldAngle: 0,
-      isAxisX: true,
-      globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.purple.shade400, Offset(offsetX, offsetY)),
-    );
-
-    // SISI KIRI (Pivot di tepi kiri sisi depan)
-    canvas.drawFace(
-      globalPivot: Offset(cx, cy),
-      pivot: Offset(offsetX - s / 2, offsetY),
-      foldAngle: fold,
-      isAxisX: false, // Lipat sumbu Y
-      globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.blue.shade400, Offset(offsetX - s, offsetY)),
-    );
-
-    // SISI KANAN (Pivot di tepi kanan sisi depan)
-    canvas.drawFace(
-      globalPivot: Offset(cx, cy),
-      pivot: Offset(offsetX + s / 2, offsetY),
-      foldAngle: -fold, // Lipat berlawanan arah
-      isAxisX: false,
-      globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.orange.shade400, Offset(offsetX + s, offsetY)),
-    );
-
-    // SISI BAWAH (Pivot di tepi bawah sisi depan)
-    canvas.drawFace(
-      globalPivot: Offset(cx, cy),
-      pivot: Offset(offsetX, offsetY + s / 2),
-      foldAngle: fold, // Lipat sumbu X
-      isAxisX: true,
-      globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.green.shade400, Offset(offsetX, offsetY + s)),
-    );
-
-    // SISI ATAS (Pivot di tepi atas sisi depan)
-    canvas.drawFace(
-      globalPivot: Offset(cx, cy),
-      pivot: Offset(offsetX, offsetY - s / 2),
-      foldAngle: -fold,
-      isAxisX: true,
-      globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.red.shade400, Offset(offsetX, offsetY - s)),
-    );
-
-    // SISI BELAKANG (Menempel di Sisi Kanan)
-    // Untuk ini, kita gunakan trik: kita gabungkan transformasinya secara manual.
+    // URUTAN MENGGAMBAR: Paling jauh ke paling dekat (Painter's Algorithm)
+    // Melipat ke arah DALAM layar (Z positif), sehingga SISI DEPAN adalah sisi yang paling dekat dengan kita
+    
+    // 1. SISI BELAKANG (Kuning - Paling jauh)
     canvas.save();
     final matrix = Matrix4.identity()..setEntry(3, 2, 0.0015);
     matrix.translate(offsetX, offsetY);
@@ -342,18 +289,73 @@ class JaringKubusPainter extends CustomPainter {
     
     // Pertama, pindah ke engsel KANAN
     matrix.translate(offsetX + s/2, offsetY);
-    // Putar sisi kanan
-    matrix.rotateY(-fold);
+    // Putar sisi kanan ke dalam layar
+    matrix.rotateY(fold);
     // Maju ke engsel luar sisi kanan
     matrix.translate(s, 0.0);
-    // Putar sisi belakang
-    matrix.rotateY(-fold);
+    // Putar sisi belakang sejajar dengan depan
+    matrix.rotateY(fold);
     // Kembalikan anchor untuk menggambar
     matrix.translate(-(offsetX + s + s/2), -offsetY);
     
     canvas.transform(matrix.storage);
     drawFaceRect(Colors.yellow.shade600, Offset(offsetX + s * 2, offsetY));
     canvas.restore();
+
+    // 2. SISI BAWAH (Hijau)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX, offsetY + s / 2),
+      foldAngle: -fold, // Lipat ke dalam
+      isAxisX: true,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawFaceRect(Colors.green.shade400, Offset(offsetX, offsetY + s)),
+    );
+
+    // 3. SISI KANAN (Oranye)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX + s / 2, offsetY),
+      foldAngle: fold, // Lipat ke dalam
+      isAxisX: false,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawFaceRect(Colors.orange.shade400, Offset(offsetX + s, offsetY)),
+    );
+
+    // 4. SISI ATAS (Merah)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX, offsetY - s / 2),
+      foldAngle: fold, // Lipat ke dalam
+      isAxisX: true,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawFaceRect(Colors.red.shade400, Offset(offsetX, offsetY - s)),
+    );
+
+    // 5. SISI KIRI (Biru)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX - s / 2, offsetY),
+      foldAngle: -fold, // Lipat ke dalam
+      isAxisX: false,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawFaceRect(Colors.blue.shade400, Offset(offsetX - s, offsetY)),
+    );
+
+    // 6. SISI DEPAN (Ungu - Paling dekat)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX, offsetY),
+      foldAngle: 0,
+      isAxisX: true,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawFaceRect(Colors.purple.shade400, Offset(offsetX, offsetY)),
+    );
   }
 
   @override
@@ -390,62 +392,10 @@ class JaringBalokPainter extends CustomPainter {
     final offsetX = cx;
     final offsetY = cy;
 
-    // SISI DEPAN (Tengah) - Ukuran W x H
-    canvas.drawFace(
-      globalPivot: Offset(cx, cy),
-      pivot: Offset(offsetX, offsetY),
-      foldAngle: 0,
-      isAxisX: true,
-      globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.purple.shade400, Offset(offsetX, offsetY), w, h),
-    );
+    // URUTAN MENGGAMBAR: Paling jauh ke paling dekat (Painter's Algorithm)
+    // Melipat ke arah DALAM layar (Z positif), sehingga SISI DEPAN adalah sisi yang paling dekat dengan kita
 
-    // SISI KIRI - Ukuran D x H
-    canvas.drawFace(
-      globalPivot: Offset(cx, cy),
-      pivot: Offset(offsetX - w / 2, offsetY),
-      foldAngle: fold,
-      isAxisX: false,
-      globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.blue.shade400, Offset(offsetX - w/2 - d/2, offsetY), d, h),
-    );
-
-    // SISI KANAN - Ukuran D x H
-    canvas.drawFace(
-      globalPivot: Offset(cx, cy),
-      pivot: Offset(offsetX + w / 2, offsetY),
-      foldAngle: -fold,
-      isAxisX: false,
-      globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.orange.shade400, Offset(offsetX + w/2 + d/2, offsetY), d, h),
-    );
-
-    // SISI BAWAH - Ukuran W x D
-    canvas.drawFace(
-      globalPivot: Offset(cx, cy),
-      pivot: Offset(offsetX, offsetY + h / 2),
-      foldAngle: fold,
-      isAxisX: true,
-      globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.green.shade400, Offset(offsetX, offsetY + h/2 + d/2), w, d),
-    );
-
-    // SISI ATAS - Ukuran W x D
-    canvas.drawFace(
-      globalPivot: Offset(cx, cy),
-      pivot: Offset(offsetX, offsetY - h / 2),
-      foldAngle: -fold,
-      isAxisX: true,
-      globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.red.shade400, Offset(offsetX, offsetY - h/2 - d/2), w, d),
-    );
-
-    // SISI BELAKANG (Menempel di Sisi Kanan) - Ukuran W x H
+    // 1. SISI BELAKANG (Kuning - Paling jauh)
     canvas.save();
     final matrix = Matrix4.identity()..setEntry(3, 2, 0.0015);
     matrix.translate(offsetX, offsetY);
@@ -455,18 +405,73 @@ class JaringBalokPainter extends CustomPainter {
     
     // Ke engsel kanan (W/2)
     matrix.translate(offsetX + w/2, offsetY);
-    // Putar sisi kanan
-    matrix.rotateY(-fold);
+    // Putar sisi kanan ke dalam
+    matrix.rotateY(fold);
     // Maju selebar sisi kanan (D)
     matrix.translate(d, 0.0);
-    // Putar sisi belakang
-    matrix.rotateY(-fold);
+    // Putar sisi belakang sejajar dengan depan
+    matrix.rotateY(fold);
     // Kembalikan
     matrix.translate(-(offsetX + w/2 + d + w/2), -offsetY);
     
     canvas.transform(matrix.storage);
     drawFaceRect(Colors.yellow.shade600, Offset(offsetX + w + d, offsetY), w, h);
     canvas.restore();
+
+    // 2. SISI BAWAH (Hijau)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX, offsetY + h / 2),
+      foldAngle: -fold, // Lipat ke dalam
+      isAxisX: true,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawFaceRect(Colors.green.shade400, Offset(offsetX, offsetY + h/2 + d/2), w, d),
+    );
+
+    // 3. SISI KANAN (Oranye)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX + w / 2, offsetY),
+      foldAngle: fold, // Lipat ke dalam
+      isAxisX: false,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawFaceRect(Colors.orange.shade400, Offset(offsetX + w/2 + d/2, offsetY), d, h),
+    );
+
+    // 4. SISI ATAS (Merah)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX, offsetY - h / 2),
+      foldAngle: fold, // Lipat ke dalam
+      isAxisX: true,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawFaceRect(Colors.red.shade400, Offset(offsetX, offsetY - h/2 - d/2), w, d),
+    );
+
+    // 5. SISI KIRI (Biru)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX - w / 2, offsetY),
+      foldAngle: -fold, // Lipat ke dalam
+      isAxisX: false,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawFaceRect(Colors.blue.shade400, Offset(offsetX - w/2 - d/2, offsetY), d, h),
+    );
+
+    // 6. SISI DEPAN (Ungu - Paling dekat)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX, offsetY),
+      foldAngle: 0,
+      isAxisX: true,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawFaceRect(Colors.purple.shade400, Offset(offsetX, offsetY), w, h),
+    );
   }
 
   @override
@@ -582,11 +587,119 @@ class JaringPrismaPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    // Placeholder logic for prisma if needed, otherwise reuse kubus fallback
     final cx = size.width / 2;
     final cy = size.height / 2;
-    final r = 50 * progress;
-    canvas.drawCircle(Offset(cx, cy), r, Paint()..color = Colors.green);
+
+    // Dimensi prisma
+    final w = size.width * 0.35; // Panjang prisma (horizontal)
+    final s = size.width * 0.2;  // Sisi segitiga sama sisi (vertikal)
+    final hTri = s * math.sqrt(3) / 2; // Tinggi segitiga
+
+    // Sudut lipat
+    // Segitiga (tutup kiri/kanan) melipat 90 derajat ke dalam
+    final foldCap = progress * (math.pi / 2); 
+    // Persegi panjang (atas/bawah) melipat 120 derajat ke dalam (karena sudut dalam segitiga 60 derajat)
+    final foldSide = progress * (math.pi * 2 / 3); 
+
+    // Perspektif global
+    final tiltX = progress * (math.pi / 6); // Tilt ke bawah
+    final tiltZ = progress * (math.pi / 8); // Putar miring
+
+    final offsetX = cx;
+    final offsetY = cy;
+
+    void drawFaceRect(Color c, Offset center, double width, double height) {
+      final rect = Rect.fromCenter(center: center, width: width, height: height);
+      canvas.drawRect(rect, Paint()..color = c..style = PaintingStyle.fill);
+      canvas.drawRect(rect, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+    }
+
+    void drawTriangle(Color c, bool isLeft) {
+      final path = Path();
+      if (isLeft) {
+        // Segitiga menghadap kiri (ujung di -X)
+        path.moveTo(0, -s / 2);
+        path.lineTo(-hTri, 0);
+        path.lineTo(0, s / 2);
+        path.close();
+      } else {
+        // Segitiga menghadap kanan (ujung di +X)
+        path.moveTo(0, -s / 2);
+        path.lineTo(hTri, 0);
+        path.lineTo(0, s / 2);
+        path.close();
+      }
+      canvas.drawPath(path, Paint()..color = c..style = PaintingStyle.fill);
+      canvas.drawPath(path, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+    }
+
+    // URUTAN MENGGAMBAR: Paling jauh ke paling dekat (Painter's Algorithm)
+    // Melipat ke arah DALAM layar (Z positif), SISI DEPAN adalah paling dekat.
+
+    // 1. SISI BAWAH (Hijau - Paling jauh)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX, offsetY + s / 2),
+      foldAngle: foldSide, // Positif -> Lipat ke dalam (Y lokal positif)
+      isAxisX: true,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawFaceRect(Colors.green.shade400, Offset(offsetX, offsetY + s), w, s),
+    );
+
+    // 2. SISI KIRI (Biru - Tutup Segitiga Kiri)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX - w / 2, offsetY),
+      foldAngle: foldCap, // Positif -> Lipat ke dalam (X lokal negatif)
+      isAxisX: false,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () {
+        canvas.save();
+        canvas.translate(offsetX - w / 2, offsetY);
+        drawTriangle(Colors.blue.shade400, true);
+        canvas.restore();
+      },
+    );
+
+    // 3. SISI KANAN (Oranye - Tutup Segitiga Kanan)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX + w / 2, offsetY),
+      foldAngle: -foldCap, // Negatif -> Lipat ke dalam (X lokal positif)
+      isAxisX: false,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () {
+        canvas.save();
+        canvas.translate(offsetX + w / 2, offsetY);
+        drawTriangle(Colors.orange.shade400, false);
+        canvas.restore();
+      },
+    );
+
+    // 4. SISI ATAS (Merah - Dinding Atas)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX, offsetY - s / 2),
+      foldAngle: -foldSide, // Negatif -> Lipat ke dalam (Y lokal negatif)
+      isAxisX: true,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawFaceRect(Colors.red.shade400, Offset(offsetX, offsetY - s), w, s),
+    );
+
+    // 5. SISI DEPAN (Ungu - Alas / Paling Dekat)
+    canvas.drawFace(
+      globalPivot: Offset(cx, cy),
+      pivot: Offset(offsetX, offsetY),
+      foldAngle: 0,
+      isAxisX: true,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawFaceRect(Colors.purple.shade400, Offset(offsetX, offsetY), w, s),
+    );
   }
 
   @override
