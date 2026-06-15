@@ -341,11 +341,11 @@ class _Solid3DPainter extends CustomPainter {
       [0, -1, 0] // Apex
     ];
     return [
-      _Face([v[0], v[3], v[2], v[1]].reversed.toList()), // Base
-      _Face([v[0], v[1], v[4]].reversed.toList()), // Front
-      _Face([v[1], v[2], v[4]].reversed.toList()), // Right
-      _Face([v[2], v[3], v[4]].reversed.toList()), // Back
-      _Face([v[3], v[0], v[4]].reversed.toList()), // Left
+      _Face([v[0], v[3], v[2], v[1]]), // Base
+      _Face([v[0], v[1], v[4]]), // Front
+      _Face([v[1], v[2], v[4]]), // Right
+      _Face([v[2], v[3], v[4]]), // Back
+      _Face([v[3], v[0], v[4]]), // Left
     ];
   }
 

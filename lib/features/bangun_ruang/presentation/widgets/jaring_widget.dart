@@ -490,10 +490,10 @@ class JaringLimasPainter extends CustomPainter {
     // Tinggi segitiga sisi (sisi miring)
     final st = s * 0.9;
     
-    // Sudut lipat segitiga (bukan 90, tapi misal 65 derajat ke dalam)
-    // Sudut persisnya tergantung tinggi limas, kita asumsikan 65 derajat (1.1 rad)
-    final fold = progress * (-1.1);
-    final tiltX = progress * (math.pi / 4); // Miringkan alas agar terlihat
+    // Sudut maksimum saat melipat (membentuk limas tertutup)
+    final maxFold = math.acos((s / 2) / st);
+    final fold = progress * (-maxFold);
+    final tiltX = progress * (math.pi / 4); // Miringkan alas agar terlihat 3D
 
     void drawAlas() {
       final rect = Rect.fromCenter(center: Offset(cx, cy), width: s, height: s);
@@ -501,25 +501,24 @@ class JaringLimasPainter extends CustomPainter {
       canvas.drawRect(rect, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
     }
 
-    void drawTriangle(Color c, Offset pivot, bool isTop, bool isRight) {
+    void drawTriangle(Color c, Offset pivot, {bool isTop = false, bool isBottom = false, bool isLeft = false, bool isRight = false}) {
       final path = Path();
-      // Segitiga akan digambar dengan alas di bawah pivot, mengarah ke luar
       if (isTop) {
         path.moveTo(pivot.dx - s/2, pivot.dy);
         path.lineTo(pivot.dx + s/2, pivot.dy);
         path.lineTo(pivot.dx, pivot.dy - st); // puncak atas
-      } else if (!isTop && !isRight) { // Bottom
+      } else if (isBottom) {
         path.moveTo(pivot.dx - s/2, pivot.dy);
         path.lineTo(pivot.dx + s/2, pivot.dy);
         path.lineTo(pivot.dx, pivot.dy + st); // puncak bawah
-      } else if (isRight) { // Kanan
+      } else if (isRight) {
         path.moveTo(pivot.dx, pivot.dy - s/2);
         path.lineTo(pivot.dx, pivot.dy + s/2);
-        path.lineTo(pivot.dx + st, pivot.dy);
-      } else { // Kiri
+        path.lineTo(pivot.dx + st, pivot.dy); // puncak kanan
+      } else if (isLeft) {
         path.moveTo(pivot.dx, pivot.dy - s/2);
         path.lineTo(pivot.dx, pivot.dy + s/2);
-        path.lineTo(pivot.dx - st, pivot.dy);
+        path.lineTo(pivot.dx - st, pivot.dy); // puncak kiri
       }
       path.close();
       canvas.drawPath(path, Paint()..color = c..style = PaintingStyle.fill);
@@ -537,28 +536,28 @@ class JaringLimasPainter extends CustomPainter {
     canvas.drawFace(
       globalPivot: Offset(cx, cy),
       pivot: Offset(cx, cy - s/2), foldAngle: -fold, isAxisX: true, globalTiltX: tiltX,
-      drawCallback: () => drawTriangle(Colors.red.shade400, Offset(cx, cy - s/2), true, false),
+      drawCallback: () => drawTriangle(Colors.red.shade400, Offset(cx, cy - s/2), isTop: true),
     );
 
     // SISI BAWAH
     canvas.drawFace(
       globalPivot: Offset(cx, cy),
       pivot: Offset(cx, cy + s/2), foldAngle: fold, isAxisX: true, globalTiltX: tiltX,
-      drawCallback: () => drawTriangle(Colors.green.shade400, Offset(cx, cy + s/2), false, false),
+      drawCallback: () => drawTriangle(Colors.green.shade400, Offset(cx, cy + s/2), isBottom: true),
     );
 
     // SISI KIRI
     canvas.drawFace(
       globalPivot: Offset(cx, cy),
       pivot: Offset(cx - s/2, cy), foldAngle: fold, isAxisX: false, globalTiltX: tiltX,
-      drawCallback: () => drawTriangle(Colors.blue.shade400, Offset(cx - s/2, cy), true, false), // Arah dibelokkan manual lewat koordinat di atas
+      drawCallback: () => drawTriangle(Colors.blue.shade400, Offset(cx - s/2, cy), isLeft: true),
     );
 
     // SISI KANAN
     canvas.drawFace(
       globalPivot: Offset(cx, cy),
       pivot: Offset(cx + s/2, cy), foldAngle: -fold, isAxisX: false, globalTiltX: tiltX,
-      drawCallback: () => drawTriangle(Colors.orange.shade400, Offset(cx + s/2, cy), false, true),
+      drawCallback: () => drawTriangle(Colors.orange.shade400, Offset(cx + s/2, cy), isRight: true),
     );
   }
 
