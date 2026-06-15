@@ -1,6 +1,6 @@
 {
-    "name": "ruang_geo",
-    "short_name": "ruang_geo",
+    "name": "RuangGeo",
+    "short_name": "RuangGeo",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
