@@ -774,48 +774,65 @@ class JaringKerucutPainter extends CustomPainter {
     final cx = size.width / 2;
     final cy = size.height / 2;
     
-    final radius = math.min(size.width, size.height) * 0.15; // Jari-jari alas
-    final s = math.min(size.width, size.height) * 0.35;      // Garis pelukis (selimut)
+    // Perbesar ukuran (radius alas 20%, garis pelukis 42%)
+    final r = math.min(size.width, size.height) * 0.20; 
+    final s = math.min(size.width, size.height) * 0.42; 
+    final h = math.sqrt(s * s - r * r); // Tinggi kerucut
+
+    // Sudut juring saat dibuka penuh
+    final theta = 2 * math.pi * r / s;
+
+    // Titik puncak juring & kerucut (Pusatkan secara vertikal)
+    final totalHeightUnfolded = s + 2 * r; 
+    final p0_0 = Offset(cx, cy - totalHeightUnfolded / 2); 
     
-    final currentWidth = s * 2 - (s * 2 - radius * 2) * progress;
-    final currentHeight = s; // tinggi kerucut tampak samping
-    
-    // Alas
-    final currentRadiusY = radius * (1 - 0.7 * progress); // Memipih jadi elips
-    final rectAlas = Rect.fromCenter(center: Offset(cx, cy + currentHeight / 2), width: radius * 2, height: currentRadiusY * 2);
-    
+    final totalHeightFolded = h + r * 0.3; // 0.3 adalah rasio pipih elips alas
+    final p0_1 = Offset(cx, cy - totalHeightFolded / 2); 
+
+    // Interpolasi Puncak (P0)
+    final p0 = Offset.lerp(p0_0, p0_1, progress)!;
+
+    // --- 1. GAMBAR ALAS (Lingkaran Hijau) ---
+    // Digambar lebih dulu agar perlahan tertutup oleh selimut saat melipat
+    final centerBase_0 = Offset(cx, p0_0.dy + s + r);
+    final centerBase_1 = Offset(cx, p0_1.dy + h);
+    final centerBase = Offset.lerp(centerBase_0, centerBase_1, progress)!;
+
+    final radiusX = r;
+    final radiusY = r * (1 - 0.7 * progress); 
+
+    final rectAlas = Rect.fromCenter(center: centerBase, width: radiusX * 2, height: radiusY * 2);
     canvas.drawOval(rectAlas, Paint()..color = Colors.green.shade400..style = PaintingStyle.fill);
     canvas.drawOval(rectAlas, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
 
-    // Selimut
+    // --- 2. GAMBAR SELIMUT (Juring Ungu) ---
+    // Bounding Box untuk busur lengkungan selimut
+    final rectArc_0 = Rect.fromCircle(center: p0_0, radius: s);
+    final rectArc_1 = Rect.fromCenter(center: centerBase_1, width: 2 * r, height: 2 * r * 0.3);
+    final rectArc = Rect.lerp(rectArc_0, rectArc_1, progress)!;
+
+    // Interpolasi sudut busur
+    // Di Flutter: 0 = Kanan, pi/2 = Bawah, pi = Kiri
+    final startAngle_0 = math.pi / 2 + theta / 2; // Kiri bawah
+    final startAngle_1 = math.pi; // Kiri rata (untuk elips)
+    final startAngle = startAngle_0 + (startAngle_1 - startAngle_0) * progress;
+
+    final sweepAngle_0 = -theta; // Menyapu ke kanan
+    final sweepAngle_1 = -math.pi; // Menyapu setengah elips bawah
+    final sweepAngle = sweepAngle_0 + (sweepAngle_1 - sweepAngle_0) * progress;
+
     final path = Path();
-    
-    final peakY = cy - currentHeight / 2;
-    final leftX = cx - currentWidth / 2;
-    final rightX = cx + currentWidth / 2;
-    
-    path.moveTo(cx, peakY);
-    // Garis kiri
-    path.lineTo(leftX, cy + currentHeight / 2);
-    
-    // Lengkung bawah
-    if (progress > 0.1) {
-      // Saat dilipat, bawahnya melengkung mengikuti oval
-      path.arcTo(rectAlas, math.pi, -math.pi, false);
-    } else {
-      // Saat dibuka, melengkung membentuk juring yang lebar
-      path.quadraticBezierTo(cx, cy + currentHeight / 2 + currentWidth/2, rightX, cy + currentHeight / 2);
-    }
-    
-    // Garis kanan kembali ke puncak
-    path.lineTo(cx, peakY);
+    path.moveTo(p0.dx, p0.dy);
+    path.arcTo(rectArc, startAngle, sweepAngle, false);
     path.close();
 
     final paintSelimut = Paint()
       ..color = Colors.purple.shade400
       ..style = PaintingStyle.fill;
 
+    // Tambahkan efek bayangan (shading 3D) saat melipat
     if (progress > 0) {
+      final bounds = path.getBounds();
       paintSelimut.shader = LinearGradient(
         colors: [
           Colors.purple.shade800.withAlpha((150 * progress).round()),
@@ -823,7 +840,7 @@ class JaringKerucutPainter extends CustomPainter {
           Colors.purple.shade800.withAlpha((150 * progress).round()),
         ],
         stops: const [0.0, 0.5, 1.0],
-      ).createShader(Rect.fromLTRB(leftX, peakY, rightX, cy + currentHeight / 2));
+      ).createShader(bounds);
     }
 
     canvas.drawPath(path, paintSelimut);
