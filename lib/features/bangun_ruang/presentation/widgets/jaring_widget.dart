@@ -7,10 +7,7 @@ import 'package:ruang_geo/core/core.dart';
 // ─────────────────────────────────────────────────────────────────────────────
 
 class JaringWidget extends StatefulWidget {
-  const JaringWidget({
-    super.key,
-    required this.bangunId,
-  });
+  const JaringWidget({super.key, required this.bangunId});
 
   final String bangunId;
 
@@ -93,12 +90,18 @@ class _JaringWidgetState extends State<JaringWidget>
                 runSpacing: 8,
                 alignment: WrapAlignment.center,
                 children: [
-                  _ColorLegend(color: Colors.purple.shade400, label: 'Alas/Depan'),
+                  _ColorLegend(
+                    color: Colors.purple.shade400,
+                    label: 'Alas/Depan',
+                  ),
                   _ColorLegend(color: Colors.red.shade400, label: 'Atas'),
                   _ColorLegend(color: Colors.green.shade400, label: 'Bawah'),
                   _ColorLegend(color: Colors.blue.shade400, label: 'Sisi 1'),
                   _ColorLegend(color: Colors.orange.shade400, label: 'Sisi 2'),
-                  _ColorLegend(color: Colors.yellow.shade600, label: 'Sisi 3/Tutup'),
+                  _ColorLegend(
+                    color: Colors.yellow.shade600,
+                    label: 'Sisi 3/Tutup',
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
@@ -108,10 +111,15 @@ class _JaringWidgetState extends State<JaringWidget>
                 children: [
                   OutlinedButton.icon(
                     onPressed: _resetAnimation,
-                    icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                    icon: const Icon(
+                      Icons.refresh_rounded,
+                      color: Colors.white,
+                    ),
                     label: Text(
                       'Reset',
-                      style: AppTypography.labelMedium.copyWith(color: Colors.white),
+                      style: AppTypography.labelMedium.copyWith(
+                        color: Colors.white,
+                      ),
                     ),
                     style: OutlinedButton.styleFrom(
                       side: BorderSide(color: Colors.white.withAlpha(100)),
@@ -122,7 +130,9 @@ class _JaringWidgetState extends State<JaringWidget>
                   ElevatedButton.icon(
                     onPressed: _toggleAnimation,
                     icon: Icon(
-                      _isFolded ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                      _isFolded
+                          ? Icons.pause_rounded
+                          : Icons.play_arrow_rounded,
                     ),
                     label: Text(
                       _isFolded ? 'Buka Jaring' : 'Lipat Bangun',
@@ -133,7 +143,10 @@ class _JaringWidgetState extends State<JaringWidget>
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
                       foregroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 24,
+                        vertical: 12,
+                      ),
                     ),
                   ),
                 ],
@@ -210,10 +223,9 @@ extension CanvasTransformExt on Canvas {
     double globalTiltZ = 0,
   }) {
     save();
-    
+
     // Matriks dasar dengan perspektif
-    final matrix = Matrix4.identity()
-      ..setEntry(3, 2, 0.0015); // Perspective
+    final matrix = Matrix4.identity()..setEntry(3, 2, 0.0015); // Perspective
 
     // Global tilt untuk melihat bangun dari sudut miring isometrik
     matrix.translate(globalPivot.dx, globalPivot.dy, 0.0);
@@ -223,19 +235,19 @@ extension CanvasTransformExt on Canvas {
 
     // Translasi ke titik pivot, putar, lalu kembali
     matrix.translate(pivot.dx, pivot.dy, 0.0);
-    
+
     if (isAxisX) {
       matrix.rotateX(foldAngle);
     } else {
       matrix.rotateY(foldAngle);
     }
-    
+
     if (extraRotZ != 0) {
       matrix.rotateZ(extraRotZ);
     }
 
     matrix.translate(-pivot.dx, -pivot.dy, 0.0);
-    
+
     transform(matrix.storage);
     drawCallback();
     restore();
@@ -256,7 +268,7 @@ class JaringKubusPainter extends CustomPainter {
     final cy = size.height / 2;
     // Ukuran satu sisi persegi
     final s = math.min(size.width, size.height) * 0.25;
-    
+
     // Global tilt saat sedang melipat agar terlihat 3D
     // Saat progress 0 (terbuka), tilt = 0 (datar)
     // Saat progress 1 (terlipat), tilt X dan Z miring agar terlihat bentuk 3D
@@ -264,12 +276,25 @@ class JaringKubusPainter extends CustomPainter {
     final tiltZ = progress * (math.pi / 8);
 
     // Sudut lipat masing-masing (90 derajat = pi/2)
-    final fold = progress * (-math.pi / 2); // Negatif karena kita melipat "ke dalam/belakang" z
+    final fold =
+        progress *
+        (-math.pi / 2); // Negatif karena kita melipat "ke dalam/belakang" z
 
     void drawFaceRect(Color c, Offset center) {
       final rect = Rect.fromCenter(center: center, width: s, height: s);
-      canvas.drawRect(rect, Paint()..color = c..style = PaintingStyle.fill);
-      canvas.drawRect(rect, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+      canvas.drawRect(
+        rect,
+        Paint()
+          ..color = c
+          ..style = PaintingStyle.fill,
+      );
+      canvas.drawRect(
+        rect,
+        Paint()
+          ..color = Colors.white30
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
     }
 
     // Posisikan kubus sedikit lebih ke atas/kiri agar saat dilipat ada di tengah
@@ -278,7 +303,7 @@ class JaringKubusPainter extends CustomPainter {
 
     // URUTAN MENGGAMBAR: Paling jauh ke paling dekat (Painter's Algorithm)
     // Melipat ke arah DALAM layar (Z positif), sehingga SISI DEPAN adalah sisi yang paling dekat dengan kita
-    
+
     // 1. SISI BELAKANG (Kuning - Paling jauh)
     canvas.save();
     final matrix = Matrix4.identity()..setEntry(3, 2, 0.0015);
@@ -286,9 +311,9 @@ class JaringKubusPainter extends CustomPainter {
     matrix.rotateX(tiltX);
     matrix.rotateZ(tiltZ);
     matrix.translate(-offsetX, -offsetY);
-    
+
     // Pertama, pindah ke engsel KANAN
-    matrix.translate(offsetX + s/2, offsetY);
+    matrix.translate(offsetX + s / 2, offsetY);
     // Putar sisi kanan ke dalam layar
     matrix.rotateY(fold);
     // Maju ke engsel luar sisi kanan
@@ -296,8 +321,8 @@ class JaringKubusPainter extends CustomPainter {
     // Putar sisi belakang sejajar dengan depan
     matrix.rotateY(fold);
     // Kembalikan anchor untuk menggambar
-    matrix.translate(-(offsetX + s + s/2), -offsetY);
-    
+    matrix.translate(-(offsetX + s + s / 2), -offsetY);
+
     canvas.transform(matrix.storage);
     drawFaceRect(Colors.yellow.shade600, Offset(offsetX + s * 2, offsetY));
     canvas.restore();
@@ -310,7 +335,8 @@ class JaringKubusPainter extends CustomPainter {
       isAxisX: true,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.green.shade400, Offset(offsetX, offsetY + s)),
+      drawCallback: () =>
+          drawFaceRect(Colors.green.shade400, Offset(offsetX, offsetY + s)),
     );
 
     // 3. SISI KANAN (Oranye)
@@ -321,7 +347,8 @@ class JaringKubusPainter extends CustomPainter {
       isAxisX: false,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.orange.shade400, Offset(offsetX + s, offsetY)),
+      drawCallback: () =>
+          drawFaceRect(Colors.orange.shade400, Offset(offsetX + s, offsetY)),
     );
 
     // 4. SISI ATAS (Merah)
@@ -332,7 +359,8 @@ class JaringKubusPainter extends CustomPainter {
       isAxisX: true,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.red.shade400, Offset(offsetX, offsetY - s)),
+      drawCallback: () =>
+          drawFaceRect(Colors.red.shade400, Offset(offsetX, offsetY - s)),
     );
 
     // 5. SISI KIRI (Biru)
@@ -343,7 +371,8 @@ class JaringKubusPainter extends CustomPainter {
       isAxisX: false,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.blue.shade400, Offset(offsetX - s, offsetY)),
+      drawCallback: () =>
+          drawFaceRect(Colors.blue.shade400, Offset(offsetX - s, offsetY)),
     );
 
     // 6. SISI DEPAN (Ungu - Paling dekat)
@@ -354,7 +383,8 @@ class JaringKubusPainter extends CustomPainter {
       isAxisX: true,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.purple.shade400, Offset(offsetX, offsetY)),
+      drawCallback: () =>
+          drawFaceRect(Colors.purple.shade400, Offset(offsetX, offsetY)),
     );
   }
 
@@ -375,18 +405,33 @@ class JaringBalokPainter extends CustomPainter {
     final cx = size.width / 2;
     final cy = size.height / 2;
     // Ukuran balok
-    final w = size.width * 0.4;  // lebar (X)
+    final w = size.width * 0.4; // lebar (X)
     final h = size.height * 0.2; // tinggi (Y)
-    final d = size.width * 0.2;  // kedalaman (Z, yang dilipat)
+    final d = size.width * 0.2; // kedalaman (Z, yang dilipat)
 
     final tiltX = progress * (math.pi / 5);
     final tiltZ = progress * (math.pi / 8);
     final fold = progress * (-math.pi / 2);
 
     void drawFaceRect(Color c, Offset center, double width, double height) {
-      final rect = Rect.fromCenter(center: center, width: width, height: height);
-      canvas.drawRect(rect, Paint()..color = c..style = PaintingStyle.fill);
-      canvas.drawRect(rect, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+      final rect = Rect.fromCenter(
+        center: center,
+        width: width,
+        height: height,
+      );
+      canvas.drawRect(
+        rect,
+        Paint()
+          ..color = c
+          ..style = PaintingStyle.fill,
+      );
+      canvas.drawRect(
+        rect,
+        Paint()
+          ..color = Colors.white30
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
     }
 
     final offsetX = cx;
@@ -402,9 +447,9 @@ class JaringBalokPainter extends CustomPainter {
     matrix.rotateX(tiltX);
     matrix.rotateZ(tiltZ);
     matrix.translate(-offsetX, -offsetY);
-    
+
     // Ke engsel kanan (W/2)
-    matrix.translate(offsetX + w/2, offsetY);
+    matrix.translate(offsetX + w / 2, offsetY);
     // Putar sisi kanan ke dalam
     matrix.rotateY(fold);
     // Maju selebar sisi kanan (D)
@@ -412,10 +457,15 @@ class JaringBalokPainter extends CustomPainter {
     // Putar sisi belakang sejajar dengan depan
     matrix.rotateY(fold);
     // Kembalikan
-    matrix.translate(-(offsetX + w/2 + d + w/2), -offsetY);
-    
+    matrix.translate(-(offsetX + w / 2 + d + w / 2), -offsetY);
+
     canvas.transform(matrix.storage);
-    drawFaceRect(Colors.yellow.shade600, Offset(offsetX + w + d, offsetY), w, h);
+    drawFaceRect(
+      Colors.yellow.shade600,
+      Offset(offsetX + w + d, offsetY),
+      w,
+      h,
+    );
     canvas.restore();
 
     // 2. SISI BAWAH (Hijau)
@@ -426,7 +476,12 @@ class JaringBalokPainter extends CustomPainter {
       isAxisX: true,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.green.shade400, Offset(offsetX, offsetY + h/2 + d/2), w, d),
+      drawCallback: () => drawFaceRect(
+        Colors.green.shade400,
+        Offset(offsetX, offsetY + h / 2 + d / 2),
+        w,
+        d,
+      ),
     );
 
     // 3. SISI KANAN (Oranye)
@@ -437,7 +492,12 @@ class JaringBalokPainter extends CustomPainter {
       isAxisX: false,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.orange.shade400, Offset(offsetX + w/2 + d/2, offsetY), d, h),
+      drawCallback: () => drawFaceRect(
+        Colors.orange.shade400,
+        Offset(offsetX + w / 2 + d / 2, offsetY),
+        d,
+        h,
+      ),
     );
 
     // 4. SISI ATAS (Merah)
@@ -448,7 +508,12 @@ class JaringBalokPainter extends CustomPainter {
       isAxisX: true,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.red.shade400, Offset(offsetX, offsetY - h/2 - d/2), w, d),
+      drawCallback: () => drawFaceRect(
+        Colors.red.shade400,
+        Offset(offsetX, offsetY - h / 2 - d / 2),
+        w,
+        d,
+      ),
     );
 
     // 5. SISI KIRI (Biru)
@@ -459,7 +524,12 @@ class JaringBalokPainter extends CustomPainter {
       isAxisX: false,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.blue.shade400, Offset(offsetX - w/2 - d/2, offsetY), d, h),
+      drawCallback: () => drawFaceRect(
+        Colors.blue.shade400,
+        Offset(offsetX - w / 2 - d / 2, offsetY),
+        d,
+        h,
+      ),
     );
 
     // 6. SISI DEPAN (Ungu - Paling dekat)
@@ -470,7 +540,8 @@ class JaringBalokPainter extends CustomPainter {
       isAxisX: true,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.purple.shade400, Offset(offsetX, offsetY), w, h),
+      drawCallback: () =>
+          drawFaceRect(Colors.purple.shade400, Offset(offsetX, offsetY), w, h),
     );
   }
 
@@ -494,83 +565,150 @@ class JaringLimasPainter extends CustomPainter {
     final s = math.min(size.width, size.height) * 0.3;
     // Tinggi segitiga sisi (sisi miring)
     final st = s * 0.9;
-    
+
     // Sudut maksimum saat melipat (membentuk limas tertutup)
     // Sudut antara bidang alas dan sisi tegak = acos((s/2) / st)
     // Karena segitiga dimulai dari posisi datar (terbuka 180 derajat dari pusat),
     // maka sudut putarnya adalah 180 - sudut_dalam
     final maxFold = math.pi - math.acos((s / 2) / st);
     final fold = progress * (-maxFold);
-    
+
     // Miringkan alas agar terlihat 3D menghadap atas (Isometric View)
-    final tiltZ = progress * (math.pi / 4);  // Putar alas jadi belah ketupat
-    final tiltX = progress * (-math.pi / 3); // Miringkan ke atas agar puncak terlihat tinggi
+    final tiltZ = progress * (math.pi / 4); // Putar alas jadi belah ketupat
+    final tiltX =
+        progress *
+        (-math.pi / 3); // Miringkan ke atas agar puncak terlihat tinggi
 
     void drawAlas() {
       final rect = Rect.fromCenter(center: Offset(cx, cy), width: s, height: s);
-      canvas.drawRect(rect, Paint()..color = Colors.purple.shade400..style = PaintingStyle.fill);
-      canvas.drawRect(rect, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+      canvas.drawRect(
+        rect,
+        Paint()
+          ..color = Colors.purple.shade400
+          ..style = PaintingStyle.fill,
+      );
+      canvas.drawRect(
+        rect,
+        Paint()
+          ..color = Colors.white30
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
     }
 
-    void drawTriangle(Color c, Offset pivot, {bool isTop = false, bool isBottom = false, bool isLeft = false, bool isRight = false}) {
+    void drawTriangle(
+      Color c,
+      Offset pivot, {
+      bool isTop = false,
+      bool isBottom = false,
+      bool isLeft = false,
+      bool isRight = false,
+    }) {
       final path = Path();
       if (isTop) {
-        path.moveTo(pivot.dx - s/2, pivot.dy);
-        path.lineTo(pivot.dx + s/2, pivot.dy);
+        path.moveTo(pivot.dx - s / 2, pivot.dy);
+        path.lineTo(pivot.dx + s / 2, pivot.dy);
         path.lineTo(pivot.dx, pivot.dy - st); // puncak atas
       } else if (isBottom) {
-        path.moveTo(pivot.dx - s/2, pivot.dy);
-        path.lineTo(pivot.dx + s/2, pivot.dy);
+        path.moveTo(pivot.dx - s / 2, pivot.dy);
+        path.lineTo(pivot.dx + s / 2, pivot.dy);
         path.lineTo(pivot.dx, pivot.dy + st); // puncak bawah
       } else if (isRight) {
-        path.moveTo(pivot.dx, pivot.dy - s/2);
-        path.lineTo(pivot.dx, pivot.dy + s/2);
+        path.moveTo(pivot.dx, pivot.dy - s / 2);
+        path.lineTo(pivot.dx, pivot.dy + s / 2);
         path.lineTo(pivot.dx + st, pivot.dy); // puncak kanan
       } else if (isLeft) {
-        path.moveTo(pivot.dx, pivot.dy - s/2);
-        path.lineTo(pivot.dx, pivot.dy + s/2);
+        path.moveTo(pivot.dx, pivot.dy - s / 2);
+        path.lineTo(pivot.dx, pivot.dy + s / 2);
         path.lineTo(pivot.dx - st, pivot.dy); // puncak kiri
       }
       path.close();
-      canvas.drawPath(path, Paint()..color = c..style = PaintingStyle.fill);
-      canvas.drawPath(path, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = c
+          ..style = PaintingStyle.fill,
+      );
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = Colors.white30
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
     }
 
     // URUTAN MENGGAMBAR SANGAT PENTING (Z-Sorting)
-    
+
     // SISI ATAS (Sisi Belakang Kanan saat dilipat isometric)
     canvas.drawFace(
       globalPivot: Offset(cx, cy),
-      pivot: Offset(cx, cy - s/2), foldAngle: -fold, isAxisX: true, globalTiltX: tiltX, globalTiltZ: tiltZ,
-      drawCallback: () => drawTriangle(Colors.red.shade400, Offset(cx, cy - s/2), isTop: true),
+      pivot: Offset(cx, cy - s / 2),
+      foldAngle: -fold,
+      isAxisX: true,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawTriangle(
+        Colors.red.shade400,
+        Offset(cx, cy - s / 2),
+        isTop: true,
+      ),
     );
 
     // SISI KIRI (Sisi Belakang Kiri saat dilipat isometric)
     canvas.drawFace(
       globalPivot: Offset(cx, cy),
-      pivot: Offset(cx - s/2, cy), foldAngle: fold, isAxisX: false, globalTiltX: tiltX, globalTiltZ: tiltZ,
-      drawCallback: () => drawTriangle(Colors.blue.shade400, Offset(cx - s/2, cy), isLeft: true),
+      pivot: Offset(cx - s / 2, cy),
+      foldAngle: fold,
+      isAxisX: false,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawTriangle(
+        Colors.blue.shade400,
+        Offset(cx - s / 2, cy),
+        isLeft: true,
+      ),
     );
 
     // ALAS (Tengah)
     canvas.drawFace(
       globalPivot: Offset(cx, cy),
-      pivot: Offset(cx, cy), foldAngle: 0, isAxisX: true, globalTiltX: tiltX, globalTiltZ: tiltZ,
+      pivot: Offset(cx, cy),
+      foldAngle: 0,
+      isAxisX: true,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
       drawCallback: () => drawAlas(),
     );
 
     // SISI BAWAH (Sisi Depan Kiri saat dilipat isometric)
     canvas.drawFace(
       globalPivot: Offset(cx, cy),
-      pivot: Offset(cx, cy + s/2), foldAngle: fold, isAxisX: true, globalTiltX: tiltX, globalTiltZ: tiltZ,
-      drawCallback: () => drawTriangle(Colors.green.shade400, Offset(cx, cy + s/2), isBottom: true),
+      pivot: Offset(cx, cy + s / 2),
+      foldAngle: fold,
+      isAxisX: true,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawTriangle(
+        Colors.green.shade400,
+        Offset(cx, cy + s / 2),
+        isBottom: true,
+      ),
     );
 
     // SISI KANAN (Sisi Depan Kanan saat dilipat isometric)
     canvas.drawFace(
       globalPivot: Offset(cx, cy),
-      pivot: Offset(cx + s/2, cy), foldAngle: -fold, isAxisX: false, globalTiltX: tiltX, globalTiltZ: tiltZ,
-      drawCallback: () => drawTriangle(Colors.orange.shade400, Offset(cx + s/2, cy), isRight: true),
+      pivot: Offset(cx + s / 2, cy),
+      foldAngle: -fold,
+      isAxisX: false,
+      globalTiltX: tiltX,
+      globalTiltZ: tiltZ,
+      drawCallback: () => drawTriangle(
+        Colors.orange.shade400,
+        Offset(cx + s / 2, cy),
+        isRight: true,
+      ),
     );
   }
 
@@ -597,9 +735,9 @@ class JaringPrismaPainter extends CustomPainter {
 
     // Sudut lipat (Melipat ke arah DALAM layar / Z positif)
     // Segitiga tutup atas & bawah melipat 90 derajat ke dalam
-    final foldCap = progress * (math.pi / 2); 
+    final foldCap = progress * (math.pi / 2);
     // Persegi panjang sisi kiri & kanan melipat 120 derajat ke dalam (karena sudut dalam segitiga 60 derajat)
-    final foldSide = progress * (math.pi * 2 / 3); 
+    final foldSide = progress * (math.pi * 2 / 3);
 
     // Perspektif global
     final tiltX = progress * (math.pi / 6); // Tilt ke bawah
@@ -609,9 +747,24 @@ class JaringPrismaPainter extends CustomPainter {
     final offsetY = cy;
 
     void drawFaceRect(Color c, Offset center, double width, double height) {
-      final rect = Rect.fromCenter(center: center, width: width, height: height);
-      canvas.drawRect(rect, Paint()..color = c..style = PaintingStyle.fill);
-      canvas.drawRect(rect, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+      final rect = Rect.fromCenter(
+        center: center,
+        width: width,
+        height: height,
+      );
+      canvas.drawRect(
+        rect,
+        Paint()
+          ..color = c
+          ..style = PaintingStyle.fill,
+      );
+      canvas.drawRect(
+        rect,
+        Paint()
+          ..color = Colors.white30
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
     }
 
     void drawTriangleAt(Color c, Offset center, bool isPointingUp) {
@@ -629,8 +782,19 @@ class JaringPrismaPainter extends CustomPainter {
         path.lineTo(center.dx - w / 2, center.dy - hTri / 2);
         path.close();
       }
-      canvas.drawPath(path, Paint()..color = c..style = PaintingStyle.fill);
-      canvas.drawPath(path, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = c
+          ..style = PaintingStyle.fill,
+      );
+      canvas.drawPath(
+        path,
+        Paint()
+          ..color = Colors.white30
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
     }
 
     // URUTAN MENGGAMBAR: Paling jauh ke paling dekat (Painter's Algorithm)
@@ -644,7 +808,8 @@ class JaringPrismaPainter extends CustomPainter {
       isAxisX: true,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.purple.shade400, Offset(offsetX, offsetY), w, h),
+      drawCallback: () =>
+          drawFaceRect(Colors.purple.shade400, Offset(offsetX, offsetY), w, h),
     );
 
     // 2. SISI BAWAH (Segitiga Bawah)
@@ -655,7 +820,11 @@ class JaringPrismaPainter extends CustomPainter {
       isAxisX: true,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawTriangleAt(Colors.green.shade400, Offset(offsetX, offsetY + h / 2 + hTri / 2), false),
+      drawCallback: () => drawTriangleAt(
+        Colors.green.shade400,
+        Offset(offsetX, offsetY + h / 2 + hTri / 2),
+        false,
+      ),
     );
 
     // 3. SISI KANAN (Dinding Kanan)
@@ -666,7 +835,12 @@ class JaringPrismaPainter extends CustomPainter {
       isAxisX: false,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.orange.shade400, Offset(offsetX + w, offsetY), w, h),
+      drawCallback: () => drawFaceRect(
+        Colors.orange.shade400,
+        Offset(offsetX + w, offsetY),
+        w,
+        h,
+      ),
     );
 
     // 4. SISI KIRI (Dinding Kiri)
@@ -677,7 +851,12 @@ class JaringPrismaPainter extends CustomPainter {
       isAxisX: false,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawFaceRect(Colors.blue.shade400, Offset(offsetX - w, offsetY), w, h),
+      drawCallback: () => drawFaceRect(
+        Colors.blue.shade400,
+        Offset(offsetX - w, offsetY),
+        w,
+        h,
+      ),
     );
 
     // 5. SISI ATAS (Segitiga Atas - Paling Dekat / Tutup Atas)
@@ -688,14 +867,17 @@ class JaringPrismaPainter extends CustomPainter {
       isAxisX: true,
       globalTiltX: tiltX,
       globalTiltZ: tiltZ,
-      drawCallback: () => drawTriangleAt(Colors.red.shade400, Offset(offsetX, offsetY - h / 2 - hTri / 2), true),
+      drawCallback: () => drawTriangleAt(
+        Colors.red.shade400,
+        Offset(offsetX, offsetY - h / 2 - hTri / 2),
+        true,
+      ),
     );
   }
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
 }
-
 
 // ─────────────────────────────────────────────────────────────────────────────
 // 4. TABUNG (Pseudo 3D / Trik 2D)
@@ -709,21 +891,26 @@ class JaringTabungPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
-    
+
     final fullWidth = size.width * 0.7;
     final height = size.height * 0.3;
-    final radius = fullWidth / (2 * math.pi); // Karena keliling selimut = 2*pi*r
+    final radius =
+        fullWidth / (2 * math.pi); // Karena keliling selimut = 2*pi*r
 
     // Saat menggulung, lebar memendek jadi diameter (2*radius)
     // dan mendapat gradien gelap di tepi
     final currentWidth = fullWidth - (fullWidth - 2 * radius) * progress;
-    
+
     // Selimut
-    final rect = Rect.fromCenter(center: Offset(cx, cy), width: currentWidth, height: height);
+    final rect = Rect.fromCenter(
+      center: Offset(cx, cy),
+      width: currentWidth,
+      height: height,
+    );
     final paintSelimut = Paint()
       ..color = Colors.blue.shade400
       ..style = PaintingStyle.fill;
-      
+
     // Tambahkan gradien shading 3D saat melengkung
     if (progress > 0) {
       paintSelimut.shader = LinearGradient(
@@ -735,26 +922,62 @@ class JaringTabungPainter extends CustomPainter {
         stops: const [0.0, 0.5, 1.0],
       ).createShader(rect);
     }
-    
+
     canvas.drawRect(rect, paintSelimut);
-    canvas.drawRect(rect, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+    canvas.drawRect(
+      rect,
+      Paint()
+        ..color = Colors.white30
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
 
     // Lingkaran Atas dan Bawah
     // Saat progress 0: utuh bulat, nempel di tepi
     // Saat progress 1: jadi elips (karena perspektif 3D silinder), geser ke tengah
     final currentRadiusY = radius * (1 - 0.7 * progress); // Memipih jadi elips
-    
-    final yAtas = cy - height/2 - radius + (radius * progress);
-    final yBawah = cy + height/2 + radius - (radius * progress);
 
-    final rectAtas = Rect.fromCenter(center: Offset(cx, yAtas), width: radius * 2, height: currentRadiusY * 2);
-    final rectBawah = Rect.fromCenter(center: Offset(cx, yBawah), width: radius * 2, height: currentRadiusY * 2);
+    final yAtas = cy - height / 2 - radius + (radius * progress);
+    final yBawah = cy + height / 2 + radius - (radius * progress);
 
-    canvas.drawOval(rectAtas, Paint()..color = Colors.red.shade400..style = PaintingStyle.fill);
-    canvas.drawOval(rectAtas, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+    final rectAtas = Rect.fromCenter(
+      center: Offset(cx, yAtas),
+      width: radius * 2,
+      height: currentRadiusY * 2,
+    );
+    final rectBawah = Rect.fromCenter(
+      center: Offset(cx, yBawah),
+      width: radius * 2,
+      height: currentRadiusY * 2,
+    );
 
-    canvas.drawOval(rectBawah, Paint()..color = Colors.green.shade400..style = PaintingStyle.fill);
-    canvas.drawOval(rectBawah, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+    canvas.drawOval(
+      rectAtas,
+      Paint()
+        ..color = Colors.red.shade400
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawOval(
+      rectAtas,
+      Paint()
+        ..color = Colors.white30
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
+
+    canvas.drawOval(
+      rectBawah,
+      Paint()
+        ..color = Colors.green.shade400
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawOval(
+      rectBawah,
+      Paint()
+        ..color = Colors.white30
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
   }
 
   @override
@@ -773,21 +996,21 @@ class JaringKerucutPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
-    
+
     // Perbesar ukuran (radius alas 20%, garis pelukis 42%)
-    final r = math.min(size.width, size.height) * 0.20; 
-    final s = math.min(size.width, size.height) * 0.42; 
+    final r = math.min(size.width, size.height) * 0.20;
+    final s = math.min(size.width, size.height) * 0.42;
     final h = math.sqrt(s * s - r * r); // Tinggi kerucut
 
     // Sudut juring saat dibuka penuh
     final theta = 2 * math.pi * r / s;
 
     // Titik puncak juring & kerucut (Pusatkan secara vertikal)
-    final totalHeightUnfolded = s + 2 * r; 
-    final p0_0 = Offset(cx, cy - totalHeightUnfolded / 2); 
-    
+    final totalHeightUnfolded = s + 2 * r;
+    final p0_0 = Offset(cx, cy - totalHeightUnfolded / 2);
+
     final totalHeightFolded = h + r * 0.3; // 0.3 adalah rasio pipih elips alas
-    final p0_1 = Offset(cx, cy - totalHeightFolded / 2); 
+    final p0_1 = Offset(cx, cy - totalHeightFolded / 2);
 
     // Interpolasi Puncak (P0)
     final p0 = Offset.lerp(p0_0, p0_1, progress)!;
@@ -799,16 +1022,35 @@ class JaringKerucutPainter extends CustomPainter {
     final centerBase = Offset.lerp(centerBase_0, centerBase_1, progress)!;
 
     final radiusX = r;
-    final radiusY = r * (1 - 0.7 * progress); 
+    final radiusY = r * (1 - 0.7 * progress);
 
-    final rectAlas = Rect.fromCenter(center: centerBase, width: radiusX * 2, height: radiusY * 2);
-    canvas.drawOval(rectAlas, Paint()..color = Colors.green.shade400..style = PaintingStyle.fill);
-    canvas.drawOval(rectAlas, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+    final rectAlas = Rect.fromCenter(
+      center: centerBase,
+      width: radiusX * 2,
+      height: radiusY * 2,
+    );
+    canvas.drawOval(
+      rectAlas,
+      Paint()
+        ..color = Colors.green.shade400
+        ..style = PaintingStyle.fill,
+    );
+    canvas.drawOval(
+      rectAlas,
+      Paint()
+        ..color = Colors.white30
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
 
     // --- 2. GAMBAR SELIMUT (Juring Ungu) ---
     // Bounding Box untuk busur lengkungan selimut
     final rectArc_0 = Rect.fromCircle(center: p0_0, radius: s);
-    final rectArc_1 = Rect.fromCenter(center: centerBase_1, width: 2 * r, height: 2 * r * 0.3);
+    final rectArc_1 = Rect.fromCenter(
+      center: centerBase_1,
+      width: 2 * r,
+      height: 2 * r * 0.3,
+    );
     final rectArc = Rect.lerp(rectArc_0, rectArc_1, progress)!;
 
     // Interpolasi sudut busur
@@ -844,7 +1086,13 @@ class JaringKerucutPainter extends CustomPainter {
     }
 
     canvas.drawPath(path, paintSelimut);
-    canvas.drawPath(path, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = Colors.white30
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2,
+    );
   }
 
   @override
@@ -874,8 +1122,19 @@ class JaringBolaPainter extends CustomPainter {
       final w = radius * 4 * (1 - progress);
       final h = radius * 2;
       final rect = Rect.fromCenter(center: Offset(cx, cy), width: w, height: h);
-      canvas.drawRect(rect, Paint()..color = Colors.blue.shade400..style = PaintingStyle.fill);
-      canvas.drawRect(rect, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+      canvas.drawRect(
+        rect,
+        Paint()
+          ..color = Colors.blue.shade400
+          ..style = PaintingStyle.fill,
+      );
+      canvas.drawRect(
+        rect,
+        Paint()
+          ..color = Colors.white30
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2,
+      );
     } else {
       final p = (progress - 0.5) * 2; // Normalize to 0-1
       final paint = Paint()
