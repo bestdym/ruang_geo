@@ -157,6 +157,10 @@ class _JaringWidgetState extends State<JaringWidget>
         return JaringLimasPainter(progress: progress);
       case 'br_tabung':
         return JaringTabungPainter(progress: progress);
+      case 'br_kerucut':
+        return JaringKerucutPainter(progress: progress);
+      case 'br_bola':
+        return JaringBolaPainter(progress: progress);
       default:
         return JaringKubusPainter(progress: progress);
     }
@@ -196,6 +200,7 @@ extension CanvasTransformExt on Canvas {
   /// Menggambar bidang dengan pivot dan rotasi sumbu lokal
   /// foldAngle = 0 (datar), math.pi/2 (tegak 90 derajat)
   void drawFace({
+    required Offset globalPivot,
     required Offset pivot,
     required double foldAngle,
     required bool isAxisX,
@@ -210,13 +215,15 @@ extension CanvasTransformExt on Canvas {
     final matrix = Matrix4.identity()
       ..setEntry(3, 2, 0.0015); // Perspective
 
+    // Global tilt untuk melihat bangun dari sudut miring isometrik
+    matrix.translate(globalPivot.dx, globalPivot.dy, 0.0);
+    matrix.rotateX(globalTiltX);
+    matrix.rotateZ(globalTiltZ);
+    matrix.translate(-globalPivot.dx, -globalPivot.dy, 0.0);
+
     // Translasi ke titik pivot, putar, lalu kembali
     matrix.translate(pivot.dx, pivot.dy, 0.0);
     
-    // Global tilt untuk melihat bangun dari sudut miring isometrik
-    matrix.rotateX(globalTiltX);
-    matrix.rotateZ(globalTiltZ);
-
     if (isAxisX) {
       matrix.rotateX(foldAngle);
     } else {
@@ -271,6 +278,7 @@ class JaringKubusPainter extends CustomPainter {
 
     // SISI DEPAN (Tengah, Statis tapi ikut tilt global)
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(offsetX, offsetY),
       foldAngle: 0,
       isAxisX: true,
@@ -281,6 +289,7 @@ class JaringKubusPainter extends CustomPainter {
 
     // SISI KIRI (Pivot di tepi kiri sisi depan)
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(offsetX - s / 2, offsetY),
       foldAngle: fold,
       isAxisX: false, // Lipat sumbu Y
@@ -291,6 +300,7 @@ class JaringKubusPainter extends CustomPainter {
 
     // SISI KANAN (Pivot di tepi kanan sisi depan)
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(offsetX + s / 2, offsetY),
       foldAngle: -fold, // Lipat berlawanan arah
       isAxisX: false,
@@ -301,6 +311,7 @@ class JaringKubusPainter extends CustomPainter {
 
     // SISI BAWAH (Pivot di tepi bawah sisi depan)
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(offsetX, offsetY + s / 2),
       foldAngle: fold, // Lipat sumbu X
       isAxisX: true,
@@ -311,6 +322,7 @@ class JaringKubusPainter extends CustomPainter {
 
     // SISI ATAS (Pivot di tepi atas sisi depan)
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(offsetX, offsetY - s / 2),
       foldAngle: -fold,
       isAxisX: true,
@@ -380,6 +392,7 @@ class JaringBalokPainter extends CustomPainter {
 
     // SISI DEPAN (Tengah) - Ukuran W x H
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(offsetX, offsetY),
       foldAngle: 0,
       isAxisX: true,
@@ -390,6 +403,7 @@ class JaringBalokPainter extends CustomPainter {
 
     // SISI KIRI - Ukuran D x H
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(offsetX - w / 2, offsetY),
       foldAngle: fold,
       isAxisX: false,
@@ -400,6 +414,7 @@ class JaringBalokPainter extends CustomPainter {
 
     // SISI KANAN - Ukuran D x H
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(offsetX + w / 2, offsetY),
       foldAngle: -fold,
       isAxisX: false,
@@ -410,6 +425,7 @@ class JaringBalokPainter extends CustomPainter {
 
     // SISI BAWAH - Ukuran W x D
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(offsetX, offsetY + h / 2),
       foldAngle: fold,
       isAxisX: true,
@@ -420,6 +436,7 @@ class JaringBalokPainter extends CustomPainter {
 
     // SISI ATAS - Ukuran W x D
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(offsetX, offsetY - h / 2),
       foldAngle: -fold,
       isAxisX: true,
@@ -511,30 +528,35 @@ class JaringLimasPainter extends CustomPainter {
 
     // ALAS (Tengah)
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(cx, cy), foldAngle: 0, isAxisX: true, globalTiltX: tiltX,
       drawCallback: () => drawAlas(),
     );
 
     // SISI ATAS
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(cx, cy - s/2), foldAngle: -fold, isAxisX: true, globalTiltX: tiltX,
       drawCallback: () => drawTriangle(Colors.red.shade400, Offset(cx, cy - s/2), true, false),
     );
 
     // SISI BAWAH
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(cx, cy + s/2), foldAngle: fold, isAxisX: true, globalTiltX: tiltX,
       drawCallback: () => drawTriangle(Colors.green.shade400, Offset(cx, cy + s/2), false, false),
     );
 
     // SISI KIRI
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(cx - s/2, cy), foldAngle: fold, isAxisX: false, globalTiltX: tiltX,
       drawCallback: () => drawTriangle(Colors.blue.shade400, Offset(cx - s/2, cy), true, false), // Arah dibelokkan manual lewat koordinat di atas
     );
 
     // SISI KANAN
     canvas.drawFace(
+      globalPivot: Offset(cx, cy),
       pivot: Offset(cx + s/2, cy), foldAngle: -fold, isAxisX: false, globalTiltX: tiltX,
       drawCallback: () => drawTriangle(Colors.orange.shade400, Offset(cx + s/2, cy), false, true),
     );
@@ -623,6 +645,129 @@ class JaringTabungPainter extends CustomPainter {
 
     canvas.drawOval(rectBawah, Paint()..color = Colors.green.shade400..style = PaintingStyle.fill);
     canvas.drawOval(rectBawah, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 5. KERUCUT (Pseudo 3D)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class JaringKerucutPainter extends CustomPainter {
+  JaringKerucutPainter({required this.progress});
+  final double progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    
+    final radius = math.min(size.width, size.height) * 0.15; // Jari-jari alas
+    final s = math.min(size.width, size.height) * 0.35;      // Garis pelukis (selimut)
+    
+    final currentWidth = s * 2 - (s * 2 - radius * 2) * progress;
+    final currentHeight = s; // tinggi kerucut tampak samping
+    
+    // Alas
+    final currentRadiusY = radius * (1 - 0.7 * progress); // Memipih jadi elips
+    final rectAlas = Rect.fromCenter(center: Offset(cx, cy + currentHeight / 2), width: radius * 2, height: currentRadiusY * 2);
+    
+    canvas.drawOval(rectAlas, Paint()..color = Colors.green.shade400..style = PaintingStyle.fill);
+    canvas.drawOval(rectAlas, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+
+    // Selimut
+    final path = Path();
+    
+    final peakY = cy - currentHeight / 2;
+    final leftX = cx - currentWidth / 2;
+    final rightX = cx + currentWidth / 2;
+    
+    path.moveTo(cx, peakY);
+    // Garis kiri
+    path.lineTo(leftX, cy + currentHeight / 2);
+    
+    // Lengkung bawah
+    if (progress > 0.1) {
+      // Saat dilipat, bawahnya melengkung mengikuti oval
+      path.arcTo(rectAlas, math.pi, -math.pi, false);
+    } else {
+      // Saat dibuka, melengkung membentuk juring yang lebar
+      path.quadraticBezierTo(cx, cy + currentHeight / 2 + currentWidth/2, rightX, cy + currentHeight / 2);
+    }
+    
+    // Garis kanan kembali ke puncak
+    path.lineTo(cx, peakY);
+    path.close();
+
+    final paintSelimut = Paint()
+      ..color = Colors.purple.shade400
+      ..style = PaintingStyle.fill;
+
+    if (progress > 0) {
+      paintSelimut.shader = LinearGradient(
+        colors: [
+          Colors.purple.shade800.withAlpha((150 * progress).round()),
+          Colors.purple.shade400,
+          Colors.purple.shade800.withAlpha((150 * progress).round()),
+        ],
+        stops: const [0.0, 0.5, 1.0],
+      ).createShader(Rect.fromLTRB(leftX, peakY, rightX, cy + currentHeight / 2));
+    }
+
+    canvas.drawPath(path, paintSelimut);
+    canvas.drawPath(path, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => true;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 6. BOLA (Pseudo 3D)
+// ─────────────────────────────────────────────────────────────────────────────
+
+class JaringBolaPainter extends CustomPainter {
+  JaringBolaPainter({required this.progress});
+  final double progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final cx = size.width / 2;
+    final cy = size.height / 2;
+    final radius = math.min(size.width, size.height) * 0.25;
+
+    // Bola tidak memiliki jaring-jaring 2D sederhana. Kita tampilkan beberapa elips atau bola
+    // Saat progress 0: Pola garis-garis bujur/lintang terbuka (map projection)
+    // Saat progress 1: Bola padat dengan shading 3D
+
+    if (progress < 0.5) {
+      // Gambarkan peta datar (proyeksi)
+      final w = radius * 4 * (1 - progress);
+      final h = radius * 2;
+      final rect = Rect.fromCenter(center: Offset(cx, cy), width: w, height: h);
+      canvas.drawRect(rect, Paint()..color = Colors.blue.shade400..style = PaintingStyle.fill);
+      canvas.drawRect(rect, Paint()..color = Colors.white30..style = PaintingStyle.stroke..strokeWidth = 2);
+    } else {
+      final p = (progress - 0.5) * 2; // Normalize to 0-1
+      final paint = Paint()
+        ..color = Colors.blue.shade400
+        ..style = PaintingStyle.fill;
+
+      paint.shader = RadialGradient(
+        center: const Alignment(-0.3, -0.3),
+        radius: 0.8,
+        colors: [
+          Colors.blue.shade300,
+          Colors.blue.shade600,
+          Colors.blue.shade900,
+        ],
+        stops: const [0.0, 0.6, 1.0],
+      ).createShader(Rect.fromCircle(center: Offset(cx, cy), radius: radius));
+
+      canvas.drawCircle(Offset(cx, cy), radius * p, paint);
+    }
   }
 
   @override
