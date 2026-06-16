@@ -89,72 +89,27 @@ class _JaringWidgetState extends State<JaringWidget>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Keterangan Warna
-              Wrap(
-                spacing: 12,
-                runSpacing: 8,
-                alignment: WrapAlignment.center,
-                children: [
-                  _ColorLegend(
-                    color: Colors.purple.shade400,
-                    label: 'Alas/Depan',
-                  ),
-                  _ColorLegend(color: Colors.red.shade400, label: 'Atas'),
-                  _ColorLegend(color: Colors.green.shade400, label: 'Bawah'),
-                  _ColorLegend(color: Colors.blue.shade400, label: 'Sisi 1'),
-                  _ColorLegend(color: Colors.orange.shade400, label: 'Sisi 2'),
-                  _ColorLegend(
-                    color: Colors.yellow.shade600,
-                    label: 'Sisi 3/Tutup',
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
               // Tombol
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  OutlinedButton.icon(
-                    onPressed: _resetAnimation,
-                    icon: const Icon(
-                      Icons.refresh_rounded,
-                      color: Colors.white,
-                    ),
-                    label: Text(
-                      'Reset',
-                      style: AppTypography.labelMedium.copyWith(
-                        color: Colors.white,
-                      ),
-                    ),
-                    style: OutlinedButton.styleFrom(
-                      side: BorderSide(color: Colors.white.withAlpha(100)),
-                      foregroundColor: Colors.white.withAlpha(100),
-                    ),
+              ElevatedButton.icon(
+                onPressed: _toggleAnimation,
+                icon: Icon(
+                  _isFolded ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                ),
+                label: Text(
+                  _isFolded ? 'Buka Jaring' : 'Lipat Bangun',
+                  style: AppTypography.labelMedium.copyWith(
+                    fontWeight: FontWeight.w700,
                   ),
-                  const SizedBox(width: 16),
-                  ElevatedButton.icon(
-                    onPressed: _toggleAnimation,
-                    icon: Icon(
-                      _isFolded
-                          ? Icons.pause_rounded
-                          : Icons.play_arrow_rounded,
-                    ),
-                    label: Text(
-                      _isFolded ? 'Buka Jaring' : 'Lipat Bangun',
-                      style: AppTypography.labelMedium.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.white,
-                      foregroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 24,
-                        vertical: 12,
-                      ),
-                    ),
+                ),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 12,
                   ),
-                ],
+                  elevation: 2,
+                ),
               ),
             ],
           ),
@@ -185,31 +140,6 @@ class _JaringWidgetState extends State<JaringWidget>
   }
 }
 
-class _ColorLegend extends StatelessWidget {
-  const _ColorLegend({required this.color, required this.label});
-  final Color color;
-  final String label;
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Container(
-          width: 12,
-          height: 12,
-          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
-        ),
-        const SizedBox(width: 6),
-        Text(
-          label,
-          style: AppTypography.labelSmall.copyWith(color: Colors.white70),
-        ),
-      ],
-    );
-  }
-}
-
 // ─────────────────────────────────────────────────────────────────────────────
 // BASE MATRIX EXTENSION UNTUK FOLDING 3D
 // ─────────────────────────────────────────────────────────────────────────────
@@ -225,7 +155,8 @@ extension CanvasTransformExt on Canvas {
     required VoidCallback drawCallback,
     double extraRotZ = 0,
     double globalTiltX = 0, // Untuk perspektif dasar
-    double globalTiltZ = 0,
+    double globalTiltY = 0, // Putar ke samping
+    double globalTiltZ = 0, // Miringkan layar
   }) {
     save();
 
@@ -235,7 +166,8 @@ extension CanvasTransformExt on Canvas {
     // Global tilt untuk melihat bangun dari sudut miring isometrik
     matrix.translate(globalPivot.dx, globalPivot.dy, 0.0);
     matrix.rotateX(globalTiltX);
-    matrix.rotateZ(globalTiltZ);
+    if (globalTiltY != 0) matrix.rotateY(globalTiltY);
+    if (globalTiltZ != 0) matrix.rotateZ(globalTiltZ);
     matrix.translate(-globalPivot.dx, -globalPivot.dy, 0.0);
 
     // Translasi ke titik pivot, putar, lalu kembali
@@ -746,7 +678,7 @@ class JaringPrismaPainter extends CustomPainter {
 
     // Perspektif global
     final tiltX = progress * (math.pi / 6); // Tilt ke bawah
-    final tiltZ = progress * (math.pi / 8); // Putar miring
+    final tiltY = progress * (math.pi / 8); // Putar ke samping
 
     final offsetX = cx;
     final offsetY = cy;
@@ -812,7 +744,7 @@ class JaringPrismaPainter extends CustomPainter {
       foldAngle: 0,
       isAxisX: true,
       globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
+      globalTiltY: tiltY,
       drawCallback: () =>
           drawFaceRect(Colors.purple.shade400, Offset(offsetX, offsetY), w, h),
     );
@@ -824,7 +756,7 @@ class JaringPrismaPainter extends CustomPainter {
       foldAngle: -foldCap, // Negatif -> Lipat ke depan (Y lokal positif)
       isAxisX: true,
       globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
+      globalTiltY: tiltY,
       drawCallback: () => drawTriangleAt(
         Colors.green.shade400,
         Offset(offsetX, offsetY + h / 2 + hTri / 2),
@@ -839,7 +771,7 @@ class JaringPrismaPainter extends CustomPainter {
       foldAngle: foldSide, // Positif -> Lipat ke depan (X lokal positif)
       isAxisX: false,
       globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
+      globalTiltY: tiltY,
       drawCallback: () => drawFaceRect(
         Colors.orange.shade400,
         Offset(offsetX + w, offsetY),
@@ -855,7 +787,7 @@ class JaringPrismaPainter extends CustomPainter {
       foldAngle: -foldSide, // Negatif -> Lipat ke depan (X lokal negatif)
       isAxisX: false,
       globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
+      globalTiltY: tiltY,
       drawCallback: () => drawFaceRect(
         Colors.blue.shade400,
         Offset(offsetX - w, offsetY),
@@ -871,7 +803,7 @@ class JaringPrismaPainter extends CustomPainter {
       foldAngle: foldCap, // Positif -> Lipat ke depan (Y lokal negatif)
       isAxisX: true,
       globalTiltX: tiltX,
-      globalTiltZ: tiltZ,
+      globalTiltY: tiltY,
       drawCallback: () => drawTriangleAt(
         Colors.red.shade400,
         Offset(offsetX, offsetY - h / 2 - hTri / 2),
