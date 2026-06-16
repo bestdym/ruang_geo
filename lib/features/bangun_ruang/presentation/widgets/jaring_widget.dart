@@ -1002,9 +1002,10 @@ class JaringKerucutPainter extends CustomPainter {
     final cx = size.width / 2;
     final cy = size.height / 2;
 
-    // Perbesar ukuran (radius alas 20%, garis pelukis 42%)
-    final r = math.min(size.width, size.height) * 0.20;
-    final s = math.min(size.width, size.height) * 0.42;
+    // Proporsi kerucut: r dan s diatur agar juring (selimut) membentuk sudut ~135 derajat.
+    // Jika s = 2r, maka sudutnya 180 (setengah lingkaran, terlihat aneh).
+    final r = math.min(size.width, size.height) * 0.15;
+    final s = math.min(size.width, size.height) * 0.40;
     final h = math.sqrt(s * s - r * r); // Tinggi kerucut
 
     // Sudut juring saat dibuka penuh
