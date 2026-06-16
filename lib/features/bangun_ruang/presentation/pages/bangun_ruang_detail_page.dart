@@ -143,12 +143,13 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
                             isActive: !_isJaringMode,
                             onTap: () => setState(() => _isJaringMode = false),
                           ),
-                          _buildModeToggle(
-                            title: 'Jaring-jaring',
-                            icon: Icons.layers_rounded,
-                            isActive: _isJaringMode,
-                            onTap: () => setState(() => _isJaringMode = true),
-                          ),
+                          if (bangun.id != 'br_bola')
+                            _buildModeToggle(
+                              title: 'Jaring-jaring',
+                              icon: Icons.layers_rounded,
+                              isActive: _isJaringMode,
+                              onTap: () => setState(() => _isJaringMode = true),
+                            ),
                         ],
                       ),
                     ),
@@ -245,28 +246,29 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
             _buildInfoCard('Sudut', _extractNumber(bangun.sifatSifat, 'sudut'), Icons.architecture_rounded),
           ],
         ),
-        const SizedBox(height: 24),
-
-        Text(
-          'Jaring-Jaring',
-          style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.w700),
-        ),
-        const SizedBox(height: 12),
-        Container(
-          height: 160,
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          decoration: BoxDecoration(
-            color: AppColors.surfaceVariant,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: AppColors.outlineVariant),
+        if (bangun.id != 'br_bola') ...[
+          const SizedBox(height: 24),
+          Text(
+            'Jaring-Jaring',
+            style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.w700),
           ),
-          child: Center(
-            child: JaringJaringViewer(
-              bangunId: bangun.id,
-              color: AppColors.primary,
+          const SizedBox(height: 12),
+          Container(
+            height: 160,
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceVariant,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.outlineVariant),
+            ),
+            child: Center(
+              child: JaringJaringViewer(
+                bangunId: bangun.id,
+                color: AppColors.primary,
+              ),
             ),
           ),
-        ),
+        ],
 
       ],
     );
