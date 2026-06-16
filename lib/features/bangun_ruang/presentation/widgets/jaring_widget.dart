@@ -61,7 +61,12 @@ class _JaringWidgetState extends State<JaringWidget>
         // Area Gambar Animasi
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.only(
+              top: 64.0,
+              left: 24.0,
+              right: 24.0,
+              bottom: 24.0,
+            ),
             child: AnimatedBuilder(
               animation: _controller,
               builder: (context, child) {
@@ -266,8 +271,8 @@ class JaringKubusPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
-    // Ukuran satu sisi persegi
-    final s = math.min(size.width, size.height) * 0.25;
+    // Ukuran satu sisi persegi (diperkecil sedikit agar tidak terpotong)
+    final s = math.min(size.width, size.height) * 0.2;
 
     // Global tilt saat sedang melipat agar terlihat 3D
     // Saat progress 0 (terbuka), tilt = 0 (datar)
@@ -404,10 +409,10 @@ class JaringBalokPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final cx = size.width / 2;
     final cy = size.height / 2;
-    // Ukuran balok
-    final w = size.width * 0.4; // lebar (X)
-    final h = size.height * 0.2; // tinggi (Y)
-    final d = size.width * 0.2; // kedalaman (Z, yang dilipat)
+    // Ukuran balok diperkecil agar tidak terpotong (fit in screen)
+    final w = size.width * 0.26; // lebar (X)
+    final h = size.height * 0.22; // tinggi (Y)
+    final d = size.width * 0.14; // kedalaman (Z, yang dilipat)
 
     final tiltX = progress * (math.pi / 5);
     final tiltZ = progress * (math.pi / 8);
@@ -456,8 +461,8 @@ class JaringBalokPainter extends CustomPainter {
     matrix.translate(d, 0.0);
     // Putar sisi belakang sejajar dengan depan
     matrix.rotateY(fold);
-    // Kembalikan
-    matrix.translate(-(offsetX + w / 2 + d + w / 2), -offsetY);
+    // Kembalikan ke engsel (bukan ke tengah sisi) agar rotasi pas
+    matrix.translate(-(offsetX + w / 2 + d), -offsetY);
 
     canvas.transform(matrix.storage);
     drawFaceRect(
