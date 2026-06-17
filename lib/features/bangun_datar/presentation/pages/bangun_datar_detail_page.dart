@@ -71,6 +71,99 @@ class _BangunDatarDetailPageState extends State<BangunDatarDetailPage>
             tabs: const ['Informasi', 'Rumus', 'Sifat', 'Contoh Soal'],
           ),
 
+          // ─── Area Atas (Tampilan Bangun Datar) ─────────────────────────────
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.35,
+            width: double.infinity,
+            child: Stack(
+              children: [
+                // Background
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: const BorderRadius.vertical(
+                      bottom: Radius.circular(32),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(10),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                ),
+                // Ornamen Lingkaran
+                Positioned(
+                  top: -50,
+                  right: -50,
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppColors.primary.withAlpha(10),
+                    ),
+                  ),
+                ),
+                // Konten Aktif
+                Positioned.fill(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 24, bottom: 70, left: 24, right: 24),
+                    child: AnimatedBuilder(
+                      animation: _drawController,
+                      builder: (context, child) {
+                        return CustomPaint(
+                          size: const Size(double.infinity, double.infinity),
+                          painter: ShapePainterFactory.getShapePainter(
+                            bangunId: bangun.id,
+                            progress: _drawController.value,
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                // Tombol Animasi
+                Positioned(
+                  bottom: 16,
+                  left: 0,
+                  right: 0,
+                  child: Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        _drawController.reset();
+                        _drawController.forward();
+                      },
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withAlpha(20),
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(color: AppColors.primary.withAlpha(50)),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.play_circle_fill_rounded, size: 18, color: AppColors.primary),
+                            const SizedBox(width: 6),
+                            Text(
+                              'Lihat Animasi',
+                              style: AppTypography.labelSmall.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
           // ─── Tab Bar View ─────────────────────────────────────────────
           Expanded(
             child: TabBarView(
@@ -96,75 +189,6 @@ class _BangunDatarDetailPageState extends State<BangunDatarDetailPage>
       padding: const EdgeInsets.all(20),
       physics: const BouncingScrollPhysics(),
       children: [
-        // Ilustrasi Bangun Datar
-        Container(
-          height: 250,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: AppColors.outlineVariant),
-            boxShadow: [
-              BoxShadow(
-                color: AppColors.primary.withAlpha(10),
-                blurRadius: 15,
-                offset: const Offset(0, 5),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(24.0),
-                  child: AnimatedBuilder(
-                    animation: _drawController,
-                    builder: (context, child) {
-                      return CustomPaint(
-                        size: const Size(double.infinity, double.infinity),
-                        painter: ShapePainterFactory.getShapePainter(
-                          bangunId: bangun.id,
-                          progress: _drawController.value,
-                        ),
-                      );
-                    },
-                  ),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
-                child: SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      _drawController.reset();
-                      _drawController.forward();
-                    },
-                    icon: const Icon(Icons.play_circle_fill_rounded, color: Colors.white),
-                    label: const Text(
-                      'Lihat Animasi',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFF6C63FF), // ungu
-                      foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      elevation: 0,
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 24),
-
         Text(
           'Deskripsi',
           style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.w700),
@@ -173,6 +197,15 @@ class _BangunDatarDetailPageState extends State<BangunDatarDetailPage>
         Text(
           bangun.deskripsi,
           style: AppTypography.bodyMedium,
+        ),
+        const SizedBox(height: 24),
+        // Info Cards (Sisi, Sudut) - dummy extraction based on sifatSifat
+        Row(
+          children: [
+            _buildInfoCard('Sisi', _extractNumber(bangun.sifatSifat, 'sisi'), Icons.square_outlined),
+            const SizedBox(width: 12),
+            _buildInfoCard('Sudut', _extractNumber(bangun.sifatSifat, 'sudut'), Icons.architecture_rounded),
+          ],
         ),
       ],
     );
@@ -330,6 +363,59 @@ class _BangunDatarDetailPageState extends State<BangunDatarDetailPage>
           const SizedBox(height: 16),
           _InteractiveAnswerDatar(jawabanBenar: jawabanBenar),
         ],
+      ),
+    );
+  }
+
+  // =========================================================================
+  // HELPER LOGIC
+  // =========================================================================
+
+  /// Ekstrak angka dari kalimat sifat (misal "Memiliki 4 sisi" -> "4")
+  String _extractNumber(List<String> sifat, String keyword) {
+    for (var kalimat in sifat) {
+      if (kalimat.toLowerCase().contains(keyword)) {
+        final regex = RegExp(r'\d+');
+        final match = regex.firstMatch(kalimat);
+        if (match != null) {
+          return match.group(0)!;
+        }
+      }
+    }
+    return '-'; // Jika tidak ada
+  }
+
+  Widget _buildInfoCard(String title, String value, IconData icon) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 8),
+        decoration: BoxDecoration(
+          color: AppColors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.outlineVariant),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primary.withAlpha(5),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Column(
+          children: [
+            Icon(icon, color: AppColors.primary, size: 24),
+            const SizedBox(height: 8),
+            Text(
+              value,
+              style: AppTypography.headlineMedium.copyWith(color: AppColors.primary),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              title,
+              style: AppTypography.labelSmall.copyWith(color: AppColors.textSecondary),
+            ),
+          ],
+        ),
       ),
     );
   }

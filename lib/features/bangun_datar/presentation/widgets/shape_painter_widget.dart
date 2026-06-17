@@ -674,6 +674,16 @@ class JajarGenjangPainter extends _BaseShapePainter {
     final sp = progressInRange(0.0, 0.7);
     drawPartialPath(canvas, [pA, pB, pC, pD], sp, strokePaint, close: true);
 
+    // ─── Label sudut (0.0–0.2) ─────────────────────────────────────────────
+    final dotOpacity = opacityInRange(0.0, 0.2);
+    if (dotOpacity > 0) {
+      final dp = Paint()..color = AppColors.primary.withAlpha((dotOpacity * 255).round())..style = PaintingStyle.fill;
+      canvas.drawCircle(pA, 3.5, dp);
+      canvas.drawCircle(pB, 3.5, dp);
+      canvas.drawCircle(pC, 3.5, dp);
+      canvas.drawCircle(pD, 3.5, dp);
+    }
+
     // Garis tinggi t (0.7–0.85)
     final tOp = opacityInRange(0.7, 0.85);
     if (tOp > 0) {
@@ -698,6 +708,13 @@ class JajarGenjangPainter extends _BaseShapePainter {
       drawLabel(canvas, 'a', Offset((pA.dx + pB.dx) / 2, pA.dy - 16), color: lc, italic: true);
       drawLabel(canvas, 'b', Offset(pD.dx - 16, (pD.dy + pA.dy) / 2), color: lc, italic: true);
       drawLabel(canvas, 't', Offset(pD.dx + skew - 18, cy), color: AppColors.secondary.withAlpha((lOp * 200).round()), italic: true, bold: true);
+
+      // Label sudut A, B, C, D
+      final pc = AppColors.primary.withAlpha((lOp * 200).round());
+      drawLabel(canvas, 'A', pA - const Offset(12, 12), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'B', pB + const Offset(12, -12), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'C', pC + const Offset(12, 12), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'D', pD + const Offset(-12, 12), color: pc, bold: true, fontSize: 11);
     }
   }
 }
@@ -735,6 +752,16 @@ class TrapesiumPainter extends _BaseShapePainter {
     final sp = progressInRange(0.0, 0.7);
     drawPartialPath(canvas, [pA, pB, pC, pD], sp, strokePaint, close: true);
 
+    // ─── Label sudut (0.0–0.2) ─────────────────────────────────────────────
+    final dotOpacity = opacityInRange(0.0, 0.2);
+    if (dotOpacity > 0) {
+      final dp = Paint()..color = AppColors.primary.withAlpha((dotOpacity * 255).round())..style = PaintingStyle.fill;
+      canvas.drawCircle(pA, 3.5, dp);
+      canvas.drawCircle(pB, 3.5, dp);
+      canvas.drawCircle(pC, 3.5, dp);
+      canvas.drawCircle(pD, 3.5, dp);
+    }
+
     // Garis tinggi (0.65–0.82)
     final tOp = opacityInRange(0.65, 0.82);
     if (tOp > 0) {
@@ -757,6 +784,13 @@ class TrapesiumPainter extends _BaseShapePainter {
       drawLabel(canvas, 'a', Offset((pA.dx + pB.dx) / 2, pA.dy - 16), color: lc, italic: true);
       drawLabel(canvas, 'b', Offset((pD.dx + pC.dx) / 2, pD.dy + 18), color: lc, italic: true);
       drawLabel(canvas, 't', Offset(cx + 16, cy), color: AppColors.secondary.withAlpha((lOp * 200).round()), italic: true, bold: true);
+
+      // Label sudut A, B, C, D
+      final pc = AppColors.primary.withAlpha((lOp * 200).round());
+      drawLabel(canvas, 'A', pA - const Offset(12, 12), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'B', pB + const Offset(12, -12), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'C', pC + const Offset(12, 12), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'D', pD + const Offset(-12, 12), color: pc, bold: true, fontSize: 11);
     }
   }
 }
@@ -798,6 +832,16 @@ class LayangLayangPainter extends _BaseShapePainter {
     final sp = progressInRange(0.0, 0.7);
     drawPartialPath(canvas, [pTop, pLeft, pBot, pRight], sp, strokePaint, close: true);
 
+    // ─── Label sudut (0.0–0.2) ─────────────────────────────────────────────
+    final dotOpacity = opacityInRange(0.0, 0.2);
+    if (dotOpacity > 0) {
+      final dp = Paint()..color = AppColors.primary.withAlpha((dotOpacity * 255).round())..style = PaintingStyle.fill;
+      canvas.drawCircle(pTop, 3.5, dp);
+      canvas.drawCircle(pRight, 3.5, dp);
+      canvas.drawCircle(pBot, 3.5, dp);
+      canvas.drawCircle(pLeft, 3.5, dp);
+    }
+
     // Diagonal d1 (vertikal, 0.65–0.8)
     final d1Op = opacityInRange(0.65, 0.8);
     if (d1Op > 0) {
@@ -825,6 +869,13 @@ class LayangLayangPainter extends _BaseShapePainter {
       final lc = AppColors.textSecondary.withAlpha((lOp * 220).round());
       drawLabel(canvas, 'd₁', Offset(cx + 18, cy + h * 0.18), color: AppColors.secondary.withAlpha((lOp * 200).round()), italic: true, bold: true);
       drawLabel(canvas, 'd₂', Offset((pLeft.dx + cx) / 2, iy - 14), color: lc, italic: true);
+
+      // Label sudut A, B, C, D
+      final pc = AppColors.primary.withAlpha((lOp * 200).round());
+      drawLabel(canvas, 'A', pTop - const Offset(0, 16), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'B', pRight + const Offset(16, 0), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'C', pBot + const Offset(0, 16), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'D', pLeft - const Offset(16, 0), color: pc, bold: true, fontSize: 11);
     }
   }
 }
@@ -869,6 +920,16 @@ class BelahKetupatPainter extends _BaseShapePainter {
     final sp = progressInRange(0.0, 0.7);
     drawPartialPath(canvas, [pTop, pRight, pBot, pLeft], sp, strokePaint, close: true);
 
+    // ─── Label sudut (0.0–0.2) ─────────────────────────────────────────────
+    final dotOpacity = opacityInRange(0.0, 0.2);
+    if (dotOpacity > 0) {
+      final dp = Paint()..color = AppColors.primary.withAlpha((dotOpacity * 255).round())..style = PaintingStyle.fill;
+      canvas.drawCircle(pTop, 3.5, dp);
+      canvas.drawCircle(pRight, 3.5, dp);
+      canvas.drawCircle(pBot, 3.5, dp);
+      canvas.drawCircle(pLeft, 3.5, dp);
+    }
+
     // Diagonal d1 vertikal (0.65–0.8)
     final d1Op = opacityInRange(0.65, 0.8);
     if (d1Op > 0) {
@@ -911,6 +972,13 @@ class BelahKetupatPainter extends _BaseShapePainter {
           color: lc, italic: true);
       drawLabel(canvas, 's', Offset(cx + w * 0.32, cy - h * 0.28),
           color: lc, italic: true);
+
+      // Label sudut A, B, C, D
+      final pc = AppColors.primary.withAlpha((lOp * 200).round());
+      drawLabel(canvas, 'A', pTop - const Offset(0, 16), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'B', pRight + const Offset(16, 0), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'C', pBot + const Offset(0, 16), color: pc, bold: true, fontSize: 11);
+      drawLabel(canvas, 'D', pLeft - const Offset(16, 0), color: pc, bold: true, fontSize: 11);
     }
   }
 }
