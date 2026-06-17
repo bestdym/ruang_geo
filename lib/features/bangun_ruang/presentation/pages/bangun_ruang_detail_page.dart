@@ -422,20 +422,30 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
       children: [
         _buildSoalCard(
           no: 1,
-          pertanyaan: 'Sebuah ${bangun.nama.toLowerCase()} memiliki panjang sisi 5 cm. Berapakah luas permukaannya?',
+          pertanyaan: 'Sebuah ${bangun.nama.toLowerCase()} memiliki panjang sisi utama 5 cm. Berapakah luas permukaannya? (Anggap L = 6 × s²)',
           jawabanBenar: '150', // Dummy answer, not dynamic
+          rumus: bangun.rumusLuas,
+          pembahasan: 'L = 6 × s²\nL = 6 × 5²\nL = 6 × 25\nL = 150 cm²',
         ),
         const SizedBox(height: 20),
         _buildSoalCard(
           no: 2,
-          pertanyaan: 'Jika volume sebuah ${bangun.nama.toLowerCase()} adalah 64 cm³, berapakah panjang sisinya?',
+          pertanyaan: 'Jika volume sebuah ${bangun.nama.toLowerCase()} adalah 64 cm³, berapakah panjang sisi utamanya? (Anggap V = s³)',
           jawabanBenar: '4', // Dummy answer, not dynamic
+          rumus: bangun.rumusVolume ?? 'V = s³',
+          pembahasan: 'V = s³\n64 = s³\ns = ∛64\ns = 4 cm',
         ),
       ],
     );
   }
 
-  Widget _buildSoalCard({required int no, required String pertanyaan, required String jawabanBenar}) {
+  Widget _buildSoalCard({
+    required int no,
+    required String pertanyaan,
+    required String jawabanBenar,
+    required String rumus,
+    required String pembahasan,
+  }) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -467,7 +477,11 @@ class _BangunRuangDetailPageState extends State<BangunRuangDetailPage>
             style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 16),
-          _InteractiveAnswer(jawabanBenar: jawabanBenar),
+          _InteractiveAnswer(
+            jawabanBenar: jawabanBenar,
+            rumus: rumus,
+            pembahasan: pembahasan,
+          ),
         ],
       ),
     );
@@ -609,8 +623,14 @@ class _PillTabBarState extends State<_PillTabBar> {
 
 /// Widget untuk input jawaban soal
 class _InteractiveAnswer extends StatefulWidget {
-  const _InteractiveAnswer({required this.jawabanBenar});
+  const _InteractiveAnswer({
+    required this.jawabanBenar,
+    required this.rumus,
+    required this.pembahasan,
+  });
   final String jawabanBenar;
+  final String rumus;
+  final String pembahasan;
 
   @override
   State<_InteractiveAnswer> createState() => _InteractiveAnswerState();
@@ -679,18 +699,72 @@ class _InteractiveAnswerState extends State<_InteractiveAnswer> {
         ),
         if (_isCorrect == false)
           Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              'Jawaban masih kurang tepat. Coba lagi!',
-              style: AppTypography.bodySmall.copyWith(color: AppColors.error),
+            padding: const EdgeInsets.only(top: 12),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.error.withAlpha(15),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.error.withAlpha(40)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Jawaban masih kurang tepat. Coba perhatikan rumus ini:',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.error,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.rumus,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         if (_isCorrect == true)
           Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              'Mantap! Jawaban kamu benar.',
-              style: AppTypography.bodySmall.copyWith(color: AppColors.success),
+            padding: const EdgeInsets.only(top: 12),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.success.withAlpha(15),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.success.withAlpha(40)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Mantap! Jawaban kamu benar.',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.success,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Pembahasan:',
+                    style: AppTypography.bodySmall.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.pembahasan,
+                    style: AppTypography.bodyMedium.copyWith(height: 1.5),
+                  ),
+                ],
+              ),
             ),
           ),
       ],

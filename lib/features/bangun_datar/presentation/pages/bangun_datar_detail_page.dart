@@ -322,14 +322,22 @@ class _BangunDatarDetailPageState extends State<BangunDatarDetailPage>
       children: [
         _buildSoalCard(
           no: 1,
-          pertanyaan: 'Sebuah ${bangun.nama.toLowerCase()} memiliki keliling 40 cm. Berapakah luasnya?',
+          pertanyaan: 'Sebuah ${bangun.nama.toLowerCase()} memiliki ukuran utama 10 cm. Berapakah luasnya? (Anggap luas = ukuran × ukuran)',
           jawabanBenar: '100', // Dummy
+          rumus: bangun.rumusLuas,
+          pembahasan: 'Luas = 10 × 10\nLuas = 100 cm²',
         ),
       ],
     );
   }
 
-  Widget _buildSoalCard({required int no, required String pertanyaan, required String jawabanBenar}) {
+  Widget _buildSoalCard({
+    required int no,
+    required String pertanyaan,
+    required String jawabanBenar,
+    required String rumus,
+    required String pembahasan,
+  }) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -361,7 +369,11 @@ class _BangunDatarDetailPageState extends State<BangunDatarDetailPage>
             style: AppTypography.bodyMedium.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 16),
-          _InteractiveAnswerDatar(jawabanBenar: jawabanBenar),
+          _InteractiveAnswerDatar(
+            jawabanBenar: jawabanBenar,
+            rumus: rumus,
+            pembahasan: pembahasan,
+          ),
         ],
       ),
     );
@@ -490,8 +502,14 @@ class _PillTabBarState extends State<_PillTabBar> {
 }
 
 class _InteractiveAnswerDatar extends StatefulWidget {
-  const _InteractiveAnswerDatar({required this.jawabanBenar});
+  const _InteractiveAnswerDatar({
+    required this.jawabanBenar,
+    required this.rumus,
+    required this.pembahasan,
+  });
   final String jawabanBenar;
+  final String rumus;
+  final String pembahasan;
 
   @override
   State<_InteractiveAnswerDatar> createState() => _InteractiveAnswerDatarState();
@@ -561,18 +579,72 @@ class _InteractiveAnswerDatarState extends State<_InteractiveAnswerDatar> {
         ),
         if (_isCorrect == false)
           Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              'Jawaban kurang tepat.',
-              style: AppTypography.bodySmall.copyWith(color: AppColors.error),
+            padding: const EdgeInsets.only(top: 12),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.error.withAlpha(15),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.error.withAlpha(40)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Jawaban kurang tepat. Ingat kembali rumus:',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.error,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    widget.rumus,
+                    style: AppTypography.bodyMedium.copyWith(
+                      fontStyle: FontStyle.italic,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         if (_isCorrect == true)
           Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: Text(
-              'Mantap! Jawaban benar.',
-              style: AppTypography.bodySmall.copyWith(color: AppColors.success),
+            padding: const EdgeInsets.only(top: 12),
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: AppColors.success.withAlpha(15),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.success.withAlpha(40)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Mantap! Jawaban benar.',
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.success,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Pembahasan:',
+                    style: AppTypography.bodySmall.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    widget.pembahasan,
+                    style: AppTypography.bodyMedium.copyWith(height: 1.5),
+                  ),
+                ],
+              ),
             ),
           ),
       ],
