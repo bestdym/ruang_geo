@@ -18,27 +18,9 @@ import '../features/profil/screens/lengkapi_profil_screen.dart';
 import '../features/profil/widgets/profil_guard.dart';
 import '../features/pencapaian/screens/pencapaian_screen.dart';
 import '../features/auth/services/auth_notifier.dart';
+import '../features/petunjuk/screens/petunjuk_screen.dart';
 import '../core/services/supabase_service.dart';
 // ─── Placeholder pages untuk shell bottom nav ─────────────────────────────────
-
-class _PetunjukPage extends StatelessWidget {
-  const _PetunjukPage();
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: const AppBarCustom(title: 'Petunjuk'),
-        body: Center(
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.menu_book_rounded,
-                size: 64, color: AppColors.secondary),
-            const SizedBox(height: 16),
-            Text('Petunjuk Penggunaan', style: AppTypography.titleMedium),
-            const SizedBox(height: 8),
-            Text('Segera hadir!', style: AppTypography.bodyMedium),
-          ]),
-        ),
-      );
-}
 
 class _ProfilPage extends StatelessWidget {
   const _ProfilPage();
@@ -194,7 +176,7 @@ final GoRouter appRouter = GoRouter(
           GoRoute(
             path: '/petunjuk',
             name: 'petunjuk',
-            builder: (context, state) => const _PetunjukPage(),
+            builder: (context, state) => const PetunjukScreen(),
           ),
         ]),
 

@@ -27,6 +27,7 @@ class AppBarCustom extends StatelessWidget implements PreferredSizeWidget {
     this.bottom,
     this.backgroundColor,
     this.centerTitle = true,
+    this.showBackButton = true,
   });
 
   final String title;
@@ -37,6 +38,7 @@ class AppBarCustom extends StatelessWidget implements PreferredSizeWidget {
   final PreferredSizeWidget? bottom;
   final Color? backgroundColor;
   final bool centerTitle;
+  final bool showBackButton;
 
   @override
   Widget build(BuildContext context) {
@@ -65,15 +67,18 @@ class AppBarCustom extends StatelessWidget implements PreferredSizeWidget {
                   child: Row(
                     children: [
                       // Tombol Back
-                      Padding(
-                        padding: const EdgeInsets.only(left: 8),
-                        child: _AppBarIconButton(
-                          icon: Icons.arrow_back_ios_new_rounded,
-                          onTap: onBack ?? () {
-                            if (context.canPop()) context.pop();
-                          },
-                        ),
-                      ),
+                      if (showBackButton)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 8),
+                          child: _AppBarIconButton(
+                            icon: Icons.arrow_back_ios_new_rounded,
+                            onTap: onBack ?? () {
+                              if (context.canPop()) context.pop();
+                            },
+                          ),
+                        )
+                      else
+                        const SizedBox(width: 16),
                       // Title
                       Expanded(
                         child: centerTitle
