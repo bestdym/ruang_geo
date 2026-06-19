@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/core.dart';
 import '../services/auth_service.dart';
+import '../../profil/services/profil_service.dart';
+import '../../profil/models/profile_model.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -40,13 +42,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
     setState(() => _isLoading = true);
     try {
-      await _authService.signUp(
+      final response = await _authService.signUp(
         email,
         password,
         name,
         sekolah,
         _selectedKelas!,
       );
+      
+      final userId = response.user?.id;
+      if (userId != null) {
+        // Simpan langsung ke tabel profiles agar status isProfileComplete terpenuhi
+        await ProfilService().updateProfile(
+          ProfileModel(
+            id: userId,
+            fullName: name,
+            username: username,
+            kelas: _selectedKelas,
+            sekolah: sekolah,
+          ),
+        );
+      }
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Pendaftaran berhasil! Silakan login.'), backgroundColor: AppColors.success),

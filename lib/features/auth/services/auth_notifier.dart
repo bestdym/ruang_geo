@@ -1,9 +1,9 @@
-import 'dart:async';
+?|import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../core/services/supabase_service.dart';
 
-class AuthNotifier extends ChangeNotifier {
+class AuthNotifier extends ChangeNotifier{
   late final StreamSubscription<AuthState> _authSubscription;
 
   AuthNotifier() {
