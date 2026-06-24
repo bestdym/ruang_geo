@@ -243,7 +243,7 @@ class _DrawerMenu extends StatelessWidget {
             label: 'Tentang Aplikasi',
             onTap: () {
               Navigator.pop(context);
-              context.push(AppConstants.routeSettings);
+              context.push(AppConstants.routeAbout);
             },
           ),
           _DrawerItem(

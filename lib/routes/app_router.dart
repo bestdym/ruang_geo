@@ -20,6 +20,7 @@ import '../features/pencapaian/screens/pencapaian_screen.dart';
 import '../features/auth/services/auth_notifier.dart';
 import '../features/petunjuk/screens/petunjuk_screen.dart';
 import '../core/services/supabase_service.dart';
+import '../features/about/presentation/pages/about_page.dart';
 // ─── Placeholder pages untuk shell bottom nav ─────────────────────────────────
 
 class _ProfilPage extends StatelessWidget {
@@ -207,6 +208,15 @@ final GoRouter appRouter = GoRouter(
       pageBuilder: (context, state) => _slidePageBuilder(
         state,
         const _ProfilPage(),
+      ),
+    ),
+
+    GoRoute(
+      path: AppConstants.routeAbout,
+      name: 'about',
+      pageBuilder: (context, state) => _slidePageBuilder(
+        state,
+        const AboutPage(),
       ),
     ),
 
