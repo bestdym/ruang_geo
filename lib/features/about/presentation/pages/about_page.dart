@@ -119,7 +119,7 @@ class AboutPage extends StatelessWidget {
             const SizedBox(height: 24),
 
             // Developer Card
-            _buildCard(
+            _HoverableCard(
               title: 'Profil Pengembang (Ketua Peneliti)',
               icon: Icons.person_rounded,
               headerColor: AppColors.primary,
@@ -169,7 +169,7 @@ class AboutPage extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Research Info Card
-            _buildCard(
+            _HoverableCard(
               title: 'Informasi Penelitian',
               icon: Icons.assignment_outlined,
               headerColor: AppColors.secondary,
@@ -205,7 +205,7 @@ class AboutPage extends StatelessWidget {
             const SizedBox(height: 16),
 
             // Research Members Card
-            _buildCard(
+            _HoverableCard(
               title: 'Anggota Peneliti',
               icon: Icons.group_outlined,
               headerColor: AppColors.success,
@@ -251,53 +251,6 @@ class AboutPage extends StatelessWidget {
     );
   }
 
-  Widget _buildCard({
-    required String title,
-    required IconData icon,
-    required Color headerColor,
-    required Widget child,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: headerColor.withAlpha(50), width: 1),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withAlpha(5),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: headerColor.withAlpha(20),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
-            ),
-            child: Row(
-              children: [
-                Icon(icon, color: headerColor, size: 20),
-                const SizedBox(width: 8),
-                Text(
-                  title,
-                  style: AppTypography.titleSmall.copyWith(
-                    color: headerColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          child,
-        ],
-      ),
-    );
-  }
 
   Widget _buildInfoRow(IconData icon, String text) {
     return Row(
@@ -361,5 +314,93 @@ class AboutPage extends StatelessWidget {
 
   Widget _buildDivider() {
     return Divider(height: 1, color: AppColors.outline.withAlpha(50));
+  }
+}
+
+class _HoverableCard extends StatefulWidget {
+  const _HoverableCard({
+    required this.title,
+    required this.icon,
+    required this.headerColor,
+    required this.child,
+  });
+
+  final String title;
+  final IconData icon;
+  final Color headerColor;
+  final Widget child;
+
+  @override
+  State<_HoverableCard> createState() => _HoverableCardState();
+}
+
+class _HoverableCardState extends State<_HoverableCard> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isHovered = true),
+        onTapUp: (_) => setState(() => _isHovered = false),
+        onTapCancel: () => setState(() => _isHovered = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutBack,
+          transform: Matrix4.identity()
+            ..scale(_isHovered ? 1.02 : 1.0)
+            ..translate(0.0, _isHovered ? -4.0 : 0.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: _isHovered ? widget.headerColor.withAlpha(100) : widget.headerColor.withAlpha(50),
+              width: _isHovered ? 1.5 : 1.0,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: widget.headerColor.withAlpha(_isHovered ? 30 : 5),
+                blurRadius: _isHovered ? 20 : 10,
+                offset: Offset(0, _isHovered ? 8 : 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                decoration: BoxDecoration(
+                  color: widget.headerColor.withAlpha(_isHovered ? 30 : 20),
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+                ),
+                child: Row(
+                  children: [
+                    AnimatedScale(
+                      scale: _isHovered ? 1.1 : 1.0,
+                      duration: const Duration(milliseconds: 300),
+                      curve: Curves.easeOutBack,
+                      child: Icon(widget.icon, color: widget.headerColor, size: 20),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      widget.title,
+                      style: AppTypography.titleSmall.copyWith(
+                        color: widget.headerColor,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              widget.child,
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }
