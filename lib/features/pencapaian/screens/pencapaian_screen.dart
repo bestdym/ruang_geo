@@ -5,6 +5,7 @@ import '../../../core/core.dart';
 import '../../../core/services/supabase_service.dart';
 import '../models/pencapaian_model.dart';
 import '../services/pencapaian_service.dart';
+import '../../home/presentation/widgets/home_widgets.dart';
 
 class PencapaianScreen extends StatefulWidget {
   const PencapaianScreen({super.key});
@@ -19,6 +20,7 @@ class _PencapaianScreenState extends State<PencapaianScreen> {
   List<PencapaianModel> _pencapaianList = [];
   StatistikModel? _statistik;
   String? _error;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
@@ -58,45 +60,54 @@ class _PencapaianScreenState extends State<PencapaianScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: _scaffoldKey,
       backgroundColor: AppColors.background,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          // ─── SliverAppBar bergradient ─────────────────────────────────────
-          SliverAppBar(
-            expandedHeight: 160,
-            pinned: true,
-            backgroundColor: AppColors.primary,
-            flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                decoration: const BoxDecoration(
-                  gradient: LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [Color(0xFF6C63FF), Color(0xFFFF7043)],
-                  ),
-                ),
-                child: SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 8),
-                        Row(
-                          children: [
-                            Container(
-                              width: 44,
-                              height: 44,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withAlpha(30),
-                                shape: BoxShape.circle,
-                              ),
-                              child: const Icon(Icons.emoji_events_rounded,
-                                  color: Colors.white, size: 24),
+      drawer: const AppDrawer(),
+      body: SafeArea(
+        child: CustomScrollView(
+          physics: const BouncingScrollPhysics(),
+          slivers: [
+            // ─── Header: HomeHeader & Card ─────────────────────────────────────
+            SliverPadding(
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+              sliver: SliverToBoxAdapter(
+                child: Column(
+                  children: [
+                    HomeHeader(
+                      onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
+                      onProfileTap: () => context.push('/profil'),
+                    ),
+                    const SizedBox(height: 20),
+                    Container(
+                      padding: const EdgeInsets.all(24),
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [AppColors.primary, Color(0xFF5A52D5)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(24),
+                        boxShadow: [
+                          BoxShadow(
+                            color: AppColors.primary.withAlpha(50),
+                            blurRadius: 15,
+                            offset: const Offset(0, 5),
+                          ),
+                        ],
+                      ),
+                      child: Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withAlpha(40),
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            const SizedBox(width: 12),
-                            Column(
+                            child: const Icon(Icons.emoji_events_rounded, color: Colors.white, size: 32),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
@@ -106,22 +117,21 @@ class _PencapaianScreenState extends State<PencapaianScreen> {
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
+                                const SizedBox(height: 4),
                                 Text(
                                   'Lihat perjalanan belajarmu',
-                                  style: AppTypography.bodySmall
-                                      .copyWith(color: Colors.white70),
+                                  style: AppTypography.bodyMedium.copyWith(color: Colors.white.withAlpha(200)),
                                 ),
                               ],
                             ),
-                          ],
-                        ),
-                      ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
+                  ],
                 ),
               ),
             ),
-          ),
 
           // ─── Konten ───────────────────────────────────────────────────────
           if (_isLoading)
@@ -179,6 +189,7 @@ class _PencapaianScreenState extends State<PencapaianScreen> {
             const SliverToBoxAdapter(child: SizedBox(height: 24)),
           ],
         ],
+        ),
       ),
     );
   }
