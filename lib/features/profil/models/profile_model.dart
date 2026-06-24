@@ -41,15 +41,16 @@ class ProfileModel extends Equatable {
         totalPoin: json['total_poin'] as int?,
       );
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'username': username,
-        'full_name': fullName,
-        'avatar_url': avatarUrl,
-        'kelas': kelas,
-        'sekolah': sekolah,
-        'total_poin': totalPoin,
-      };
+  Map<String, dynamic> toJson() {
+    final map = <String, dynamic>{'id': id};
+    if (username != null) map['username'] = username;
+    if (fullName != null) map['full_name'] = fullName;
+    if (avatarUrl != null) map['avatar_url'] = avatarUrl;
+    if (kelas != null) map['kelas'] = kelas;
+    if (sekolah != null) map['sekolah'] = sekolah;
+    if (totalPoin != null) map['total_poin'] = totalPoin;
+    return map;
+  }
 
   ProfileModel copyWith({
     String? id,

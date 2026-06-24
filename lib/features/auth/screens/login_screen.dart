@@ -37,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
         emailOrUsername,
         _passwordController.text,
       );
-      // Navigation handled by GoRouter redirect automatically
+      if (mounted) context.go('/home');
     } on AuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

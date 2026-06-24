@@ -14,7 +14,7 @@ import '../features/kuis/presentation/pages/kuis_play_page.dart';
 import '../features/kuis/presentation/pages/kuis_hasil_page.dart';
 import '../features/auth/screens/login_screen.dart';
 import '../features/auth/screens/register_screen.dart';
-import '../features/profil/screens/lengkapi_profil_screen.dart';
+
 import '../features/profil/widgets/profil_guard.dart';
 import '../features/pencapaian/screens/pencapaian_screen.dart';
 import '../features/auth/services/auth_notifier.dart';
@@ -119,11 +119,7 @@ final GoRouter appRouter = GoRouter(
       name: 'register',
       pageBuilder: (context, state) => _slidePageBuilder(state, const RegisterScreen()),
     ),
-    GoRoute(
-      path: '/lengkapi-profil',
-      name: 'lengkapi-profil',
-      pageBuilder: (context, state) => _fadePageBuilder(state, const LengkapiProfilScreen()),
-    ),
+
 
     // ─── Splash redirect ────────────────────────────────────────────────────
     GoRoute(

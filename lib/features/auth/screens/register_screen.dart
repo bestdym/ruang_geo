@@ -38,6 +38,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
+    if (username.contains(' ')) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Username tidak boleh mengandung spasi'), backgroundColor: AppColors.error),
+      );
+      return;
+    }
+
     // Tambahkan domain dummy ke username agar bisa dipakai sebagai email di Supabase
     String email = '$username@ruanggeo.app';
 
@@ -66,10 +73,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       }
 
       if (mounted) {
+        if (response.session != null) {
+          await _authService.signOut();
+        }
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Pendaftaran berhasil! Silakan login.'), backgroundColor: AppColors.success),
         );
-        context.pop(); // Kembali ke halaman login
+        context.go('/login');
       }
     } on AuthException catch (e) {
       if (mounted) {
