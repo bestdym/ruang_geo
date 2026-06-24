@@ -22,6 +22,7 @@ import '../features/petunjuk/screens/petunjuk_screen.dart';
 import '../core/services/supabase_service.dart';
 import '../features/about/presentation/pages/about_page.dart';
 import '../features/profil/screens/profil_screen.dart';
+import '../features/settings/screens/settings_screen.dart';
 // ─── Placeholder pages untuk shell bottom nav ─────────────────────────────────
 
 class _PencapaianPage extends StatelessWidget {
@@ -44,24 +45,7 @@ class _PencapaianPage extends StatelessWidget {
       );
 }
 
-class _PengaturanPage extends StatelessWidget {
-  const _PengaturanPage();
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: const AppBarCustom(title: 'Pengaturan'),
-        body: Center(
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.settings_rounded,
-                size: 64, color: AppColors.textHint),
-            const SizedBox(height: 16),
-            Text('Pengaturan', style: AppTypography.titleMedium),
-            const SizedBox(height: 8),
-            Text('Segera hadir!', style: AppTypography.bodyMedium),
-          ]),
-        ),
-      );
-}
+
 
 // ─── GoRouter Configuration ───────────────────────────────────────────────────
 
@@ -165,7 +149,7 @@ final GoRouter appRouter = GoRouter(
           GoRoute(
             path: AppConstants.routeSettings,
             name: 'pengaturan',
-            builder: (context, state) => const _PengaturanPage(),
+            builder: (context, state) => const SettingsScreen(),
           ),
         ]),
       ],
