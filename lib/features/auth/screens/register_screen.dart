@@ -18,8 +18,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _sekolahController = TextEditingController();
-  String? _selectedKelas;
-  
+  final _kelasController = TextEditingController();
+
   final _authService = AuthService();
   bool _isLoading = false;
   bool _isPasswordVisible = false;
@@ -28,9 +28,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     String name = _nameController.text.trim();
     String username = _usernameController.text.trim();
     String sekolah = _sekolahController.text.trim();
+    String kelas = _kelasController.text.trim();
     String password = _passwordController.text;
 
-    if (name.isEmpty || username.isEmpty || password.isEmpty || sekolah.isEmpty || _selectedKelas == null) {
+    if (name.isEmpty || username.isEmpty || password.isEmpty || sekolah.isEmpty || kelas.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Semua field harus diisi, termasuk asal sekolah dan kelas'), backgroundColor: AppColors.error),
       );
@@ -47,7 +48,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         password,
         name,
         sekolah,
-        _selectedKelas!,
+        kelas,
       );
       
       final userId = response.user?.id;
@@ -58,7 +59,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
             id: userId,
             fullName: name,
             username: username,
-            kelas: _selectedKelas,
+            kelas: kelas,
             sekolah: sekolah,
           ),
         );
@@ -149,72 +150,6 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildKelasSelector() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 4, bottom: 12),
-          child: Text(
-            'Pilih Kelas',
-            style: TextStyle(
-              color: AppColors.textSecondary,
-              fontWeight: FontWeight.bold,
-              fontSize: 14,
-            ),
-          ),
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: ['7', '8', '9'].map((kelas) {
-            final isSelected = _selectedKelas == kelas;
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 4),
-                child: GestureDetector(
-                  onTap: () => setState(() => _selectedKelas = kelas),
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: isSelected ? AppColors.primary : Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(
-                        color: isSelected ? AppColors.primary : AppColors.outlineVariant,
-                        width: 2,
-                      ),
-                      boxShadow: isSelected ? [
-                        BoxShadow(
-                          color: AppColors.primary.withOpacity(0.3),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
-                        )
-                      ] : [
-                        BoxShadow(
-                          color: AppColors.outline.withOpacity(0.1),
-                          blurRadius: 4,
-                          offset: const Offset(0, 2),
-                        )
-                      ],
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      'Kelas $kelas',
-                      style: TextStyle(
-                        color: isSelected ? Colors.white : AppColors.textPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -269,8 +204,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   labelText: 'Asal Sekolah',
                   icon: Icons.school_outlined,
                 ),
-                const SizedBox(height: 24),
-                _buildKelasSelector(),
+                const SizedBox(height: 16),
+                _buildTextField(
+                  controller: _kelasController,
+                  labelText: 'Kelas',
+                  icon: Icons.class_outlined,
+                ),
                 const SizedBox(height: 24),
                 _buildTextField(
                   controller: _passwordController,

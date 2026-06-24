@@ -21,34 +21,8 @@ import '../features/auth/services/auth_notifier.dart';
 import '../features/petunjuk/screens/petunjuk_screen.dart';
 import '../core/services/supabase_service.dart';
 import '../features/about/presentation/pages/about_page.dart';
+import '../features/profil/screens/profil_screen.dart';
 // ─── Placeholder pages untuk shell bottom nav ─────────────────────────────────
-
-class _ProfilPage extends StatelessWidget {
-  const _ProfilPage();
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: AppColors.background,
-        appBar: const AppBarCustom(title: 'Profil'),
-        body: Center(
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Container(
-              width: 80,
-              height: 80,
-              decoration: const BoxDecoration(
-                gradient: AppColors.primaryGradient,
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Icons.person_rounded,
-                  size: 44, color: Colors.white),
-            ),
-            const SizedBox(height: 16),
-            Text('Profil Pengguna', style: AppTypography.titleMedium),
-            const SizedBox(height: 8),
-            Text('Segera hadir!', style: AppTypography.bodyMedium),
-          ]),
-        ),
-      );
-}
 
 class _PencapaianPage extends StatelessWidget {
   const _PencapaianPage();
@@ -207,7 +181,7 @@ final GoRouter appRouter = GoRouter(
       name: 'profil',
       pageBuilder: (context, state) => _slidePageBuilder(
         state,
-        const _ProfilPage(),
+        const ProfilGuard(child: ProfilScreen()),
       ),
     ),
 
