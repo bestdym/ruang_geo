@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ruang_geo/core/core.dart';
+import '../../home/presentation/widgets/home_widgets.dart';
 
 class PetunjukScreen extends StatelessWidget {
   const PetunjukScreen({super.key});
@@ -8,17 +10,21 @@ class PetunjukScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const AppBarCustom(
-        title: 'Petunjuk Penggunaan',
-        showBackButton: false,
-      ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        physics: const BouncingScrollPhysics(),
-        children: [
-          // ─── Header Card ──────────────────────────────────────────────────
-          Container(
-            padding: const EdgeInsets.all(24),
+      drawer: const AppDrawer(),
+      body: Builder(
+        builder: (context) => SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(20),
+            physics: const BouncingScrollPhysics(),
+            children: [
+              HomeHeader(
+                onMenuTap: () => Scaffold.of(context).openDrawer(),
+                onProfileTap: () => context.push('/profil'),
+              ),
+              const SizedBox(height: 20),
+              // ─── Header Card ──────────────────────────────────────────────────
+              Container(
+                padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
                 colors: [AppColors.primary, Color(0xFF5A52D5)],
@@ -126,7 +132,9 @@ class PetunjukScreen extends StatelessWidget {
           ),
           
           const SizedBox(height: 40),
-        ],
+            ],
+          ),
+        ),
       ),
     );
   }
