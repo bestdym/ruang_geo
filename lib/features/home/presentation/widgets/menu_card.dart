@@ -40,6 +40,7 @@ class _MenuCardState extends State<MenuCard>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scaleAnim;
+  bool _isHovered = false;
 
   @override
   void initState() {
@@ -62,42 +63,53 @@ class _MenuCardState extends State<MenuCard>
   }
 
   void _onTapDown(TapDownDetails _) {
+    setState(() => _isHovered = true);
     _controller.forward();
   }
 
   void _onTapUp(TapUpDetails _) {
+    setState(() => _isHovered = false);
     _controller.reverse();
     HapticFeedback.lightImpact();
     widget.onTap();
   }
 
   void _onTapCancel() {
+    setState(() => _isHovered = false);
     _controller.reverse();
   }
 
   @override
   Widget build(BuildContext context) {
-    final card = ScaleTransition(
-      scale: _scaleAnim,
-      child: GestureDetector(
-        onTapDown: _onTapDown,
-        onTapUp: _onTapUp,
-        onTapCancel: _onTapCancel,
-        child: Container(
-          height: 72,
-          decoration: BoxDecoration(
-            gradient: widget.gradient,
-            borderRadius: BorderRadius.circular(16),
-            boxShadow: [
-              BoxShadow(
-                color: _extractShadowColor(widget.gradient),
-                blurRadius: 16,
-                offset: const Offset(0, 6),
-                spreadRadius: -2,
-              ),
-            ],
-          ),
-          child: Stack(
+    final card = MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: ScaleTransition(
+        scale: _scaleAnim,
+        child: GestureDetector(
+          onTapDown: _onTapDown,
+          onTapUp: _onTapUp,
+          onTapCancel: _onTapCancel,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeOutBack,
+            transform: Matrix4.identity()
+              ..scale(_isHovered ? 1.02 : 1.0)
+              ..translate(0.0, _isHovered ? -4.0 : 0.0),
+            height: 72,
+            decoration: BoxDecoration(
+              gradient: widget.gradient,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: _extractShadowColor(widget.gradient).withAlpha(_isHovered ? 150 : 100),
+                  blurRadius: _isHovered ? 24 : 16,
+                  offset: Offset(0, _isHovered ? 8 : 6),
+                  spreadRadius: _isHovered ? 0 : -2,
+                ),
+              ],
+            ),
+            child: Stack(
             children: [
               // ─── Dekorasi lingkaran di sudut kanan ─────────────────────────
               Positioned(
@@ -217,7 +229,7 @@ class _MenuCardState extends State<MenuCard>
           ),
         ),
       ),
-    );
+    ));
 
     if (widget.heroTag != null) {
       return Hero(tag: widget.heroTag!, child: card);
