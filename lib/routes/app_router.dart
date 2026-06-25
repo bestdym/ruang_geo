@@ -174,7 +174,6 @@ final GoRouter appRouter = GoRouter(
                     KuisPlayPage(kategori: state.pathParameters['kategori']!),
                 routes: [
                   GoRoute(
-                    parentNavigatorKey: _rootNavigatorKey,
                     path: 'hasil',
                     name: 'kuis-hasil',
                     builder: (context, state) {

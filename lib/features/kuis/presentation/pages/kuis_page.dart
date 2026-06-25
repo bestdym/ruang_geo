@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:ruang_geo/core/core.dart';
 
+import '../../../home/presentation/widgets/home_widgets.dart';
+
 /// Halaman awal Kuis - Pilih Kategori
 class KuisPage extends StatelessWidget {
   const KuisPage({super.key});
@@ -10,14 +12,21 @@ class KuisPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const AppBarCustom(title: 'Kuis & Latihan'),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // ─── Header Banner ───────────────────────────────────────────
-            Container(
+      drawer: const AppDrawer(),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              HomeHeader(
+                onMenuTap: () => Scaffold.of(context).openDrawer(),
+                title: 'Kuis',
+                icon: Icons.quiz_rounded,
+              ),
+              const SizedBox(height: 24),
+              // ─── Header Banner ───────────────────────────────────────────
+              Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 gradient: AppColors.kuisGradient,
@@ -106,6 +115,7 @@ class KuisPage extends StatelessWidget {
               ],
             ),
           ],
+        ),
         ),
       ),
     );

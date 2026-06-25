@@ -5,6 +5,8 @@ import '../../auth/services/auth_service.dart';
 import '../services/profil_service.dart';
 import '../models/profile_model.dart';
 
+import '../../home/presentation/widgets/home_widgets.dart';
+
 class ProfilScreen extends StatefulWidget {
   const ProfilScreen({super.key});
 
@@ -123,22 +125,82 @@ class _ProfilScreenState extends State<ProfilScreen> {
     );
   }
 
+  Widget _buildActionTile(BuildContext context, {required IconData icon, required String title, required String subtitle, required VoidCallback onTap}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 16),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.outlineVariant),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.02),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: AppColors.secondary.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: AppColors.secondary, size: 24),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: AppTypography.titleSmall.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: AppTypography.labelMedium.copyWith(color: AppColors.textSecondary),
+                  ),
+                ],
+              ),
+            ),
+            const Icon(Icons.chevron_right_rounded, color: AppColors.textHint),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const AppBarCustom(title: 'Profil Pengguna'),
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator())
-          : _profile == null
-              ? const Center(child: Text('Gagal memuat profil'))
-              : SingleChildScrollView(
-                  padding: const EdgeInsets.all(24),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      // Avatar & Username Header
-                      Center(
+      drawer: const AppDrawer(),
+      body: SafeArea(
+        child: _isLoading
+            ? const Center(child: CircularProgressIndicator())
+            : _profile == null
+                ? const Center(child: Text('Gagal memuat profil'))
+                : SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        HomeHeader(
+                          onMenuTap: () => Scaffold.of(context).openDrawer(),
+                          title: 'Profil',
+                          icon: Icons.person_rounded,
+                        ),
+                        const SizedBox(height: 24),
+                        // Avatar & Username Header
+                        Center(
                         child: Column(
                           children: [
                             Container(
@@ -180,6 +242,19 @@ class _ProfilScreenState extends State<ProfilScreen> {
                       _buildInfoTile(Icons.class_rounded, 'Kelas', _profile?.kelas ?? '-'),
                       _buildInfoTile(Icons.stars_rounded, 'Total Poin', '${_profile?.totalPoin ?? 0} Poin'),
                       
+                      const SizedBox(height: 24),
+                      
+                      // Menu Lainnya
+                      Text('Menu Lainnya', style: AppTypography.titleMedium.copyWith(fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 16),
+                      _buildActionTile(
+                        context,
+                        icon: Icons.emoji_events_rounded,
+                        title: 'Pencapaian Kuis',
+                        subtitle: 'Lihat badge dan histori kuis kamu',
+                        onTap: () => context.push('/pencapaian'),
+                      ),
+                      
                       const SizedBox(height: 32),
                       
                       // Logout Button
@@ -198,6 +273,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
                     ],
                   ),
                 ),
+      ),
     );
   }
 }

@@ -29,9 +29,13 @@ class HomeHeader extends StatelessWidget {
   const HomeHeader({
     super.key,
     required this.onMenuTap,
+    this.title,
+    this.icon,
   });
 
   final VoidCallback onMenuTap;
+  final String? title;
+  final IconData? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -56,15 +60,15 @@ class HomeHeader extends StatelessWidget {
                 gradient: AppColors.primaryGradient,
                 borderRadius: BorderRadius.circular(8),
               ),
-              child: const Icon(
-                Icons.view_in_ar_rounded,
+              child: Icon(
+                icon ?? Icons.view_in_ar_rounded,
                 color: Colors.white,
                 size: 18,
               ),
             ),
             const SizedBox(width: 8),
             Text(
-              AppConstants.appName,
+              title ?? AppConstants.appName,
               style: AppTypography.titleLarge.copyWith(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w800,

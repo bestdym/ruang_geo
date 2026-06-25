@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/core.dart';
+import '../../../home/presentation/widgets/home_widgets.dart';
 
 class MateriPage extends StatelessWidget {
   const MateriPage({super.key});
@@ -9,11 +10,18 @@ class MateriPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: const AppBarCustom(title: 'Materi'),
-      body: ListView(
-        padding: const EdgeInsets.all(AppConstants.spacingMD),
-        children: [
-          _buildMenuCard(
+      drawer: const AppDrawer(),
+      body: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(AppConstants.spacingMD),
+          children: [
+            HomeHeader(
+              onMenuTap: () => Scaffold.of(context).openDrawer(),
+              title: 'Materi',
+              icon: Icons.menu_book_rounded,
+            ),
+            const SizedBox(height: AppConstants.spacingLG),
+            _buildMenuCard(
             context,
             title: 'Bangun Datar',
             subtitle: 'Pelajari berbagai bentuk dua dimensi',
@@ -31,6 +39,7 @@ class MateriPage extends StatelessWidget {
             route: AppConstants.routeBangunRuang,
           ),
         ],
+      ),
       ),
     );
   }
