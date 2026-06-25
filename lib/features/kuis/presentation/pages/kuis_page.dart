@@ -16,7 +16,7 @@ class KuisPage extends StatelessWidget {
       body: Builder(
         builder: (context) => SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
+            padding: const EdgeInsets.all(AppConstants.spacingMD),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -28,50 +28,51 @@ class KuisPage extends StatelessWidget {
               const SizedBox(height: 24),
               // ─── Header Banner ───────────────────────────────────────────
               Container(
-              padding: const EdgeInsets.all(24),
-              decoration: BoxDecoration(
-                gradient: AppColors.kuisGradient,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.warning.withAlpha(50),
-                    blurRadius: 15,
-                    offset: const Offset(0, 8),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Uji Pemahamanmu!',
-                          style: AppTypography.titleLarge.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
+                padding: const EdgeInsets.all(AppConstants.spacingLG),
+                decoration: BoxDecoration(
+                  color: AppColors.warning.withAlpha(25),
+                  borderRadius: BorderRadius.circular(AppConstants.radiusLG),
+                  border: Border.all(color: AppColors.warning.withAlpha(75), width: 2),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Uji Pemahamanmu!',
+                            style: AppTypography.titleLarge.copyWith(
+                              color: AppColors.textPrimary,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Pilih kategori kuis dan raih skor tertinggi.',
-                          style: AppTypography.bodySmall.copyWith(
-                            color: Colors.white.withAlpha(200),
+                          const SizedBox(height: AppConstants.spacingXS),
+                          Text(
+                            'Pilih kategori kuis dan raih skor tertinggi.',
+                            style: AppTypography.bodySmall.copyWith(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  const Icon(
-                    Icons.emoji_events_rounded,
-                    size: 64,
-                    color: Colors.white,
-                  ),
-                ],
+                    const SizedBox(width: AppConstants.spacingMD),
+                    Container(
+                      padding: const EdgeInsets.all(AppConstants.spacingMD),
+                      decoration: BoxDecoration(
+                        color: AppColors.warning.withAlpha(50),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(
+                        Icons.emoji_events_rounded,
+                        size: AppConstants.iconLG,
+                        color: AppColors.warning,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
             const SizedBox(height: 32),
 
             Text(
@@ -81,6 +82,7 @@ class KuisPage extends StatelessWidget {
             const SizedBox(height: 16),
 
             // ─── Grid Kategori ───────────────────────────────────────────
+            // ─── List Kategori ───────────────────────────────────────────
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,

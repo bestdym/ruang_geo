@@ -190,7 +190,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
             : _profile == null
                 ? const Center(child: Text('Gagal memuat profil'))
                 : SingleChildScrollView(
-                    padding: const EdgeInsets.all(24),
+                    padding: const EdgeInsets.all(AppConstants.spacingMD),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
