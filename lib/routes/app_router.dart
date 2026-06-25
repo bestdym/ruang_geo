@@ -371,12 +371,51 @@ class _AppShell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: navigationShell,
-      bottomNavigationBar: _BottomNav(
-        currentIndex: navigationShell.currentIndex,
-        onTap: (index) => navigationShell.goBranch(
-          index,
-          initialLocation: index == navigationShell.currentIndex,
+      floatingActionButton: Transform.translate(
+        offset: const Offset(0, 22),
+        child: Container(
+          width: 84,
+          height: 84,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            color: AppColors.background,
+          ),
+          padding: const EdgeInsets.all(8),
+          child: FloatingActionButton(
+            onPressed: () => navigationShell.goBranch(
+              2,
+              initialLocation: 2 == navigationShell.currentIndex,
+            ),
+            backgroundColor: AppColors.primary,
+            elevation: 0,
+            highlightElevation: 0,
+            shape: const CircleBorder(),
+            child: const Icon(Icons.view_in_ar_rounded, color: Colors.white, size: 34),
+          ),
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withAlpha(15),
+              blurRadius: 20,
+              offset: const Offset(0, -4),
+            ),
+          ],
+        ),
+        child: SafeArea(
+          child: _BottomNav(
+            currentIndex: navigationShell.currentIndex,
+            onTap: (index) => navigationShell.goBranch(
+              index,
+              initialLocation: index == navigationShell.currentIndex,
+            ),
+          ),
         ),
       ),
     );
@@ -392,47 +431,52 @@ class _BottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
+  @override
   Widget build(BuildContext context) {
     return Container(
-      color: AppColors.background,
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.paddingOf(context).bottom + 12,
-        top: 12,
-        left: 16,
-        right: 16,
-      ),
+      color: Colors.transparent,
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          _NavItem(
-            icon: Icons.home_rounded,
-            label: 'Home',
-            isSelected: currentIndex == 0,
-            onTap: () => onTap(0),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _NavItem(
+                  icon: Icons.home_rounded,
+                  label: 'Home',
+                  isSelected: currentIndex == 0,
+                  onTap: () => onTap(0),
+                ),
+                _NavItem(
+                  icon: Icons.menu_book_rounded,
+                  label: 'Materi',
+                  isSelected: currentIndex == 1,
+                  onTap: () => onTap(1),
+                ),
+              ],
+            ),
           ),
-          _NavItem(
-            icon: Icons.menu_book_rounded,
-            label: 'Materi',
-            isSelected: currentIndex == 1,
-            onTap: () => onTap(1),
-          ),
-          _NavItem(
-            icon: Icons.view_in_ar_rounded,
-            label: 'AR Kamera',
-            isSelected: currentIndex == 2,
-            onTap: () => onTap(2),
-          ),
-          _NavItem(
-            icon: Icons.quiz_rounded,
-            label: 'Kuis',
-            isSelected: currentIndex == 3,
-            onTap: () => onTap(3),
-          ),
-          _NavItem(
-            icon: Icons.person_rounded,
-            label: 'Profil',
-            isSelected: currentIndex == 4,
-            onTap: () => onTap(4),
+          const SizedBox(width: 72),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                _NavItem(
+                  icon: Icons.quiz_rounded,
+                  label: 'Kuis',
+                  isSelected: currentIndex == 3,
+                  onTap: () => onTap(3),
+                ),
+                _NavItem(
+                  icon: Icons.person_rounded,
+                  label: 'Profil',
+                  isSelected: currentIndex == 4,
+                  onTap: () => onTap(4),
+                ),
+              ],
+            ),
           ),
         ],
       ),
