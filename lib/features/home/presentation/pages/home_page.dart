@@ -30,12 +30,13 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
     'Tahukah Kamu? Piramida di Mesir berbentuk limas segi empat yang merupakan salah satu bangun ruang dasar.',
     'Tahukah Kamu? Tabung tidak memiliki titik sudut, melainkan hanya 2 rusuk melengkung.',
   ];
-  late final String _dailyFact;
+  late String _dailyFact;
+  bool _wasHome = true;
 
   @override
   void initState() {
     super.initState();
-    _dailyFact = _funFacts[Random().nextInt(_funFacts.length)];
+    _randomizeFact();
     
     _fadeController = AnimationController(
       vsync: this,
@@ -46,6 +47,36 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
       _fadeController.forward();
       _fetchData();
     });
+  }
+
+  void _randomizeFact() {
+    _dailyFact = _funFacts[Random().nextInt(_funFacts.length)];
+  }
+
+  bool _listenerAdded = false;
+  late final GoRouter _router;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_listenerAdded) {
+      _router = GoRouter.of(context);
+      _router.routerDelegate.addListener(_onRouteChanged);
+      _listenerAdded = true;
+    }
+  }
+
+  void _onRouteChanged() {
+    if (!mounted) return;
+    final currentPath = _router.routerDelegate.currentConfiguration.uri.path;
+    final isHome = currentPath == AppConstants.routeHome;
+    if (isHome && !_wasHome) {
+      setState(() {
+        _randomizeFact();
+      });
+      _fadeController.forward(from: 0.0);
+    }
+    _wasHome = isHome;
   }
 
   Future<void> _fetchData() async {
@@ -68,6 +99,9 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
 
   @override
   void dispose() {
+    if (_listenerAdded) {
+      _router.routerDelegate.removeListener(_onRouteChanged);
+    }
     _fadeController.dispose();
     super.dispose();
   }
