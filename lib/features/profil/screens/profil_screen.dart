@@ -183,8 +183,9 @@ class _ProfilScreenState extends State<ProfilScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
-      body: SafeArea(
-        child: _isLoading
+      body: Builder(
+        builder: (context) => SafeArea(
+          child: _isLoading
             ? const Center(child: CircularProgressIndicator())
             : _profile == null
                 ? const Center(child: Text('Gagal memuat profil'))
@@ -273,6 +274,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
                     ],
                   ),
                 ),
+        ),
       ),
     );
   }

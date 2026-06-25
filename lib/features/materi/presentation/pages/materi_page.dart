@@ -11,12 +11,13 @@ class MateriPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(AppConstants.spacingMD),
-          children: [
-            HomeHeader(
-              onMenuTap: () => Scaffold.of(context).openDrawer(),
+      body: Builder(
+        builder: (context) => SafeArea(
+          child: ListView(
+            padding: const EdgeInsets.all(AppConstants.spacingMD),
+            children: [
+              HomeHeader(
+                onMenuTap: () => Scaffold.of(context).openDrawer(),
               title: 'Materi',
               icon: Icons.menu_book_rounded,
             ),
@@ -39,6 +40,7 @@ class MateriPage extends StatelessWidget {
             route: AppConstants.routeBangunRuang,
           ),
         ],
+      ),
       ),
       ),
     );

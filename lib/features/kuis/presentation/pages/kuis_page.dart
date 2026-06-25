@@ -13,14 +13,15 @@ class KuisPage extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.background,
       drawer: const AppDrawer(),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              HomeHeader(
-                onMenuTap: () => Scaffold.of(context).openDrawer(),
+      body: Builder(
+        builder: (context) => SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                HomeHeader(
+                  onMenuTap: () => Scaffold.of(context).openDrawer(),
                 title: 'Kuis',
                 icon: Icons.quiz_rounded,
               ),
@@ -117,6 +118,7 @@ class KuisPage extends StatelessWidget {
           ],
         ),
         ),
+      ),
       ),
     );
   }
