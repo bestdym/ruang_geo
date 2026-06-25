@@ -62,7 +62,6 @@ class _PencapaianScreenState extends State<PencapaianScreen> {
     return Scaffold(
       key: _scaffoldKey,
       backgroundColor: AppColors.background,
-      drawer: const AppDrawer(),
       body: SafeArea(
         child: CustomScrollView(
           physics: const BouncingScrollPhysics(),
@@ -74,7 +73,8 @@ class _PencapaianScreenState extends State<PencapaianScreen> {
                 child: Column(
                   children: [
                     HomeHeader(
-                      onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
+                      isBackButton: true,
+                      onBackTap: () => context.pop(),
                     ),
                     const SizedBox(height: 20),
                     Container(
@@ -402,7 +402,7 @@ class _PencapaianScreenState extends State<PencapaianScreen> {
           ),
           const SizedBox(height: 28),
           ElevatedButton.icon(
-            onPressed: () => context.push(AppConstants.routeKuis),
+            onPressed: () => context.go(AppConstants.routeKuis),
             style: ElevatedButton.styleFrom(
               backgroundColor: AppColors.primary,
               foregroundColor: Colors.white,

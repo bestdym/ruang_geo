@@ -252,7 +252,7 @@ class _ProfilScreenState extends State<ProfilScreen> {
                         icon: Icons.emoji_events_rounded,
                         title: 'Pencapaian Kuis',
                         subtitle: 'Lihat badge dan histori kuis kamu',
-                        onTap: () => context.push('/pencapaian'),
+                        onTap: () => context.push('/profil/pencapaian'),
                       ),
                       
                       const SizedBox(height: 32),

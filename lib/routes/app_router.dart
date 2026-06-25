@@ -198,6 +198,16 @@ final GoRouter appRouter = GoRouter(
             path: '/profil',
             name: 'profil',
             builder: (context, state) => const ProfilGuard(child: ProfilScreen()),
+            routes: [
+              GoRoute(
+                path: 'pencapaian',
+                name: 'pencapaian',
+                pageBuilder: (context, state) => _slidePageBuilder(
+                  state,
+                  const ProfilGuard(child: PencapaianScreen()),
+                ),
+              ),
+            ],
           ),
         ]),
       ],
@@ -228,15 +238,6 @@ final GoRouter appRouter = GoRouter(
       pageBuilder: (context, state) => _slidePageBuilder(
         state,
         const PetunjukScreen(),
-      ),
-    ),
-
-    GoRoute(
-      path: '/pencapaian',
-      name: 'pencapaian',
-      pageBuilder: (context, state) => _slidePageBuilder(
-        state,
-        const ProfilGuard(child: PencapaianScreen()),
       ),
     ),
 

@@ -28,25 +28,29 @@ class _MenuData {
 class HomeHeader extends StatelessWidget {
   const HomeHeader({
     super.key,
-    required this.onMenuTap,
+    this.onMenuTap,
     this.title,
     this.icon,
+    this.isBackButton = false,
+    this.onBackTap,
   });
 
-  final VoidCallback onMenuTap;
+  final VoidCallback? onMenuTap;
   final String? title;
   final IconData? icon;
+  final bool isBackButton;
+  final VoidCallback? onBackTap;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        // ─── Hamburger ────────────────────────────────────────────────────
+        // ─── Hamburger / Back ─────────────────────────────────────────────
         _HeaderIconButton(
-          icon: Icons.menu_rounded,
-          onTap: onMenuTap,
-          semanticLabel: 'Buka menu',
+          icon: isBackButton ? Icons.arrow_back_ios_new_rounded : Icons.menu_rounded,
+          onTap: isBackButton ? (onBackTap ?? () {}) : (onMenuTap ?? () {}),
+          semanticLabel: isBackButton ? 'Kembali' : 'Buka menu',
         ),
 
         // ─── Logo teks tengah ─────────────────────────────────────────────
