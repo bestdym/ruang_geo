@@ -23,6 +23,7 @@ import '../core/services/supabase_service.dart';
 import '../features/about/presentation/pages/about_page.dart';
 import '../features/profil/screens/profil_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
+import '../features/materi/presentation/pages/materi_page.dart';
 // ─── Placeholder pages untuk shell bottom nav ─────────────────────────────────
 
 class _PencapaianPage extends StatelessWidget {
@@ -71,7 +72,10 @@ class _PencapaianPage extends StatelessWidget {
 ///   - /kuis/:kategori/hasil
 final _authNotifier = AuthNotifier();
 
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+
 final GoRouter appRouter = GoRouter(
+  navigatorKey: _rootNavigatorKey,
   initialLocation: AppConstants.routeHome,
   debugLogDiagnostics: false,
   refreshListenable: _authNotifier,
@@ -126,30 +130,75 @@ final GoRouter appRouter = GoRouter(
           ),
         ]),
 
-        // 1: Petunjuk
+        // 1: Materi
         StatefulShellBranch(routes: [
           GoRoute(
-            path: '/petunjuk',
-            name: 'petunjuk',
-            builder: (context, state) => const PetunjukScreen(),
+            path: '/materi',
+            name: 'materi',
+            builder: (context, state) => const MateriPage(),
           ),
         ]),
 
-        // 2: Pencapaian
+        // 2: AR
         StatefulShellBranch(routes: [
           GoRoute(
-            path: '/pencapaian',
-            name: 'pencapaian',
-            builder: (context, state) => ProfilGuard(child: const PencapaianScreen()),
+            path: AppConstants.routeAR,
+            name: 'ar',
+            builder: (context, state) => const ArPage(),
+            routes: [
+              GoRoute(
+                parentNavigatorKey: _rootNavigatorKey,
+                path: ':shapeId',
+                name: 'ar-view',
+                pageBuilder: (context, state) => _fadePageBuilder(
+                  state,
+                  ArViewPage(shapeId: state.pathParameters['shapeId']!),
+                ),
+              ),
+            ],
           ),
         ]),
 
-        // 3: Pengaturan
+        // 3: Kuis
         StatefulShellBranch(routes: [
           GoRoute(
-            path: AppConstants.routeSettings,
-            name: 'pengaturan',
-            builder: (context, state) => const SettingsScreen(),
+            path: AppConstants.routeKuis,
+            name: 'kuis',
+            builder: (context, state) => const ProfilGuard(child: KuisPage()),
+            routes: [
+              GoRoute(
+                parentNavigatorKey: _rootNavigatorKey,
+                path: ':kategori',
+                name: 'kuis-play',
+                builder: (context, state) =>
+                    KuisPlayPage(kategori: state.pathParameters['kategori']!),
+                routes: [
+                  GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
+                    path: 'hasil',
+                    name: 'kuis-hasil',
+                    builder: (context, state) {
+                      final extra = state.extra as Map<String, dynamic>? ?? {};
+                      return KuisHasilPage(
+                        kategori: state.pathParameters['kategori']!,
+                        score: extra['score'] as int? ?? 0,
+                        total: extra['total'] as int? ?? 0,
+                        poin: extra['poin'] as int? ?? 0,
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ]),
+
+        // 4: Profil
+        StatefulShellBranch(routes: [
+          GoRoute(
+            path: '/profil',
+            name: 'profil',
+            builder: (context, state) => const ProfilGuard(child: ProfilScreen()),
           ),
         ]),
       ],
@@ -157,20 +206,38 @@ final GoRouter appRouter = GoRouter(
 
     // ─── Feature Pages (Full-screen, di luar shell) ──────────────────────────
     GoRoute(
-      path: '/profil',
-      name: 'profil',
-      pageBuilder: (context, state) => _slidePageBuilder(
-        state,
-        const ProfilGuard(child: ProfilScreen()),
-      ),
-    ),
-
-    GoRoute(
       path: AppConstants.routeAbout,
       name: 'about',
       pageBuilder: (context, state) => _slidePageBuilder(
         state,
         const AboutPage(),
+      ),
+    ),
+
+    GoRoute(
+      path: AppConstants.routeSettings,
+      name: 'pengaturan',
+      pageBuilder: (context, state) => _slidePageBuilder(
+        state,
+        const SettingsScreen(),
+      ),
+    ),
+
+    GoRoute(
+      path: '/petunjuk',
+      name: 'petunjuk',
+      pageBuilder: (context, state) => _slidePageBuilder(
+        state,
+        const PetunjukScreen(),
+      ),
+    ),
+
+    GoRoute(
+      path: '/pencapaian',
+      name: 'pencapaian',
+      pageBuilder: (context, state) => _slidePageBuilder(
+        state,
+        const ProfilGuard(child: PencapaianScreen()),
       ),
     ),
 
@@ -221,57 +288,6 @@ final GoRouter appRouter = GoRouter(
             BangunDatarDetailPage(
                 bangunId: state.pathParameters['id']!),
           ),
-        ),
-      ],
-    ),
-
-    GoRoute(
-      path: AppConstants.routeAR,
-      name: 'ar',
-      pageBuilder: (context, state) => _fadePageBuilder(
-        state,
-        const ArPage(),
-      ),
-      routes: [
-        GoRoute(
-          path: ':shapeId',
-          name: 'ar-view',
-          pageBuilder: (context, state) => _fadePageBuilder(
-            state,
-            ArViewPage(shapeId: state.pathParameters['shapeId']!),
-          ),
-        ),
-      ],
-    ),
-
-    GoRoute(
-      path: AppConstants.routeKuis,
-      name: 'kuis',
-      pageBuilder: (context, state) => _slidePageBuilder(
-        state,
-        ProfilGuard(child: const KuisPage()),
-      ),
-      routes: [
-        GoRoute(
-          path: ':kategori',
-          name: 'kuis-play',
-          builder: (context, state) =>
-              KuisPlayPage(kategori: state.pathParameters['kategori']!),
-          routes: [
-            GoRoute(
-              path: 'hasil',
-              name: 'kuis-hasil',
-              builder: (context, state) {
-                final extra = state.extra as Map<String, dynamic>? ?? {};
-                return KuisHasilPage(
-                  kategori: state.pathParameters['kategori']!,
-                  score: extra['score'] as int? ?? 0,
-                  total: extra['total'] as int? ?? 0,
-                  poin: extra['poin'] as int? ?? 0,
-                );
-              },
-            ),
-          ],
         ),
       ],
     ),
@@ -390,27 +406,33 @@ class _BottomNav extends StatelessWidget {
         children: [
           _NavItem(
             icon: Icons.home_rounded,
-            label: 'Beranda',
+            label: 'Home',
             isSelected: currentIndex == 0,
             onTap: () => onTap(0),
           ),
           _NavItem(
             icon: Icons.menu_book_rounded,
-            label: 'Petunjuk',
+            label: 'Materi',
             isSelected: currentIndex == 1,
             onTap: () => onTap(1),
           ),
           _NavItem(
-            icon: Icons.emoji_events_rounded,
-            label: 'Pencapaian',
+            icon: Icons.view_in_ar_rounded,
+            label: 'AR Kamera',
             isSelected: currentIndex == 2,
             onTap: () => onTap(2),
           ),
           _NavItem(
-            icon: Icons.settings_rounded,
-            label: 'Pengaturan',
+            icon: Icons.quiz_rounded,
+            label: 'Kuis',
             isSelected: currentIndex == 3,
             onTap: () => onTap(3),
+          ),
+          _NavItem(
+            icon: Icons.person_rounded,
+            label: 'Profil',
+            isSelected: currentIndex == 4,
+            onTap: () => onTap(4),
           ),
         ],
       ),
