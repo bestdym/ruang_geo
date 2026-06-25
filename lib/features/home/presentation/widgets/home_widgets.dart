@@ -29,11 +29,9 @@ class HomeHeader extends StatelessWidget {
   const HomeHeader({
     super.key,
     required this.onMenuTap,
-    required this.onProfileTap,
   });
 
   final VoidCallback onMenuTap;
-  final VoidCallback onProfileTap;
 
   @override
   Widget build(BuildContext context) {
@@ -76,12 +74,8 @@ class HomeHeader extends StatelessWidget {
           ],
         ),
 
-        // ─── Profil ────────────────────────────────────────────────────────
-        _HeaderIconButton(
-          icon: Icons.person_rounded,
-          onTap: onProfileTap,
-          semanticLabel: 'Buka profil',
-        ),
+        // ─── Placeholder agar logo tetap di tengah ─────────────────────────
+        const SizedBox(width: 42),
       ],
     );
   }

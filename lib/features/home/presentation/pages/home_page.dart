@@ -113,7 +113,6 @@ class _HomePageState extends State<HomePage>
                           // Header
                           HomeHeader(
                             onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
-                            onProfileTap: () => context.push('/profil'),
                           ),
 
                           const SizedBox(height: 20),

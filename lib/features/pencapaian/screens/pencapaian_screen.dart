@@ -75,7 +75,6 @@ class _PencapaianScreenState extends State<PencapaianScreen> {
                   children: [
                     HomeHeader(
                       onMenuTap: () => _scaffoldKey.currentState?.openDrawer(),
-                      onProfileTap: () => context.push('/profil'),
                     ),
                     const SizedBox(height: 20),
                     Container(

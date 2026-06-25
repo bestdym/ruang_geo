@@ -23,7 +23,6 @@ class SettingsScreen extends StatelessWidget {
                     children: [
                       HomeHeader(
                         onMenuTap: () => Scaffold.of(context).openDrawer(),
-                        onProfileTap: () => context.push('/profil'),
                       ),
                       const SizedBox(height: 20),
                       // Header Card
