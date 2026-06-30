@@ -137,14 +137,14 @@ class _ModelViewerScreenState extends State<ModelViewerScreen> {
                   ),
                 ),
                 const SizedBox(width: 12),
-                // Tombol AR Mode
+                // Tombol VR Mode
                 Expanded(
                   child: _ControlButton(
                     icon: Icons.view_in_ar_rounded,
-                    label: '📷 AR Mode',
+                    label: 'VR Mode',
                     isActive: false,
                     onTap: () {
-                      context.push('${AppConstants.routeAR}/${_bangun.id}');
+                      context.push('/bangun-ruang/${_bangun.id}/vr');
                     },
                     activeColor: AppColors.accent,
                   ),
