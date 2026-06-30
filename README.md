@@ -73,4 +73,4 @@ lib/
 ```
 
 ---
-*Dibuat untuk memajukan cara belajar matematika dan geometri menggunakan teknologi terkini.* 🇮🇩
+*Dibuat untuk memajukan cara belajar matematika dan geometri menggunakan teknologi terkini 🇮🇩.
