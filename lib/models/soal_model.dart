@@ -4,7 +4,7 @@ import 'package:equatable/equatable.dart';
 enum TipeSoal {
   pilihanGanda('Pilihan Ganda'),
   benarSalah('Benar atau Salah'),
-  isiLengkap('Isi Lengkap');
+  pernyataanBS('Pernyataan Benar/Salah');
 
   const TipeSoal(this.label);
   final String label;
@@ -18,9 +18,11 @@ class SoalModel extends Equatable {
     required this.tipe,
     required this.pilihan,
     required this.jawabanBenar,
+    this.jawabanBenarMulti,
     required this.kategori,
     required this.poin,
     this.penjelasan,
+    this.penjelasanGambarUrl,
     this.bangunId,
     this.imagePath,
     this.gambarUrl,
@@ -37,8 +39,14 @@ class SoalModel extends Equatable {
   /// Index jawaban benar dalam [pilihan]
   final int jawabanBenar;
 
+  /// Index-index jawaban benar (multi & pernyataanBS)
+  final List<int>? jawabanBenarMulti;
+
   /// Penjelasan setelah jawaban diungkap (opsional)
   final String? penjelasan;
+
+  /// URL gambar penjelasan dari Supabase Storage (opsional)
+  final String? penjelasanGambarUrl;
 
   /// Kategori soal (ruang / datar / campuran)
   final String kategori;
@@ -57,11 +65,16 @@ class SoalModel extends Equatable {
   final String? rumusHint;
 
   String get jawabanBenarTeks =>
-      pilihan.isNotEmpty && jawabanBenar < pilihan.length
+      pilihan.isNotEmpty && jawabanBenar >= 0 && jawabanBenar < pilihan.length
           ? pilihan[jawabanBenar]
           : '';
 
-  bool isJawaban(int index) => index == jawabanBenar;
+  bool isJawaban(int index) {
+    if (jawabanBenarMulti != null) {
+      return jawabanBenarMulti!.contains(index);
+    }
+    return index == jawabanBenar;
+  }
 
   SoalModel copyWith({
     String? id,
@@ -69,7 +82,9 @@ class SoalModel extends Equatable {
     TipeSoal? tipe,
     List<String>? pilihan,
     int? jawabanBenar,
+    List<int>? jawabanBenarMulti,
     String? penjelasan,
+    String? penjelasanGambarUrl,
     String? kategori,
     String? bangunId,
     int? poin,
@@ -83,7 +98,9 @@ class SoalModel extends Equatable {
       tipe: tipe ?? this.tipe,
       pilihan: pilihan ?? this.pilihan,
       jawabanBenar: jawabanBenar ?? this.jawabanBenar,
+      jawabanBenarMulti: jawabanBenarMulti ?? this.jawabanBenarMulti,
       penjelasan: penjelasan ?? this.penjelasan,
+      penjelasanGambarUrl: penjelasanGambarUrl ?? this.penjelasanGambarUrl,
       kategori: kategori ?? this.kategori,
       bangunId: bangunId ?? this.bangunId,
       poin: poin ?? this.poin,
@@ -99,7 +116,9 @@ class SoalModel extends Equatable {
         'tipe': tipe.name,
         'pilihan': pilihan,
         'jawaban_benar': jawabanBenar,
+        'jawaban_benar_multi': jawabanBenarMulti,
         'penjelasan': penjelasan,
+        'penjelasan_gambar_url': penjelasanGambarUrl,
         'kategori': kategori,
         'bangun_id': bangunId,
         'poin': poin,
@@ -117,8 +136,12 @@ class SoalModel extends Equatable {
           orElse: () => TipeSoal.pilihanGanda,
         ),
         pilihan: List<String>.from(json['pilihan'] as List),
-        jawabanBenar: json['jawaban_benar'] as int,
+        jawabanBenar: json['jawaban_benar'] as int? ?? -1,
+        jawabanBenarMulti: json['jawaban_benar_multi'] != null
+            ? List<int>.from(json['jawaban_benar_multi'] as List)
+            : null,
         penjelasan: json['penjelasan'] as String?,
+        penjelasanGambarUrl: json['penjelasan_gambar_url'] as String?,
         kategori: json['kategori'] as String? ?? 'campuran',
         bangunId: json['bangun_id'] as String?,
         poin: json['poin'] as int? ?? 10,

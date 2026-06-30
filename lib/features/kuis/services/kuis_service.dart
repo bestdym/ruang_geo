@@ -14,12 +14,21 @@ class KuisService {
           .eq('is_active', true)
           .limit(10);
     } else {
+      String dbKategori = kategori;
+      if (kategori == 'ruang') {
+        dbKategori = 'bangun_ruang';
+      } else if (kategori == 'datar') {
+        dbKategori = 'bangun_datar';
+      } else if (kategori == 'tka') {
+        dbKategori = 'TKA';
+      }
+
       // Filter berdasarkan kategori spesifik
       data = await supabase
           .from('soal')
           .select()
           .eq('is_active', true)
-          .eq('kategori', kategori)
+          .eq('kategori', dbKategori)
           .limit(10);
     }
 
