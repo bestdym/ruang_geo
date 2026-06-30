@@ -167,7 +167,7 @@ class KuisHasilPage extends StatelessWidget {
               ElevatedButton(
                 onPressed: () {
                   // Ulangi
-                  context.pushReplacement('/kuis/$kategori');
+                  context.go('/kuis/$kategori');
                 },
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 56),

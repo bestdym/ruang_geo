@@ -319,8 +319,8 @@ class _PencapaianScreenState extends State<PencapaianScreen> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    '${p.soalBenar}/${p.totalSoal}',
-                    style: AppTypography.labelMedium.copyWith(
+                    '${p.skor.toStringAsFixed(0)}%',
+                    style: AppTypography.labelLarge.copyWith(
                       color: _getSkorColor(p.skor),
                       fontWeight: FontWeight.bold,
                     ),

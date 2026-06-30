@@ -4,9 +4,10 @@ import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:ruang_geo/core/core.dart';
 import 'package:ruang_geo/models/models.dart';
-import 'package:ruang_geo/models/models.dart';
 import 'package:ruang_geo/features/kuis/services/kuis_service.dart';
 import 'package:ruang_geo/features/kuis/presentation/widgets/widgets.dart';
+import '../../utils/kuis_scoring.dart';
+import '../widgets/kuis_header.dart';
 import 'package:ruang_geo/core/services/supabase_service.dart';
 
 /// Halaman bermain kuis - data dari Supabase
@@ -40,8 +41,8 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
 
   // State Jawaban
   int? _selectedSingleIndex;
-  Set<int> _selectedMultiIndices = {};
-  Map<int, bool> _pernyataanJawaban = {};
+  final Set<int> _selectedMultiIndices = {};
+  final Map<int, bool> _pernyataanJawaban = {};
   bool _isAnswerRevealed = false;
 
   @override
@@ -142,55 +143,34 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
     if (_isAnswerRevealed) return;
 
     final soal = _soalList[_currentIndex];
-    int poinSoal = 0;
-    bool isBenarSoal = false;
     
-    int jawabanDipilih = 0;
-
-    if (soal.tipe == TipeSoal.pilihanGanda && soal.jawabanBenarMulti == null) {
-      isBenarSoal = _selectedSingleIndex == soal.jawabanBenar;
-      poinSoal = isBenarSoal ? soal.poin : 0;
-      jawabanDipilih = _selectedSingleIndex ?? -1;
-    } else if (soal.tipe == TipeSoal.pilihanGanda && soal.jawabanBenarMulti != null) {
-      int correctSelected = _selectedMultiIndices.where((idx) => soal.jawabanBenarMulti!.contains(idx)).length;
-      int wrongSelected = _selectedMultiIndices.where((idx) => !soal.jawabanBenarMulti!.contains(idx)).length;
-      int netCorrect = correctSelected - wrongSelected;
-      if (netCorrect < 0) netCorrect = 0;
-      poinSoal = (netCorrect / soal.jawabanBenarMulti!.length * soal.poin).floor();
-      isBenarSoal = netCorrect == soal.jawabanBenarMulti!.length;
-    } else if (soal.tipe == TipeSoal.benarSalah) {
-      isBenarSoal = _selectedSingleIndex == soal.jawabanBenar;
-      poinSoal = isBenarSoal ? soal.poin : 0;
-      jawabanDipilih = _selectedSingleIndex ?? -1;
-    } else if (soal.tipe == TipeSoal.pernyataanBS) {
-      int correctSelected = 0;
-      for (int i = 0; i < soal.pilihan.length; i++) {
-        bool isBenar = soal.jawabanBenarMulti?.contains(i) ?? false;
-        if (_pernyataanJawaban[i] == isBenar) {
-          correctSelected++;
-        }
-      }
-      poinSoal = (correctSelected / soal.pilihan.length * soal.poin).floor();
-      isBenarSoal = correctSelected == soal.pilihan.length;
-    }
+    final result = KuisScoring.hitung(
+      soal: soal,
+      selectedSingleIndex: _selectedSingleIndex,
+      selectedMultiIndices: _selectedMultiIndices,
+      pernyataanJawaban: _pernyataanJawaban,
+    );
 
     setState(() {
       _isAnswerRevealed = true;
       _timer?.cancel();
-      if (isBenarSoal) {
+      if (result.isBenarSoal) {
         _score++;
       }
-      _poinDidapat += poinSoal;
+      _poinDidapat += result.poinSoal;
     });
 
     if (_sesiId != null) {
-      _kuisService.simpanJawaban(
-        sesiId: _sesiId!,
-        soalId: soal.id,
-        jawabanDipilih: jawabanDipilih,
-        isBenar: isBenarSoal,
-        poin: poinSoal,
-      );
+      final currentSesiId = _sesiId;
+      if (currentSesiId != null) {
+        _kuisService.simpanJawaban(
+          sesiId: currentSesiId,
+          soalId: soal.id,
+          jawabanDipilih: result.jawabanDipilih,
+          isBenar: result.isBenarSoal,
+          poin: result.poinSoal,
+        );
+      }
     }
   }
 
@@ -210,20 +190,24 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
 
       final userId = supabase.auth.currentUser?.id;
       if (_sesiId != null && userId != null) {
-        await _kuisService.selesaikanSesi(
-          sesiId: _sesiId!,
-          userId: userId,
-          kategori: widget.kategori,
-          soalBenar: _score,
-          totalSoal: _soalList.length,
-          totalPoin: _poinDidapat,
-          durasiDetik: _totalDurasi,
-        );
+        final currentSesiId = _sesiId;
+        if (currentSesiId != null) {
+          await _kuisService.selesaikanSesi(
+            sesiId: currentSesiId,
+            userId: userId,
+            kategori: widget.kategori,
+            soalBenar: _score,
+            totalSoal: _soalList.length,
+            totalPoin: _poinDidapat,
+            durasiDetik: _totalDurasi,
+          );
+        }
       }
 
       if (mounted) {
-        context.pushReplacement(
-          '/kuis/${widget.kategori}/hasil',
+        context.pushReplacementNamed(
+          'kuis-hasil',
+          pathParameters: {'kategori': widget.kategori},
           extra: {
             'score': _score,
             'total': _soalList.length,
@@ -240,17 +224,7 @@ class _KuisPlayPageState extends State<KuisPlayPage> {
     _durasiTimer?.cancel();
     super.dispose();
   }
-  
-  Widget _buildGambar(String? url) {
-    if (url == null || url.isEmpty) return const SizedBox.shrink();
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.network(url, fit: BoxFit.cover),
-      ),
-    );
-  }
+
 
   @override
   Widget build(BuildContext context) {

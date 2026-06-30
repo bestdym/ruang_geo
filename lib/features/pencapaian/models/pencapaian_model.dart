@@ -5,8 +5,7 @@ class PencapaianModel extends Equatable {
   const PencapaianModel({
     required this.id,
     required this.kategori,
-    required this.soalBenar,
-    required this.totalSoal,
+    required this.skor,
     required this.totalPoin,
     required this.bintang,
     required this.createdAt,
@@ -14,14 +13,10 @@ class PencapaianModel extends Equatable {
 
   final String id;
   final String kategori;
-  final int soalBenar;
-  final int totalSoal;
+  final double skor;
   final int totalPoin;
   final int bintang;
   final DateTime createdAt;
-
-  /// Skor dalam persen (0.0 - 100.0)
-  double get skor => totalSoal == 0 ? 0 : (soalBenar / totalSoal) * 100;
 
   /// Label kategori yang rapi untuk ditampilkan
   String get kategoriLabel {
@@ -37,18 +32,23 @@ class PencapaianModel extends Equatable {
     }
   }
 
-  factory PencapaianModel.fromJson(Map<String, dynamic> json) => PencapaianModel(
-        id: json['id'] as String,
-        kategori: json['kategori'] as String? ?? 'campuran',
-        soalBenar: json['soal_benar'] as int? ?? 0,
-        totalSoal: json['total_soal'] as int? ?? 10,
-        totalPoin: json['total_poin'] as int? ?? 0,
-        bintang: json['bintang'] as int? ?? 0,
-        createdAt: DateTime.parse(json['created_at'] as String),
-      );
+  factory PencapaianModel.fromJson(Map<String, dynamic> json) {
+    // Handle parsing skor whether it's int or double from Supabase
+    final dynamic skorJson = json['skor'];
+    final double parsedSkor = skorJson is num ? skorJson.toDouble() : 0.0;
+    
+    return PencapaianModel(
+      id: json['id'] as String,
+      kategori: json['kategori'] as String? ?? 'campuran',
+      skor: parsedSkor,
+      totalPoin: json['total_poin'] as int? ?? 0,
+      bintang: json['bintang'] as int? ?? 0,
+      createdAt: DateTime.parse(json['created_at'] as String),
+    );
+  }
 
   @override
-  List<Object?> get props => [id, kategori, soalBenar, totalPoin, createdAt];
+  List<Object?> get props => [id, kategori, skor, totalPoin, createdAt];
 }
 
 /// Model statistik agregat user

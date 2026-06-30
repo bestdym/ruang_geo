@@ -35,6 +35,13 @@ class KuisService {
     return data.map((json) => SoalModel.fromJson(json)).toList();
   }
 
+  String _mapKategori(String kategori) {
+    if (kategori == 'ruang') return 'bangun_ruang';
+    if (kategori == 'datar') return 'bangun_datar';
+    if (kategori == 'tka') return 'TKA';
+    return kategori;
+  }
+
   /// Membuat sesi kuis baru di Supabase dan mengembalikan ID sesi
   Future<String?> mulaiSesi(
       String userId, String kategori, int totalSoal) async {
@@ -43,7 +50,7 @@ class KuisService {
           .from('sesi_kuis')
           .insert({
             'user_id': userId,
-            'kategori': kategori,
+            'kategori': _mapKategori(kategori),
             'total_soal': totalSoal,
             'status': 'berlangsung',
             'started_at': DateTime.now().toIso8601String(),
@@ -52,6 +59,7 @@ class KuisService {
           .single();
       return data['id'] as String;
     } catch (e) {
+      print('Error mulaiSesi: $e');
       return null;
     }
   }
@@ -73,7 +81,7 @@ class KuisService {
         'poin_didapat': isBenar ? poin : 0,
       });
     } catch (e) {
-      // Gagal simpan jawaban tidak crash app
+      print('Error simpanJawaban: $e');
     }
   }
 
@@ -88,6 +96,7 @@ class KuisService {
     required int durasiDetik,
   }) async {
     final bintang = hitungBintang(soalBenar, totalSoal);
+    final dbKategori = _mapKategori(kategori);
 
     try {
       // 1. Update status sesi menjadi 'selesai'
@@ -95,23 +104,22 @@ class KuisService {
         'status': 'selesai',
         'soal_benar': soalBenar,
         'total_poin': totalPoin,
-        'bintang': bintang,
         'durasi_detik': durasiDetik,
         'finished_at': DateTime.now().toIso8601String(),
       }).eq('id', sesiId);
 
-      // 2. Simpan pencapaian
-      await supabase.from('pencapaian').upsert({
+      // 2. Simpan pencapaian (insert daripada upsert untuk histori per sesi)
+      final int skor = totalSoal == 0 ? 0 : ((soalBenar / totalSoal) * 100).round();
+      await supabase.from('pencapaian').insert({
         'user_id': userId,
-        'kategori': kategori,
-        'soal_benar': soalBenar,
-        'total_soal': totalSoal,
+        'kategori': dbKategori,
+        'skor': skor,
         'total_poin': totalPoin,
         'bintang': bintang,
         'sesi_id': sesiId,
       });
     } catch (e) {
-      // Gagal update tidak crash app
+      print('Error selesaikanSesi: $e');
     }
   }
 

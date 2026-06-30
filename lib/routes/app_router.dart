@@ -172,15 +172,16 @@ final GoRouter appRouter = GoRouter(
                 path: ':kategori',
                 name: 'kuis-play',
                 builder: (context, state) =>
-                    KuisPlayPage(kategori: state.pathParameters['kategori']!),
+                    KuisPlayPage(kategori: state.pathParameters['kategori'] ?? 'campuran'),
                 routes: [
                   GoRoute(
+                    parentNavigatorKey: _rootNavigatorKey,
                     path: 'hasil',
                     name: 'kuis-hasil',
                     builder: (context, state) {
                       final extra = state.extra as Map<String, dynamic>? ?? {};
                       return KuisHasilPage(
-                        kategori: state.pathParameters['kategori']!,
+                        kategori: state.pathParameters['kategori'] ?? 'campuran',
                         score: extra['score'] as int? ?? 0,
                         total: extra['total'] as int? ?? 0,
                         poin: extra['poin'] as int? ?? 0,

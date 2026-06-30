@@ -90,7 +90,7 @@ class KuisContentView extends StatelessWidget {
                     teks: soal.pilihan[index],
                     isRevealed: isAnswerRevealed,
                     isSelected: selectedMultiIndices.contains(index),
-                    isCorrect: soal.jawabanBenarMulti!.contains(index),
+                    isCorrect: (soal.jawabanBenarMulti ?? []).contains(index),
                     onTap: () => onMultiSelect(index),
                   ),
                 );
